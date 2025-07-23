@@ -1,0 +1,157 @@
+.main {
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+.heroSection {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  max-width: 1200px;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.heroImage {
+  width: 65%;
+  max-width: 700px;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+}
+
+.heroText {
+  flex: 1;
+  padding: 1rem;
+}
+
+.heroText h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: #0070f3;
+}
+
+.heroDescription {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.heroSubtext {
+  font-size: 1.1rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.section {
+  width: 100%;
+  background: #f0f6ff;
+  margin: 2rem 0;
+  padding: 2rem 0;
+  display: flex;
+  justify-content: center;
+}
+.sectionAlt {
+  width: 100%;
+  background: #fff7e6;
+  margin: 2rem 0;
+  padding: 2rem 0;
+  display: flex;
+  justify-content: center;
+}
+.sectionContent {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  max-width: 900px;
+  width: 100%;
+}
+.sectionImage {
+  width: 180px;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.section h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2rem;
+  color: #0070f3;
+}
+.sectionAlt h2 {
+  color: #ff9900;
+}
+.section p {
+  font-size: 1.1rem;
+  color: #333;
+}
+
+@media (max-width: 768px) {
+  .heroSection {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0 0.5rem;
+  }
+  .heroImage {
+    width: 100%;
+    max-width: 320px;
+  }
+  .heroText {
+    padding: 0.5rem;
+    text-align: center;
+  }
+  .heroText h1 {
+    font-size: 1.7rem;
+  }
+  .heroDescription {
+    font-size: 1rem;
+  }
+  .heroSubtext {
+    font-size: 0.95rem;
+  }
+}
+@media (max-width: 468px) {
+  .heroSection {
+    gap: 0.5rem;
+    padding: 0 0.2rem;
+  }
+  .heroImage {
+    max-width: 220px;
+  }
+  .heroText {
+    padding: 0.2rem;
+  }
+  .heroText h1 {
+    font-size: 1.2rem;
+  }
+  .heroDescription {
+    font-size: 0.85rem;
+  }
+  .heroSubtext {
+    font-size: 0.8rem;
+  }
+}
+@media (max-width: 320px) {
+  .heroSection {
+    gap: 0.2rem;
+    padding: 0 0.1rem;
+  }
+  .heroImage {
+    max-width: 120px;
+  }
+  .heroText {
+    padding: 0.1rem;
+  }
+  .heroText h1 {
+    font-size: 0.95rem;
+  }
+  .heroDescription {
+    font-size: 0.7rem;
+  }
+  .heroSubtext {
+    font-size: 0.65rem;
+  }
+}

@@ -1,0 +1,561 @@
+.authContainer {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.authCard {
+  background: #fff;
+  border-radius: 20px;
+  padding: 3rem;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 500px;
+}
+
+.authHeader {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.authHeader h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.authHeader p {
+  margin: 0;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.authForm {
+  margin-bottom: 2rem;
+}
+
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.input {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid #e1e5e9;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #f8f9fa;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #667eea;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.userTypeSelector {
+  display: flex;
+  justify-content: center;
+  gap: 1.2rem;
+  margin-top: 0.5rem;
+}
+
+.radioLabel {
+  cursor: pointer;
+  display: block;
+}
+
+.radioInput {
+  display: none;
+}
+
+.radioCard {
+  padding: 1rem;
+  border: 2px solid #e1e5e9;
+  border-radius: 12px;
+  text-align: center;
+  transition: all 0.3s ease;
+  background: #f8f9fa;
+  width: 170px;
+  min-width: 150px;
+  max-width: 100%;
+  height: 90px;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.08);
+}
+
+.radioCard h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.radioCard p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.radioInput:checked + .radioCard {
+  border-color: #667eea;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.radioInput:checked + .radioCard h3,
+.radioInput:checked + .radioCard p {
+  color: #fff;
+}
+
+.submitBtn {
+  width: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border: none;
+  padding: 1rem;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+.submitBtn:hover:enabled {
+  background: linear-gradient(135deg, #5a6fd8 0%, #5e3b8a 100%);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.18);
+  filter: brightness(0.97);
+}
+
+.message {
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+.success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.authFooter {
+  text-align: center;
+  padding-top: 1rem;
+  border-top: 1px solid #e1e5e9;
+}
+
+.authFooter p {
+  margin: 0;
+  color: #666;
+}
+
+.authFooter a {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.authFooter a:hover {
+  text-decoration: underline;
+}
+
+.authCardWithGraphic {
+  display: flex;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 900px;
+  min-height: 540px;
+  overflow: hidden;
+}
+
+.authCardLeft {
+  flex: 1.1;
+  padding: 3rem 2.5rem 3rem 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.authCardRight {
+  flex: 1;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 2rem;
+  color: #fff;
+  text-align: center;
+}
+
+.signupGraphic {
+  width: 380px;
+  height: 440px;
+  max-width: 100%;
+  max-height: 100%;
+  margin-bottom: 2.5rem;
+  border-radius: 20px;
+  box-shadow: 0 12px 40px rgba(102, 126, 234, 0.18);
+}
+
+.signupText h2 {
+  margin: 0 0 0.7rem 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.signupText p {
+  margin: 0;
+  font-size: 1.05rem;
+  color: #f3f3f3;
+  line-height: 1.6;
+}
+
+/* Laptop screens (1024px - 1366px) */
+@media (max-width: 1366px) {
+  .authContainer {
+    padding: 1.5rem;
+  }
+  
+  .authCardWithGraphic {
+    max-width: 800px;
+    min-height: 480px;
+  }
+  
+  .authCardLeft {
+    padding: 2.5rem 2rem 2.5rem 2.5rem;
+  }
+  
+  .authCardRight {
+    padding: 2rem 1.5rem;
+  }
+  
+  .signupGraphic {
+    width: 320px;
+    height: 380px;
+    margin-bottom: 2rem;
+  }
+  
+  .signupText h2 {
+    font-size: 1.3rem;
+  }
+  
+  .signupText p {
+    font-size: 0.95rem;
+  }
+  
+  .authCard {
+    padding: 2.5rem;
+    max-width: 450px;
+  }
+  
+  .authHeader h1 {
+    font-size: 2.2rem;
+  }
+  
+  .authHeader p {
+    font-size: 1rem;
+  }
+}
+
+/* Tablet screens */
+@media (max-width: 1024px) {
+  .authContainer {
+    padding: 1.5rem;
+  }
+  
+  .authCardWithGraphic {
+    max-width: 750px;
+    min-height: 460px;
+  }
+  
+  .authCardLeft {
+    padding: 2rem 1.5rem;
+  }
+  
+  .authCardRight {
+    padding: 1.5rem 1rem;
+  }
+  
+  .signupGraphic {
+    width: 280px;
+    height: 340px;
+    margin-bottom: 1.5rem;
+  }
+  
+  .signupText h2 {
+    font-size: 1.2rem;
+  }
+  
+  .signupText p {
+    font-size: 0.9rem;
+  }
+  
+  .authCard {
+    padding: 2rem;
+    max-width: 400px;
+  }
+  
+  .authHeader h1 {
+    font-size: 2rem;
+  }
+  
+  .authHeader p {
+    font-size: 0.95rem;
+  }
+}
+
+/* Mobile screens */
+@media (max-width: 768px) {
+  .authContainer {
+    padding: 1rem;
+  }
+  
+  .authCardWithGraphic {
+    flex-direction: column;
+    min-height: unset;
+    max-width: 100%;
+  }
+  
+  .authCardLeft, .authCardRight {
+    padding: 1.5rem 1rem;
+  }
+  
+  .authCardRight {
+    border-radius: 0 0 20px 20px;
+  }
+  
+  .authCard {
+    padding: 1.5rem;
+    max-width: 100%;
+  }
+  
+  .authHeader h1 {
+    font-size: 1.8rem;
+  }
+  
+  .authHeader p {
+    font-size: 0.9rem;
+  }
+  
+  .input {
+    padding: 0.8rem;
+    font-size: 0.9rem;
+  }
+  
+  .submitBtn {
+    padding: 0.8rem;
+    font-size: 1rem;
+  }
+  
+  .userTypeSelector {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+  
+  .radioCard {
+    padding: 1rem;
+  }
+  
+  .radioCard h3 {
+    font-size: 1rem;
+  }
+  
+  .radioCard p {
+    font-size: 0.8rem;
+  }
+  
+  .signupGraphic {
+    width: 280px;
+    height: 320px;
+    margin-bottom: 1.5rem;
+  }
+  
+  .signupText h2 {
+    font-size: 1.3rem;
+  }
+  
+  .signupText p {
+    font-size: 0.9rem;
+  }
+}
+
+/* Small mobile screens (320px - 468px) */
+@media (max-width: 468px) {
+  .authContainer {
+    padding: 0.5rem;
+  }
+  
+  .authCardWithGraphic {
+    border-radius: 10px;
+  }
+  
+  .authCardLeft, .authCardRight {
+    padding: 1rem 0.8rem;
+  }
+  
+  .authCard {
+    padding: 1rem;
+    border-radius: 10px;
+  }
+  
+  .authHeader h1 {
+    font-size: 1.5rem;
+  }
+  
+  .authHeader p {
+    font-size: 0.8rem;
+  }
+  
+  .formGroup {
+    margin-bottom: 1rem;
+  }
+  
+  .formGroup label {
+    font-size: 0.85rem;
+  }
+  
+  .input {
+    padding: 0.7rem;
+    font-size: 0.85rem;
+    border-radius: 8px;
+  }
+  
+  .submitBtn {
+    padding: 0.7rem;
+    font-size: 0.9rem;
+    border-radius: 8px;
+  }
+  
+  .radioCard {
+    padding: 0.8rem;
+    border-radius: 8px;
+  }
+  
+  .radioCard h3 {
+    font-size: 0.9rem;
+  }
+  
+  .radioCard p {
+    font-size: 0.75rem;
+  }
+  
+  .message {
+    padding: 0.8rem;
+    font-size: 0.85rem;
+  }
+  
+  .signupGraphic {
+    width: 220px;
+    height: 260px;
+    margin-bottom: 1rem;
+  }
+  
+  .signupText h2 {
+    font-size: 1.1rem;
+  }
+  
+  .signupText p {
+    font-size: 0.8rem;
+  }
+}
+
+/* Extra small mobile screens (320px and below) */
+@media (max-width: 320px) {
+  .authContainer {
+    padding: 0.3rem;
+  }
+  
+  .authCardWithGraphic {
+    border-radius: 8px;
+  }
+  
+  .authCardLeft, .authCardRight {
+    padding: 0.8rem 0.5rem;
+  }
+  
+  .authCard {
+    padding: 0.8rem;
+    border-radius: 8px;
+  }
+  
+  .authHeader h1 {
+    font-size: 1.3rem;
+  }
+  
+  .authHeader p {
+    font-size: 0.75rem;
+  }
+  
+  .input {
+    padding: 0.6rem;
+    font-size: 0.8rem;
+  }
+  
+  .submitBtn {
+    padding: 0.6rem;
+    font-size: 0.85rem;
+  }
+  
+  .radioCard {
+    padding: 0.6rem;
+  }
+  
+  .radioCard h3 {
+    font-size: 0.8rem;
+  }
+  
+  .radioCard p {
+    font-size: 0.7rem;
+  }
+  
+  .signupGraphic {
+    width: 180px;
+    height: 220px;
+  }
+  
+  .signupText h2 {
+    font-size: 1rem;
+  }
+  
+  .signupText p {
+    font-size: 0.75rem;
+  }
+} 
