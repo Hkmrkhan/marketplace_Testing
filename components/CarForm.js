@@ -5,18 +5,26 @@ export default function CarForm({ onSubmit }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
-  const [image, setImage] = useState('');
+  const [images, setImages] = useState(['', '', '', '', '']); // Array for 5 images
 
   const resetForm = () => {
     setTitle('');
     setDescription('');
     setPrice('');
-    setImage('');
+    setImages(['', '', '', '', '']);
+  };
+
+  const handleImageChange = (index, value) => {
+    const newImages = [...images];
+    newImages[index] = value;
+    setImages(newImages);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit({ title, description, price, image }, resetForm);
+    // Filter out empty image URLs
+    const validImages = images.filter(img => img.trim() !== '');
+    onSubmit({ title, description, price, images: validImages }, resetForm);
   };
 
   return (
@@ -65,18 +73,27 @@ export default function CarForm({ onSubmit }) {
               required
             />
           </div>
+          </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>Image URL</label>
+          <label className={styles.label}>Car Images (Up to 5)</label>
+          <p className={styles.helperText}>Add image URLs for your car. At least one image is required.</p>
+          
+          {images.map((image, index) => (
+            <div key={index} className={styles.imageInputGroup}>
+              <label className={styles.imageLabel}>
+                Image {index + 1} {index === 0 && <span className={styles.required}>*</span>}
+              </label>
             <input
               type="url"
-              placeholder="https://example.com/car-image.jpg"
+                placeholder={`https://example.com/car-image-${index + 1}.jpg`}
               value={image}
-              onChange={(e) => setImage(e.target.value)}
+                onChange={(e) => handleImageChange(index, e.target.value)}
               className={styles.input}
-              required
+                required={index === 0} // Only first image is required
             />
           </div>
+          ))}
         </div>
 
         <div className={styles.formActions}>

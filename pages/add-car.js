@@ -55,11 +55,11 @@ export default function AddCarPage() {
         title: car.title,
         description: car.description,
         price: parseFloat(car.price),
-        image_url: car.image,
+        images: car.images, // Now handling multiple images
         status: 'available'
       });
 
-      // Add car to Supabase with seller_id
+      // Add car to Supabase with seller_id and multiple images
       const { data, error } = await supabase
         .from('cars')
         .insert([
@@ -69,7 +69,8 @@ export default function AddCarPage() {
             title: car.title,
             description: car.description,
             price: parseFloat(car.price),
-            image_url: car.image,
+            image_url: car.images[0], // Primary image (first one)
+            additional_images: car.images.slice(1), // Additional images as array
             status: 'available'
           }
         ])

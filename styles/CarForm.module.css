@@ -59,6 +59,30 @@
   letter-spacing: 0.5px;
 }
 
+.helperText {
+  margin: 0 0 1rem 0;
+  color: #666;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+.imageInputGroup {
+  margin-bottom: 1rem;
+}
+
+.imageLabel {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.9rem;
+}
+
+.required {
+  color: #e74c3c;
+  font-weight: bold;
+}
+
 .input,
 .textarea {
   width: 100%;
@@ -184,6 +208,14 @@
     margin-bottom: 0.6rem;
   }
   
+  .helperText {
+    font-size: 0.8rem;
+  }
+  
+  .imageLabel {
+    font-size: 0.8rem;
+  }
+  
   .input,
   .textarea {
     padding: 1rem;
@@ -243,6 +275,14 @@
     margin-bottom: 0.5rem;
   }
   
+  .helperText {
+    font-size: 0.75rem;
+  }
+  
+  .imageLabel {
+    font-size: 0.75rem;
+  }
+  
   .input,
   .textarea {
     padding: 0.8rem;
@@ -300,6 +340,14 @@
   .label {
     font-size: 0.75rem;
     margin-bottom: 0.4rem;
+  }
+  
+  .helperText {
+    font-size: 0.7rem;
+  }
+  
+  .imageLabel {
+    font-size: 0.7rem;
   }
   
   .input,

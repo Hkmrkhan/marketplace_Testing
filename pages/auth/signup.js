@@ -7,6 +7,7 @@ export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const [whatsappNumber, setWhatsappNumber] = useState('');
   const [userType, setUserType] = useState('buyer');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -58,6 +59,70 @@ export default function SignupPage() {
         setMessage('❌ ' + error.message);
         setLoading(false);
         return;
+      }
+
+      // Create profile with WhatsApp number
+      if (data.user) {
+        console.log('Creating profile with data:', {
+          id: data.user.id,
+          full_name: fullName,
+          email: email,
+          user_type: userType,
+          whatsapp_number: whatsappNumber
+        });
+        
+        // Clean WhatsApp number (remove spaces, dashes, etc.)
+        const cleanWhatsappNumber = whatsappNumber ? whatsappNumber.replace(/[\s\-\(\)]/g, '') : null;
+        
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .insert([{
+            id: data.user.id,
+            full_name: fullName,
+            email: email,
+            user_type: userType,
+            whatsapp_number: cleanWhatsappNumber
+          }])
+          .select();
+
+        if (profileError) {
+          console.error('Profile creation error:', profileError);
+          
+          // Try alternative approach - create profile without RLS check
+          try {
+            const { data: altProfileData, error: altError } = await supabase
+              .from('profiles')
+              .upsert([{
+                id: data.user.id,
+                full_name: fullName,
+                email: email,
+                user_type: userType,
+                whatsapp_number: cleanWhatsappNumber
+              }], { 
+                onConflict: 'id',
+                ignoreDuplicates: false 
+              })
+              .select();
+              
+            if (altError) {
+              console.error('Alternative profile creation also failed:', altError);
+              setMessage('❌ Profile creation failed: ' + profileError.message);
+              setLoading(false);
+              return;
+            } else {
+              console.log('Profile created successfully via upsert:', altProfileData);
+              console.log('WhatsApp number saved:', cleanWhatsappNumber);
+            }
+          } catch (upsertError) {
+            console.error('Upsert also failed:', upsertError);
+            setMessage('❌ Profile creation failed: ' + profileError.message);
+            setLoading(false);
+            return;
+          }
+        } else {
+          console.log('Profile created successfully:', profileData);
+          console.log('WhatsApp number saved:', cleanWhatsappNumber);
+        }
       }
       
     setMessage('✅ Account created! Redirecting to your dashboard...');
@@ -115,6 +180,22 @@ export default function SignupPage() {
                 className={styles.input}
                 disabled={loading}
               />
+            </div>
+            <div className={styles.formGroup}>
+              <label>WhatsApp Number (Optional)</label>
+              <input
+                type="tel"
+                placeholder="e.g., 0341XXXXXXX or +92341XXXXXXX"
+                value={whatsappNumber}
+                onChange={e => setWhatsappNumber(e.target.value)}
+                className={styles.input}
+                disabled={loading}
+                pattern="[0-9+\-\s\(\)]+"
+                title="Enter your WhatsApp number with or without country code"
+              />
+              <small style={{ color: '#666', fontSize: '12px', marginTop: '4px' }}>
+                Format: 0341XXXXXXX or +92341XXXXXXX
+              </small>
             </div>
             <div className={styles.formGroup}>
               <label>I want to:</label>
