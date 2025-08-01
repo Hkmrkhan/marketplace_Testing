@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import AIChat from '../components/AIChat';
 import { supabase } from '../utils/supabaseClient';
 import styles from '../styles/Dashboard.module.css';
 import dynamic from 'next/dynamic';
@@ -765,6 +766,12 @@ export default function BuyerDashboard() {
               Profile
             </button>
             <button 
+              className={`${styles.navItem} ${activeTab === 'aihelp' ? styles.active : ''}`}
+              onClick={() => setActiveTab('aihelp')}
+            >
+              🤖 AI Assistant
+            </button>
+            <button 
               className={`${styles.navItem} ${styles.logoutBtn}`}
               onClick={handleLogout}
             >
@@ -1036,6 +1043,21 @@ export default function BuyerDashboard() {
                   )}
                 </form>
               )}
+            </div>
+          )}
+          {activeTab === 'aihelp' && (
+            <div className={styles.aiAssistant}>
+              <div className={styles.sectionHeader}>
+                <h1>🤖 AI Car Assistant</h1>
+                <p>Car buying ke liye expert advice len! Koi bhi sawal puchhiye.</p>
+              </div>
+              <div className={styles.chatSection}>
+                <AIChat 
+                  context="buyer-dashboard"
+                  isFloating={false}
+                  userId={user?.id}
+                />
+              </div>
             </div>
           )}
         </div>

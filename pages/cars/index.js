@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import CarCard from '../../components/CarCard';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
+import VoiceSearch from '../../components/VoiceSearch';
 import { supabase } from '../../utils/supabaseClient';
 import styles from '../../styles/Cars.module.css';
 
@@ -41,9 +42,97 @@ export default function CarsPage() {
     fetchCars();
   }, []);
 
+  // Enhanced search function for better voice search support
+  const normalizeText = (text) => {
+    return text
+      .toLowerCase()
+      .replace(/[^\w\s]/g, '') // Remove special characters
+      .replace(/\s+/g, ' ') // Normalize spaces
+      .trim();
+  };
+
+  const fuzzyMatch = (searchTerm, text) => {
+    const normalizedSearch = normalizeText(searchTerm);
+    const normalizedText = normalizeText(text);
+    
+    // Direct match
+    if (normalizedText.includes(normalizedSearch)) {
+      return true;
+    }
+    
+    // Split search term and check individual words
+    const searchWords = normalizedSearch.split(' ').filter(word => word.length > 1);
+    const textWords = normalizedText.split(' ');
+    
+    // Check if most search words are present
+    let matchCount = 0;
+    searchWords.forEach(searchWord => {
+      textWords.forEach(textWord => {
+        // Exact word match
+        if (textWord.includes(searchWord) || searchWord.includes(textWord)) {
+          matchCount++;
+        }
+        // Similarity for voice recognition errors - more lenient for car names
+        else if (searchWord.length > 2 && textWord.length > 2) {
+          const similarity = calculateSimilarity(searchWord, textWord);
+          // Lower threshold for better voice search support
+          if (similarity > 0.5) {
+            matchCount++;
+          }
+        }
+        // Special case for short car names (3-4 letters)
+        else if (searchWord.length <= 4 && textWord.length <= 4 && searchWord.length > 2) {
+          const similarity = calculateSimilarity(searchWord, textWord);
+          if (similarity > 0.4) {
+            matchCount++;
+          }
+        }
+      });
+    });
+    
+    return searchWords.length > 0 && matchCount >= Math.ceil(searchWords.length * 0.5);
+  };
+
+  // Simple similarity calculation
+  const calculateSimilarity = (str1, str2) => {
+    const longer = str1.length > str2.length ? str1 : str2;
+    const shorter = str1.length > str2.length ? str2 : str1;
+    const editDistance = getEditDistance(longer, shorter);
+    return (longer.length - editDistance) / longer.length;
+  };
+
+  const getEditDistance = (str1, str2) => {
+    const matrix = [];
+    for (let i = 0; i <= str2.length; i++) {
+      matrix[i] = [i];
+    }
+    for (let j = 0; j <= str1.length; j++) {
+      matrix[0][j] = j;
+    }
+    for (let i = 1; i <= str2.length; i++) {
+      for (let j = 1; j <= str1.length; j++) {
+        if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
+          matrix[i][j] = matrix[i - 1][j - 1];
+        } else {
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j - 1] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j] + 1
+          );
+        }
+      }
+    }
+    return matrix[str2.length][str1.length];
+  };
+
   const filteredCars = cars.filter(car => {
     if (car.status === 'available') {
-      return car.title.toLowerCase().includes(searchTerm.toLowerCase()) || (car.description || '').toLowerCase().includes(searchTerm.toLowerCase());
+      if (!searchTerm.trim()) return true;
+      
+      const titleMatch = fuzzyMatch(searchTerm, car.title || '');
+      const descriptionMatch = fuzzyMatch(searchTerm, car.description || '');
+      
+      return titleMatch || descriptionMatch;
     }
     if (userProfile?.user_type === 'buyer' && car.status === 'sold' && car.buyer_id === userProfile.id) {
       return true;
@@ -84,6 +173,7 @@ export default function CarsPage() {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className={styles.searchInput}
               />
+              <VoiceSearch onSearchChange={setSearchTerm} />
             </div>
             <div className={styles.stats}>
               <span className={styles.statItem}>

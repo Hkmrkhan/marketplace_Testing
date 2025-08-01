@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import AIChat from '../components/AIChat';
 import { supabase } from '../utils/supabaseClient';
 import styles from '../styles/Dashboard.module.css';
 
@@ -598,6 +599,12 @@ export default function SellerDashboard() {
               }}>{unreadCount}</span>}
             </button>
             <button 
+              className={`${styles.navItem} ${activeTab === 'aihelp' ? styles.active : ''}`}
+              onClick={() => setActiveTab('aihelp')}
+            >
+              🤖 AI Assistant
+            </button>
+            <button 
               className={`${styles.navItem} ${styles.logoutBtn}`}
               onClick={handleLogout}
             >
@@ -901,6 +908,21 @@ export default function SellerDashboard() {
                   )}
                 </form>
               )}
+            </div>
+          )}
+          {activeTab === 'aihelp' && (
+            <div className={styles.aiAssistant}>
+              <div className={styles.sectionHeader}>
+                <h1>🤖 AI Car Assistant</h1>
+                <p>Car selling ke liye expert advice len! Market analysis, pricing tips aur zyada.</p>
+              </div>
+              <div className={styles.chatSection}>
+                <AIChat 
+                  context="seller-dashboard"
+                  isFloating={false}
+                  userId={user?.id}
+                />
+              </div>
             </div>
           )}
         </div>

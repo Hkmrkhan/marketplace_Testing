@@ -2375,4 +2375,38 @@
     width: 25px;
     height: 25px;
   }
+}
+
+/* AI Assistant Styles */
+.aiAssistant {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin: 20px 0;
+}
+
+.aiAssistant .sectionHeader {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px 30px;
+  text-align: center;
+  margin: 0;
+}
+
+.aiAssistant .sectionHeader h1 {
+  margin: 0 0 8px 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.aiAssistant .sectionHeader p {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 14px;
+}
+
+.chatSection {
+  padding: 0;
+  background: #f8f9fa;
 } 
