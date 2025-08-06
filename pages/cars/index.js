@@ -3,6 +3,7 @@ import CarCard from '../../components/CarCard';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import VoiceSearch from '../../components/VoiceSearch';
+import CarFilter from '../../components/CarFilter';
 import { supabase } from '../../utils/supabaseClient';
 import styles from '../../styles/Cars.module.css';
 
@@ -11,19 +12,66 @@ export default function CarsPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [userProfile, setUserProfile] = useState(null);
+  const [filters, setFilters] = useState({
+    title: '',
+    minPrice: '',
+    maxPrice: '',
+    miles_min: '',
+    miles_max: '',
+    reg_district: '',
+    year_min: '',
+    year_max: '',
+    priceRange: ''
+  });
 
   const fetchCars = async () => {
     setLoading(true);
-    // Fetch from Supabase view 'cars_with_seller'
+    // Fetch from Supabase view 'cars_with_seller_enhanced'
     const { data, error } = await supabase
-      .from('cars_with_seller')
+      .from('cars_with_seller_enhanced')
       .select('*')
       .eq('status', 'available')
       .order('created_at', { ascending: false });
     if (error) {
       setCars([]);
     } else {
-      setCars(data || []);
+      // Clean descriptions for all cars
+      const cleanedCars = (data || []).map(car => {
+        if (car.description) {
+          console.log('Original car description:', car.description);
+          
+          // Remove the specific Supabase link pattern with @ symbol
+          car.description = car.description.replace(/@luxuryhttps:\/\/supabase\.com\/dashboard\/project\/[^\s]+/g, 'Luxury car');
+          // Remove the specific Supabase link pattern
+          car.description = car.description.replace(/luxuryhttps:\/\/supabase\.com\/dashboard\/project\/[^\s]+/g, 'Luxury car');
+          // Remove Bing image URLs
+          car.description = car.description.replace(/https:\/\/th\.bing\.com\/th\?id=[^\s]+/g, '');
+          // Remove any URLs or Supabase links from description
+          car.description = car.description.replace(/https?:\/\/[^\s]+/g, '').trim();
+          // Remove any database references or technical strings
+          car.description = car.description.replace(/supabase\.com\/dashboard\/project\/[^\s]+/g, '').trim();
+          car.description = car.description.replace(/schema=public/g, '').trim();
+          car.description = car.description.replace(/editor\/\d+/g, '').trim();
+          // Remove price from description if it's mixed in
+          car.description = car.description.replace(/\d{4,5}\s*$/g, '').trim();
+          // Clean up multiple spaces
+          car.description = car.description.replace(/\s+/g, ' ').trim();
+          
+          // If description still contains problematic patterns, completely replace it
+          if (car.description.includes('supabase.com') || car.description.includes('@luxury') || car.description.includes('schema=public') || car.description.includes('luxuryhttps')) {
+            car.description = 'Luxury car with premium features and excellent condition. Perfect for those looking for a high-end vehicle with all modern amenities. Contact seller for more details and test drive.';
+          }
+          
+          // If description is empty after cleaning, set a default
+          if (!car.description) {
+            car.description = 'Luxury car with premium features. Contact seller for more details.';
+          }
+          
+          console.log('Cleaned car description:', car.description);
+        }
+        return car;
+      });
+      setCars(cleanedCars);
     }
     setLoading(false);
   };
@@ -125,14 +173,125 @@ export default function CarsPage() {
     return matrix[str2.length][str1.length];
   };
 
+  // Filter handling function
+  const handleFilterChange = (filterType, value) => {
+    if (filterType === 'clear') {
+      setFilters({
+        title: '',
+        minPrice: '',
+        maxPrice: '',
+        miles_min: '',
+        miles_max: '',
+        reg_district: '',
+        year_min: '',
+        year_max: '',
+        priceRange: ''
+      });
+      return;
+    }
+    
+    if (filterType === 'load') {
+      setFilters(value);
+      return;
+    }
+    
+    setFilters(prev => ({
+      ...prev,
+      [filterType]: value
+    }));
+  };
+
+  // Apply filters to cars
   const filteredCars = cars.filter(car => {
+    console.log('Filtering car:', {
+      id: car.id,
+      title: car.title,
+      price: car.price,
+      miles: car.miles,
+      reg_district: car.reg_district,
+      year: car.year,
+      status: car.status
+    });
+    
     if (car.status === 'available') {
-      if (!searchTerm.trim()) return true;
+      // Search term filter
+      if (searchTerm.trim()) {
+        const titleMatch = fuzzyMatch(searchTerm, car.title || '');
+        const descriptionMatch = fuzzyMatch(searchTerm, car.description || '');
+        if (!titleMatch && !descriptionMatch) return false;
+      }
       
-      const titleMatch = fuzzyMatch(searchTerm, car.title || '');
-      const descriptionMatch = fuzzyMatch(searchTerm, car.description || '');
+      // Title filter
+      if (filters.title && !car.title?.toLowerCase().includes(filters.title.toLowerCase())) {
+        console.log('Filtered out by title:', car.title);
+        return false;
+      }
       
-      return titleMatch || descriptionMatch;
+      // Price range filter
+      if (filters.minPrice && car.price < parseFloat(filters.minPrice)) {
+        console.log('Filtered out by min price:', car.price, '<', filters.minPrice);
+        return false;
+      }
+      if (filters.maxPrice && car.price > parseFloat(filters.maxPrice)) {
+        console.log('Filtered out by max price:', car.price, '>', filters.maxPrice);
+        return false;
+      }
+      
+      // Quick price range filter
+      if (filters.priceRange) {
+        const price = car.price;
+        switch (filters.priceRange) {
+          case 'budget':
+            if (price > 1000) return false;
+            break;
+          case 'mid':
+            if (price < 1000 || price > 5000) return false;
+            break;
+          case 'premium':
+            if (price < 5000 || price > 10000) return false;
+            break;
+          case 'luxury':
+            if (price < 10000) return false;
+            break;
+        }
+      }
+      
+      // Miles range filter
+      if (filters.miles_min && filters.miles_min.trim() !== '') {
+        const filterMilesMin = parseFloat(filters.miles_min);
+        if (car.miles && car.miles < filterMilesMin) {
+          console.log('Filtered out by min miles:', car.miles, '<', filterMilesMin);
+          return false;
+        }
+      }
+      if (filters.miles_max && filters.miles_max.trim() !== '') {
+        const filterMilesMax = parseFloat(filters.miles_max);
+        if (car.miles && car.miles > filterMilesMax) {
+          console.log('Filtered out by max miles:', car.miles, '>', filterMilesMax);
+          return false;
+        }
+      }
+      
+      // District filter
+      if (filters.reg_district && filters.reg_district.trim() !== '') {
+        if (!car.reg_district || car.reg_district !== filters.reg_district) {
+          console.log('Filtered out by district:', car.reg_district, '!=', filters.reg_district);
+          return false;
+        }
+      }
+      
+      // Year range filter
+      if (filters.year_min && car.year && car.year < parseInt(filters.year_min)) {
+        console.log('Filtered out by min year:', car.year, '<', filters.year_min);
+        return false;
+      }
+      if (filters.year_max && car.year && car.year > parseInt(filters.year_max)) {
+        console.log('Filtered out by max year:', car.year, '>', filters.year_max);
+        return false;
+      }
+      
+      console.log('Car passed all filters:', car.title);
+      return true;
     }
     if (userProfile?.user_type === 'buyer' && car.status === 'sold' && car.buyer_id === userProfile.id) {
       return true;
@@ -181,6 +340,9 @@ export default function CarsPage() {
               </span>
             </div>
           </div>
+
+          {/* Filter Section */}
+          <CarFilter onFilterChange={handleFilterChange} filters={filters} />
 
           {loading ? (
             <div className={styles.loading}>

@@ -297,23 +297,59 @@ export default async function handler(req, res) {
         });
         
         if (exactPriceCars.length > 0) {
-          const carDetails = exactPriceCars.slice(0, 2).map(car => 
-            `**🚗 ${car.title}** - **${car.formatted_price}**
-💰 **Seller:** ${car.seller_name || 'Unknown'}
-📝 **Description:** ${car.description?.substring(0, 80) || 'No description available'}...
-📅 **Listed:** ${car.days_since_listed} days ago`
-          ).join('\n\n');
+          const carDetails = exactPriceCars.slice(0, 2).map(car => {
+            let details = `**🚗 ${car.title}** - **${car.formatted_price}**
+💰 **Seller:** ${car.seller_name || 'Unknown'}`;
+            
+            // Add miles info if available
+            if (car.miles && car.miles > 0) {
+              details += `\n📏 **Miles:** ${car.miles.toLocaleString()}`;
+            }
+            
+            // Add year info if available
+            if (car.year) {
+              details += `\n📅 **Year:** ${car.year}`;
+            }
+            
+            // Add district info if available
+            if (car.reg_district) {
+              details += `\n📍 **District:** ${car.reg_district}`;
+            }
+            
+            details += `\n📝 **Description:** ${car.description?.substring(0, 80) || 'No description available'}...
+📅 **Listed:** ${car.days_since_listed} days ago`;
+            
+            return details;
+          }).join('\n\n');
           response = `✅ **Exact $${budget} price mein ye cars milti hain:**
 
 ${carDetails}
 
 🛒 **Total ${exactPriceCars.length} cars available at this exact price!**`;
         } else if (nearPriceCars.length > 0) {
-          const carDetails = nearPriceCars.slice(0, 3).map(car => 
-            `**🚗 ${car.title}** - **${car.formatted_price}**
-💰 **Seller:** ${car.seller_name || 'Unknown'}
-📊 **Category:** ${car.price_category}`
-          ).join('\n\n');
+          const carDetails = nearPriceCars.slice(0, 3).map(car => {
+            let details = `**🚗 ${car.title}** - **${car.formatted_price}**
+💰 **Seller:** ${car.seller_name || 'Unknown'}`;
+            
+            // Add miles info if available
+            if (car.miles && car.miles > 0) {
+              details += `\n📏 **Miles:** ${car.miles.toLocaleString()}`;
+            }
+            
+            // Add year info if available
+            if (car.year) {
+              details += `\n📅 **Year:** ${car.year}`;
+            }
+            
+            // Add district info if available
+            if (car.reg_district) {
+              details += `\n📍 **District:** ${car.reg_district}`;
+            }
+            
+            details += `\n📊 **Category:** ${car.price_category}`;
+            
+            return details;
+          }).join('\n\n');
           response = `💡 **$${budget} ke similar range mein ye cars available hain:**
 
 ${carDetails}
@@ -325,14 +361,32 @@ ${carDetails}
             const cheapestAffordable = affordableCars.reduce((min, car) => 
               car.numeric_price < min.numeric_price ? car : min
             );
-            response = `❌ **$${budget} exact price mein koi car nahi hai.**
+            
+            let details = `❌ **$${budget} exact price mein koi car nahi hai.**
 
 💰 **Aap ke budget mein best option:** "${cheapestAffordable.title}" - **${cheapestAffordable.formatted_price}**
-📊 **Category:** ${cheapestAffordable.price_category}
-
-📈 **Higher options $${minPrice} se start hoti hai marketplace mein.**`;
-                      } else {
-              response = `❌ **$${budget} budget mein koi car available nahi hai.**
+📊 **Category:** ${cheapestAffordable.price_category}`;
+            
+            // Add miles info if available
+            if (cheapestAffordable.miles && cheapestAffordable.miles > 0) {
+              details += `\n📏 **Miles:** ${cheapestAffordable.miles.toLocaleString()}`;
+            }
+            
+            // Add year info if available
+            if (cheapestAffordable.year) {
+              details += `\n📅 **Year:** ${cheapestAffordable.year}`;
+            }
+            
+            // Add district info if available
+            if (cheapestAffordable.reg_district) {
+              details += `\n📍 **District:** ${cheapestAffordable.reg_district}`;
+            }
+            
+            details += `\n\n📈 **Higher options $${minPrice} se start hoti hai marketplace mein.**`;
+            
+            response = details;
+          } else {
+            response = `❌ **$${budget} budget mein koi car available nahi hai.**
 
 💰 **Minimum price:** $${minPrice}
 📊 **Average price:** $${avgPrice}
@@ -352,16 +406,34 @@ ${carDetails}
              lowerMessage.includes('kam price') || lowerMessage.includes('low price')) {
       const cheapestCar = availableCars.find(car => car.numeric_price === minPrice);
       if (cheapestCar) {
-        response = `🚗 **Sabse sasti car:** "${cheapestCar.title}" - **${cheapestCar.formatted_price}**
+        let details = `🚗 **Sabse sasti car:** "${cheapestCar.title}" - **${cheapestCar.formatted_price}**
 
 💰 **Seller:** ${cheapestCar.seller_name || 'Unknown Seller'}
-📊 **Category:** ${cheapestCar.price_category} (${cheapestCar.ai_price_range})
-📅 **Listed:** ${cheapestCar.days_since_listed} days ago
+📊 **Category:** ${cheapestCar.price_category} (${cheapestCar.ai_price_range})`;
+        
+        // Add miles info if available
+        if (cheapestCar.miles && cheapestCar.miles > 0) {
+          details += `\n📏 **Miles:** ${cheapestCar.miles.toLocaleString()}`;
+        }
+        
+        // Add year info if available
+        if (cheapestCar.year) {
+          details += `\n📅 **Year:** ${cheapestCar.year}`;
+        }
+        
+        // Add district info if available
+        if (cheapestCar.reg_district) {
+          details += `\n📍 **District:** ${cheapestCar.reg_district}`;
+        }
+        
+        details += `\n📅 **Listed:** ${cheapestCar.days_since_listed} days ago
 📸 **Images:** ${cheapestCar.has_images ? 'Available' : 'Not uploaded'}
 📝 **Description:** ${cheapestCar.description?.substring(0, 100) || 'Description not available'}...
 📞 **Contact:** ${cheapestCar.seller_whatsapp ? 'WhatsApp available' : 'Use marketplace chat'}
 
 🛒 **Cars page se direct purchase kar sakte hain!**`;
+        
+        response = details;
       } else {
         response = `Currently marketplace mein koi cars available nahi hain. Database check kar rahe hain...`;
       }
@@ -370,15 +442,33 @@ ${carDetails}
     else if (lowerMessage.includes('expensive') || lowerMessage.includes('premium') || lowerMessage.includes('luxury')) {
       const expensiveCar = availableCars.find(car => car.numeric_price === maxPrice);
       if (expensiveCar) {
-        response = `💎 **Premium car:** "${expensiveCar.title}" - **${expensiveCar.formatted_price}**
+        let details = `💎 **Premium car:** "${expensiveCar.title}" - **${expensiveCar.formatted_price}**
 
 🏆 **Category:** ${expensiveCar.price_category} (${expensiveCar.ai_price_range})
-💰 **Seller:** ${expensiveCar.seller_name || 'Premium Seller'}
-⭐ **Top quality aur features ke saath!**
+💰 **Seller:** ${expensiveCar.seller_name || 'Premium Seller'}`;
+        
+        // Add miles info if available
+        if (expensiveCar.miles && expensiveCar.miles > 0) {
+          details += `\n📏 **Miles:** ${expensiveCar.miles.toLocaleString()}`;
+        }
+        
+        // Add year info if available
+        if (expensiveCar.year) {
+          details += `\n📅 **Year:** ${expensiveCar.year}`;
+        }
+        
+        // Add district info if available
+        if (expensiveCar.reg_district) {
+          details += `\n📍 **District:** ${expensiveCar.reg_district}`;
+        }
+        
+        details += `\n⭐ **Top quality aur features ke saath!**
 📸 **Images:** ${expensiveCar.additional_images_count + (expensiveCar.has_images ? 1 : 0)} photos available
 📅 **Listed:** ${expensiveCar.days_since_listed} days ago
 
 🎯 **Luxury segment mein ye best option hai marketplace mein!**`;
+        
+        response = details;
       } else {
         response = `Currently koi premium cars available nahi hain marketplace mein. Budget cars check kar sakte hain!`;
       }
@@ -392,12 +482,30 @@ ${carDetails}
         }).slice(0, 3);
         
         if (midRangeCars.length > 0) {
-          const carDetails = midRangeCars.map(car => 
-            `**🚗 ${car.title}** - **${car.formatted_price}**
+          const carDetails = midRangeCars.map(car => {
+            let details = `**🚗 ${car.title}** - **${car.formatted_price}**
 📊 **${car.price_category} category** 
-💰 **Seller:** ${car.seller_name || 'Verified Seller'}
-⭐ **${car.has_images ? 'Photos available' : 'No photos yet'}**`
-          ).join('\n\n');
+💰 **Seller:** ${car.seller_name || 'Verified Seller'}`;
+            
+            // Add miles info if available
+            if (car.miles && car.miles > 0) {
+              details += `\n📏 **Miles:** ${car.miles.toLocaleString()}`;
+            }
+            
+            // Add year info if available
+            if (car.year) {
+              details += `\n📅 **Year:** ${car.year}`;
+            }
+            
+            // Add district info if available
+            if (car.reg_district) {
+              details += `\n📍 **District:** ${car.reg_district}`;
+            }
+            
+            details += `\n⭐ **${car.has_images ? 'Photos available' : 'No photos yet'}**`;
+            
+            return details;
+          }).join('\n\n');
           response = `🎯 **Aap ke liye best recommendations (value for money):**
 
 ${carDetails}

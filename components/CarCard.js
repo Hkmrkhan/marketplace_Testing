@@ -41,6 +41,15 @@ export default function CarCard({ car }) {
         <h3>{car.title}</h3>
         <p>{car.description}</p>
         <p className={styles.price}>${car.price}</p>
+        {car.miles && car.miles > 0 && (
+          <p className={styles.miles}>Miles: {car.miles.toLocaleString()}</p>
+        )}
+        {car.year && (
+          <p className={styles.year}>📅 {car.year}</p>
+        )}
+        {car.reg_district && car.reg_district !== 'Other' && (
+          <p className={styles.district}>📍 {car.reg_district}</p>
+        )}
         <p className={car.status === 'sold' ? styles.sold : styles.available}>
           {car.status === 'sold' ? 'Sold' : 'Available'}
         </p>

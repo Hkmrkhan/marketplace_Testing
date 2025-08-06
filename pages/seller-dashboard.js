@@ -378,7 +378,7 @@ export default function SellerDashboard() {
         setSales([]);
       } else {
         console.log('Sales with details:', salesData);
-      setSales(salesData || []);
+    setSales(salesData || []);
       }
       setLoading(false);
     };
@@ -650,8 +650,7 @@ export default function SellerDashboard() {
                 ) : (
                   <div className={styles.carsGrid}>
                     {myCars.map(car => (
-                      <div key={car.id} style={{ marginBottom: 32 }}>
-                            <h3>{car.title}</h3>
+                      <div key={car.id} className={styles.carCard}>
                         {/* Gallery block */}
                         <div className={styles.carImageContainer}>
                           {/* Main image */}
@@ -659,38 +658,41 @@ export default function SellerDashboard() {
                             src={getAllImages(car)[imageIndexes[car.id] || 0]}
                             alt={car.title}
                           />
+                          {/* Thumbnails row - only show if more than 1 image */}
+                          {getAllImages(car).length > 1 && (
+                            <div className={styles.thumbnailsRow}>
+                              {getAllImages(car).map((img, idx) => (
+                                <img
+                                  key={idx}
+                                  src={img}
+                                  alt={`Thumbnail ${idx + 1}`}
+                                  className={
+                                    styles.thumbnail +
+                                    ((imageIndexes[car.id] || 0) === idx ? ' ' + styles.activeThumbnail : '')
+                                  }
+                                  onClick={() => setImageIndexes(prev => ({ ...prev, [car.id]: idx }))}
+                                />
+                              ))}
+                            </div>
+                          )}
                         </div>
-                        {/* Thumbnails row - only show if more than 1 image */}
-                        {getAllImages(car).length > 1 && (
-                          <div className={styles.thumbnailsRow}>
-                            {getAllImages(car).map((img, idx) => (
-                              <img
-                                key={idx}
-                                src={img}
-                                alt={`Thumbnail ${idx + 1}`}
-                                className={
-                                  styles.thumbnail +
-                                  ((imageIndexes[car.id] || 0) === idx ? ' ' + styles.activeThumbnail : '')
-                                }
-                                onClick={() => setImageIndexes(prev => ({ ...prev, [car.id]: idx }))}
-                              />
-                            ))}
-                          </div>
-                        )}
-                        <p>{car.description}</p>
-                            <p className={styles.price}>${car.price}</p>
-                            <p className={car.status === 'sold' ? styles.sold : styles.available}>
-                              {car.status === 'sold' ? 'Sold' : 'Available'}
-                            </p>
-                        {car.status === 'sold' && sales.find(s => (s.car_id === (car.car_id || car.id))) && (
-                              <div className={styles.buyerInfo}>
-                            <span>Buyer: <b>{sales.find(s => (s.car_id === (car.car_id || car.id)))?.buyer_name || 'N/A'}</b></span>
-                            {sales.find(s => (s.car_id === (car.car_id || car.id)))?.buyer_email && (
-                              <span style={{ marginLeft: 8, color: '#888' }}>({sales.find(s => (s.car_id === (car.car_id || car.id)))?.buyer_email})</span>
-                            )}
-                          </div>
-                        )}
+                        <div className={styles.carInfo}>
+                          <h3>{car.title}</h3>
+                          <p>{car.description}</p>
+                          <p className={styles.price}>${car.price?.toLocaleString()}</p>
+                          <p className={car.status === 'sold' ? styles.sold : styles.available}>
+                            {car.status === 'sold' ? 'Sold' : 'Available'}
+                          </p>
+                          {car.status === 'sold' && sales.find(s => (s.car_id === (car.car_id || car.id))) && (
+                            <div className={styles.buyerInfo}>
+                              <span>Buyer: <b>{sales.find(s => (s.car_id === (car.car_id || car.id)))?.buyer_name || 'N/A'}</b></span>
+                              {sales.find(s => (s.car_id === (car.car_id || car.id)))?.buyer_email && (
+                                <span style={{ marginLeft: 8, color: '#888' }}>({sales.find(s => (s.car_id === (car.car_id || car.id)))?.buyer_email})</span>
+                              )}
+                            </div>
+                          )}
                         </div>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -787,7 +789,7 @@ export default function SellerDashboard() {
                         <div className={styles.carInfo}>
                           <h3>{car.title}</h3>
                           <p>{car.description}</p>
-                          <p className={styles.price}>${car.price}</p>
+                          <p className={styles.price}>${car.price?.toLocaleString()}</p>
                           <p className={car.status === 'sold' ? styles.sold : styles.available}>
                             {car.status === 'sold' ? 'Sold' : 'Available'}
                           </p>

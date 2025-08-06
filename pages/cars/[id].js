@@ -101,6 +101,39 @@ export default function CarDetails() {
       setError('Car not found');
       setCar(null);
     } else {
+      // Clean the description field
+      if (data.description) {
+        console.log('Original description:', data.description);
+        
+        // Remove the specific Supabase link pattern with @ symbol
+        data.description = data.description.replace(/@luxuryhttps:\/\/supabase\.com\/dashboard\/project\/[^\s]+/g, 'Luxury car');
+        // Remove the specific Supabase link pattern
+        data.description = data.description.replace(/luxuryhttps:\/\/supabase\.com\/dashboard\/project\/[^\s]+/g, 'Luxury car');
+        // Remove Bing image URLs
+        data.description = data.description.replace(/https:\/\/th\.bing\.com\/th\?id=[^\s]+/g, '');
+        // Remove any URLs or Supabase links from description
+        data.description = data.description.replace(/https?:\/\/[^\s]+/g, '').trim();
+        // Remove any database references or technical strings
+        data.description = data.description.replace(/supabase\.com\/dashboard\/project\/[^\s]+/g, '').trim();
+        data.description = data.description.replace(/schema=public/g, '').trim();
+        data.description = data.description.replace(/editor\/\d+/g, '').trim();
+        // Remove price from description if it's mixed in
+        data.description = data.description.replace(/\d{4,5}\s*$/g, '').trim();
+        // Clean up multiple spaces
+        data.description = data.description.replace(/\s+/g, ' ').trim();
+        
+        // If description still contains problematic patterns, completely replace it
+        if (data.description.includes('supabase.com') || data.description.includes('@luxury') || data.description.includes('schema=public') || data.description.includes('luxuryhttps')) {
+          data.description = 'Luxury car with premium features and excellent condition. Perfect for those looking for a high-end vehicle with all modern amenities. Contact seller for more details and test drive.';
+        }
+        
+        // If description is empty after cleaning, set a default
+        if (!data.description) {
+          data.description = 'Luxury car with premium features. Contact seller for more details.';
+        }
+        
+        console.log('Cleaned description:', data.description);
+      }
       setCar(data);
     }
     setLoading(false);

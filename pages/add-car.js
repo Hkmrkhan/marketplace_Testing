@@ -69,6 +69,9 @@ export default function AddCarPage() {
             title: car.title,
             description: car.description,
             price: parseFloat(car.price),
+            miles: car.miles ? parseInt(car.miles) : 0,
+            reg_district: car.reg_district || 'Other',
+            year: car.year ? parseInt(car.year) : 2020,
             image_url: car.images[0], // Primary image (first one)
             additional_images: car.images.slice(1), // Additional images as array
             status: 'available'

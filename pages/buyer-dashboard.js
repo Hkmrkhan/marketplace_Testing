@@ -174,47 +174,22 @@ function CarChat({ carId, sellerId, buyerId, currentUserId }) {
         )}
         <div ref={messagesEndRef} />
       </div>
-      <div className="car-chat-input-row" style={{
-        display: 'flex',
-        gap: 8,
-        marginTop: 8,
-        width: '100%'
-      }}>
-        <input
-          type="text"
+      <div className={styles.inputContainer}>
+        <textarea
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
+          onKeyPress={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
           placeholder="Type your message..."
-          onKeyDown={e => { if (e.key === 'Enter') sendMessage(); }}
+          className={styles.messageInput}
+          rows="1"
           disabled={sending}
-          style={{
-            flex: 1,
-            padding: '10px 12px',
-            borderRadius: '12px 0 0 12px',
-            border: '1px solid #ccc',
-            outline: 'none',
-            boxShadow: 'none',
-            fontSize: 16,
-            background: 'white',
-            transition: 'none',
-            width: '100%'
-          }}
         />
         <button
           onClick={sendMessage}
-          disabled={sending || !newMessage.trim()}
-          style={{
-            padding: '10px 18px',
-            background: '#667eea',
-            color: 'white',
-            border: 'none',
-            borderRadius: 8,
-            cursor: sending || !newMessage.trim() ? 'not-allowed' : 'pointer',
-            fontWeight: 'bold',
-            fontSize: 16
-          }}
+          disabled={!newMessage.trim() || sending}
+          className={styles.sendButton}
         >
-          Send
+          {sending ? '⏳' : '➤'}
         </button>
       </div>
     </div>
@@ -1049,7 +1024,7 @@ export default function BuyerDashboard() {
             <div className={styles.aiAssistant}>
               <div className={styles.sectionHeader}>
                 <h1>🤖 AI Car Assistant</h1>
-                <p>Car buying ke liye expert advice len! Koi bhi sawal puchhiye.</p>
+                <p>Car buying ke liye koi b sawal pooch sktay hein.</p>
               </div>
               <div className={styles.chatSection}>
                 <AIChat 
