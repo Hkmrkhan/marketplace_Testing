@@ -6,67 +6,71 @@ import AIChat from '../components/AIChat';
 import { supabase } from '../utils/supabaseClient';
 import styles from '../styles/Dashboard.module.css';
 
-// WhatsApp number formatting function
-const formatWhatsAppNumber = (number) => {
-  if (!number) return null;
-  
-  // Remove non-digit characters
-  let cleaned = number.replace(/\D/g, '');
-  
-  // Convert 03XX... to 92XX... (Pakistan format)
-  if (cleaned.startsWith('0')) {
-    cleaned = '92' + cleaned.slice(1);
-  }
-  
-  // If already starts with 92, return as is
-  if (cleaned.startsWith('92')) {
-    return cleaned;
-  }
-  
-  // If it's a 10-digit number, assume it's Pakistan and add 92
-  if (cleaned.length === 10) {
-    return '92' + cleaned;
-  }
-  
-  return cleaned;
-};
-
-// Unified Chat Component for Seller
-function UnifiedSellerChat({ sellerId, myCars, buyersByCar }) {
-  const [selectedCar, setSelectedCar] = useState(null);
-  const [selectedBuyer, setSelectedBuyer] = useState(null);
+// CarChat Component for Seller Dashboard
+function CarChat({ carId, sellerId, buyerId, currentUserId }) {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [loadingMessages, setLoadingMessages] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [loadingMessages, setLoadingMessages] = useState(true);
+  const [selectedBuyer, setSelectedBuyer] = useState(null);
+  const [buyers, setBuyers] = useState([]);
   const messagesEndRef = useRef(null);
 
-  // Get all unique buyers across all cars
-  const allBuyers = useMemo(() => {
-    const buyers = [];
-    Object.keys(buyersByCar).forEach(carId => {
-      const car = myCars.find(c => c.id === carId);
-      buyersByCar[carId].forEach(buyer => {
-        buyers.push({
-          ...buyer,
-          carId,
-          carTitle: car?.title || 'Unknown Car'
-        });
+  // Fetch buyers who have messaged for this car
+  const fetchBuyers = async () => {
+    try {
+      console.log('CarChat: Fetching buyers for car:', carId, 'seller:', sellerId);
+      
+      const { data, error } = await supabase
+        .from('messages')
+        .select('sender_id, sender:profiles!messages_sender_id_fkey(full_name)')
+        .eq('car_id', carId)
+        .eq('receiver_id', sellerId)
+        .neq('sender_id', sellerId);
+
+      if (error) {
+        console.error('Error fetching buyers:', error);
+        return;
+      }
+
+      console.log('CarChat: Raw buyer data:', data);
+
+      const uniqueBuyers = [];
+      const seenBuyers = new Set();
+      
+      data?.forEach(row => {
+        if (row.sender_id && !seenBuyers.has(row.sender_id)) {
+          seenBuyers.add(row.sender_id);
+          uniqueBuyers.push({
+            id: row.sender_id,
+            full_name: row.sender?.full_name || 'Unknown Buyer'
+          });
+        }
       });
-    });
-    return buyers;
-  }, [buyersByCar, myCars]);
+
+      console.log('CarChat: Processed buyers:', uniqueBuyers);
+      setBuyers(uniqueBuyers);
+      
+      // Auto-select first buyer if available
+      if (uniqueBuyers.length > 0 && !selectedBuyer) {
+        setSelectedBuyer(uniqueBuyers[0].id);
+        console.log('CarChat: Auto-selected buyer:', uniqueBuyers[0]);
+      }
+    } catch (error) {
+      console.error('Error in fetchBuyers:', error);
+    }
+  };
 
   const fetchMessages = async () => {
-    if (!selectedCar || !selectedBuyer) return;
+    if (!selectedBuyer) return;
     
     try {
       setLoadingMessages(true);
       const { data, error } = await supabase
         .from('messages_with_names')
         .select('*')
-        .eq('car_id', selectedCar)
-        .or(`and(sender_id.eq.${selectedBuyer},receiver_id.eq.${sellerId}),and(sender_id.eq.${sellerId},receiver_id.eq.${selectedBuyer})`)
+        .eq('car_id', carId)
+        .or(`and(sender_id.eq.${currentUserId},receiver_id.eq.${selectedBuyer}),and(sender_id.eq.${selectedBuyer},receiver_id.eq.${currentUserId})`)
         .order('created_at', { ascending: true });
 
       if (error) {
@@ -74,7 +78,13 @@ function UnifiedSellerChat({ sellerId, myCars, buyersByCar }) {
         return;
       }
 
-      setMessages(data || []);
+      const formattedMessages = data?.map(msg => ({
+        ...msg,
+        sender_name: msg.sender_name || (msg.sender_id === currentUserId ? 'You' : 'Buyer'),
+        receiver_name: msg.receiver_name || (msg.receiver_id === currentUserId ? 'You' : 'Buyer')
+      })) || [];
+
+      setMessages(formattedMessages);
     } catch (error) {
       console.error('Error fetching messages:', error);
     } finally {
@@ -83,15 +93,15 @@ function UnifiedSellerChat({ sellerId, myCars, buyersByCar }) {
   };
 
   const sendMessage = async () => {
-    if (!newMessage.trim() || loading || !selectedCar || !selectedBuyer) return;
+    if (!newMessage.trim() || sending || !selectedBuyer) return;
 
     try {
-      setLoading(true);
+      setSending(true);
       const { error } = await supabase
         .from('messages')
         .insert([{
-          car_id: selectedCar,
-          sender_id: sellerId,
+          car_id: carId,
+          sender_id: currentUserId,
           receiver_id: selectedBuyer,
           message: newMessage.trim()
         }]);
@@ -106,6 +116,391 @@ function UnifiedSellerChat({ sellerId, myCars, buyersByCar }) {
     } catch (error) {
       console.error('Error sending message:', error);
     } finally {
+      setSending(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBuyers();
+  }, [carId, sellerId]);
+
+  useEffect(() => {
+    if (selectedBuyer) {
+      fetchMessages();
+    }
+  }, [selectedBuyer, carId, currentUserId]);
+
+  // Real-time subscription for new messages
+  useEffect(() => {
+    if (!selectedBuyer || !carId) return;
+
+    const subscription = supabase
+      .channel(`car_chat:${carId}:${selectedBuyer}`)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages',
+        filter: `car_id=eq.${carId}`
+      }, (payload) => {
+        const newMessage = payload.new;
+        
+        // Only add message if it's relevant to current conversation
+        if (
+          newMessage.car_id === carId &&
+          ((newMessage.sender_id === selectedBuyer && newMessage.receiver_id === currentUserId) ||
+           (newMessage.sender_id === currentUserId && newMessage.receiver_id === selectedBuyer))
+        ) {
+          setMessages(prev => [...prev, {
+            ...newMessage,
+            sender_name: newMessage.sender_id === currentUserId ? 'You' : 'Buyer'
+          }]);
+        }
+      })
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [selectedBuyer, carId, currentUserId]);
+
+  useEffect(() => {
+    if (messagesEndRef.current && messages.length > 0) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'auto' });
+    }
+  }, [messages.length]);
+
+  if (buyers.length === 0) {
+    return (
+      <div style={{ 
+        padding: '10px', 
+        textAlign: 'center', 
+        color: '#666',
+        background: '#f8f9fa',
+        borderRadius: '8px',
+        fontSize: '12px',
+        border: '1px solid #e0e0e0'
+      }}>
+        <div style={{ marginBottom: '8px' }}>💬 Chat</div>
+        <div style={{ fontSize: '11px', color: '#888' }}>
+          No buyers have messaged for this car yet.
+        </div>
+        <div style={{ fontSize: '10px', color: '#999', marginTop: '4px' }}>
+          When buyers contact you, chat will appear here.
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="car-chat-box" style={{
+      width: '100%',
+      maxWidth: '100%',
+      minWidth: '100%',
+      height: 'auto',
+      minHeight: '200px',
+      background: '#fff',
+      borderRadius: '10px',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.07)',
+      padding: '12px',
+      display: 'flex',
+      flexDirection: 'column',
+      margin: '0 auto',
+      border: '1px solid #e0e0e0'
+    }}>
+      {/* Buyer Selection - Simple dropdown */}
+      {buyers.length > 1 && (
+        <div style={{ marginBottom: '8px' }}>
+          <select
+            value={selectedBuyer || ''}
+            onChange={(e) => setSelectedBuyer(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '6px 8px',
+              borderRadius: '6px',
+              border: '1px solid #ddd',
+              fontSize: '12px',
+              background: '#fff',
+              color: '#333'
+            }}
+          >
+            {buyers.map(buyer => (
+              <option key={buyer.id} value={buyer.id}>
+                {buyer.full_name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+      
+      <div className="car-chat-messages" style={{
+        height: '130px',
+        overflowY: 'auto',
+        border: '1px solid #eee',
+        borderRadius: '10px',
+        padding: '12px',
+        background: '#f8f9fb',
+        marginBottom: '8px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '8px'
+      }}>
+        {/* Buyer Indicator */}
+        {selectedBuyer && (
+          <div style={{
+            fontSize: '11px',
+            color: '#666',
+            textAlign: 'center',
+            padding: '4px 8px',
+            background: '#e9ecef',
+            borderRadius: '6px',
+            marginBottom: '8px'
+          }}>
+            Chatting with: {buyers.find(b => b.id === selectedBuyer)?.full_name || 'Unknown Buyer'}
+          </div>
+        )}
+        
+        {loadingMessages ? (
+          <div style={{ color: '#888', textAlign: 'center', marginTop: '20px' }}>Loading...</div>
+        ) : messages.length === 0 ? (
+          <div className="car-chat-empty" style={{ color: '#888', textAlign: 'center', marginTop: '40px' }}>No messages yet.</div>
+        ) : (
+          messages.map((msg, index) => (
+            <div key={index} style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: msg.sender_id === currentUserId ? 'flex-end' : 'flex-start',
+              marginBottom: '4px'
+            }}>
+              <div style={{
+                background: msg.sender_id === currentUserId ? '#007bff' : '#e9ecef',
+                color: msg.sender_id === currentUserId ? 'white' : '#333',
+                padding: '6px 10px',
+                borderRadius: '12px',
+                maxWidth: '80%',
+                fontSize: '12px',
+                lineHeight: '1.3',
+                wordWrap: 'break-word'
+              }}>
+                <div style={{
+                  fontWeight: 'bold',
+                  fontSize: '11px',
+                  marginBottom: '2px',
+                  opacity: '0.9'
+                }}>
+                  {msg.sender_name}
+                </div>
+                {msg.message}
+              </div>
+            </div>
+          ))
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+      
+      <div className={styles.inputContainer}>
+        <textarea
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+          onKeyPress={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
+          placeholder="Type your message..."
+          className={styles.messageInput}
+          rows="1"
+          disabled={sending || !selectedBuyer}
+        />
+        <button
+          onClick={sendMessage}
+          disabled={!newMessage.trim() || sending || !selectedBuyer}
+          className={styles.sendButton}
+        >
+          {sending ? '⏳' : '➤'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
+
+// Unified Chat Component for Seller
+function UnifiedSellerChat({ sellerId, myCars, buyersByCar }) {
+  const [selectedCar, setSelectedCar] = useState(null);
+  const [selectedBuyer, setSelectedBuyer] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+  const messagesEndRef = useRef(null);
+
+  // Get all unique buyers across all cars
+  const allBuyers = useMemo(() => {
+    console.log('=== Building allBuyers ===');
+    console.log('buyersByCar:', buyersByCar);
+    console.log('buyersByCar keys:', Object.keys(buyersByCar));
+    
+    const buyers = [];
+    const seenBuyers = new Set(); // Track seen buyer IDs
+    
+    // Process each car's buyers
+    Object.keys(buyersByCar).forEach((carId, carIndex) => {
+      const car = myCars.find(c => c.id === carId);
+      if (!car) {
+        console.log(`Car not found for ID: ${carId}`);
+        return;
+      }
+      
+      console.log(`\n--- Processing Car ${carIndex + 1}/${Object.keys(buyersByCar).length}: ${car.title} (${carId}) ---`);
+      console.log(`Buyers for this car:`, buyersByCar[carId]);
+      console.log(`Buyers array length:`, buyersByCar[carId]?.length || 0);
+      
+      if (!buyersByCar[carId] || buyersByCar[carId].length === 0) {
+        console.log(`No buyers found for car: ${car.title}`);
+        return;
+      }
+      
+      // Add each buyer for this car
+      buyersByCar[carId].forEach((buyer, buyerIndex) => {
+        console.log(`Processing buyer ${buyerIndex + 1}/${buyersByCar[carId].length}:`, buyer);
+        
+        if (!buyer || !buyer.id) {
+          console.log(`Invalid buyer data:`, buyer);
+          return;
+        }
+        
+        // Only add if we haven't seen this buyer before
+        if (!seenBuyers.has(buyer.id)) {
+          seenBuyers.add(buyer.id);
+          const buyerData = {
+            ...buyer,
+            carId: carId,
+            carTitle: car.title || 'Unknown Car',
+            displayName: `${buyer.full_name || 'Unknown'} - ${car.title || 'Unknown Car'}`
+          };
+          
+          console.log(`✅ Adding buyer ${buyerIndex + 1}/${buyersByCar[carId].length} for car ${car.title}:`, buyerData);
+          buyers.push(buyerData);
+        } else {
+          console.log(`⏭️ Buyer ${buyer.full_name} already exists for car ${car.title}, skipping...`);
+        }
+      });
+    });
+    
+    console.log('\n=== FINAL allBuyers RESULT ===');
+    console.log('Final allBuyers array:', buyers);
+    console.log('Total buyers found:', buyers.length);
+    console.log('Buyers by car:');
+    buyers.forEach((buyer, index) => {
+      console.log(`${index + 1}. ${buyer.full_name} - ${buyer.carTitle} (Car ID: ${buyer.carId})`);
+    });
+    
+    return buyers;
+  }, [buyersByCar, myCars]);
+
+  const fetchMessages = async () => {
+    if (!selectedCar || !selectedBuyer) return;
+    
+    console.log('Fetching messages for:', { selectedCar, selectedBuyer, sellerId });
+    
+    try {
+      setLoadingMessages(true);
+      
+      // First, get all messages for the selected car
+      const { data, error } = await supabase
+        .from('messages_with_names')
+        .select('*')
+        .eq('car_id', selectedCar)
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching messages:', error);
+        return;
+      }
+
+      console.log('Raw messages data:', data);
+
+      // Filter messages to ensure they belong to the specific car and buyer conversation
+      const filteredMessages = (data || []).filter(msg => {
+        // Message must be between the selected buyer and seller
+        const isBetweenSelectedUsers = (
+          (msg.sender_id === selectedBuyer && msg.receiver_id === sellerId) ||
+          (msg.sender_id === sellerId && msg.receiver_id === selectedBuyer)
+        );
+        
+        // Message must be for the selected car
+        const isForSelectedCar = msg.car_id === selectedCar;
+        
+        const isValid = isBetweenSelectedUsers && isForSelectedCar;
+        console.log(`Message ${msg.id}:`, {
+          sender: msg.sender_id,
+          receiver: msg.receiver_id,
+          car: msg.car_id,
+          isBetweenUsers: isBetweenSelectedUsers,
+          isForCar: isForSelectedCar,
+          isValid
+        });
+        
+        return isValid;
+      });
+
+      console.log('Filtered messages:', filteredMessages);
+      setMessages(filteredMessages);
+      
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+    } finally {
+      setLoadingMessages(false);
+    }
+  };
+
+  const sendMessage = async () => {
+    if (!newMessage.trim() || loading || !selectedCar || !selectedBuyer) return;
+
+    console.log('Sending message:', {
+      message: newMessage.trim(),
+      carId: selectedCar,
+      senderId: sellerId,
+      receiverId: selectedBuyer
+    });
+
+    try {
+      setLoading(true);
+      
+      // Add the new message to the current conversation immediately for better UX
+      const newMsg = {
+        id: Date.now().toString(), // Temporary ID
+        car_id: selectedCar,
+        sender_id: sellerId,
+        receiver_id: selectedBuyer,
+        message: newMessage.trim(),
+        sender_name: 'You',
+        created_at: new Date().toISOString()
+      };
+      
+      setMessages(prev => [...prev, newMsg]);
+      
+      const { error } = await supabase
+        .from('messages')
+        .insert([{
+          car_id: selectedCar,
+          sender_id: sellerId,
+          receiver_id: selectedBuyer,
+          message: newMessage.trim()
+        }]);
+
+      if (error) {
+        console.error('Error sending message:', error);
+        // Remove the temporary message if sending failed
+        setMessages(prev => prev.filter(msg => msg.id !== newMsg.id));
+        return;
+      }
+
+      console.log('Message sent successfully');
+      setNewMessage('');
+      
+    } catch (error) {
+      console.error('Error sending message:', error);
+      // Remove the temporary message if sending failed
+      setMessages(prev => prev.filter(msg => msg.id !== newMsg.id));
+    } finally {
       setLoading(false);
     }
   };
@@ -116,6 +511,53 @@ function UnifiedSellerChat({ sellerId, myCars, buyersByCar }) {
     }
   }, [selectedCar, selectedBuyer]);
 
+  // Real-time subscription to new messages for current conversation
+  useEffect(() => {
+    if (!selectedCar || !selectedBuyer) return;
+
+    console.log('Setting up real-time subscription for:', { selectedCar, selectedBuyer, sellerId });
+
+    const subscription = supabase
+      .channel(`messages:${selectedCar}:${selectedBuyer}`)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages',
+        filter: `car_id=eq.${selectedCar}`
+      }, (payload) => {
+        const newMessage = payload.new;
+        console.log('New message received:', newMessage);
+        
+        // Only add message if it's relevant to current conversation
+        if (
+          newMessage.car_id === selectedCar &&
+          ((newMessage.sender_id === selectedBuyer && newMessage.receiver_id === sellerId) ||
+           (newMessage.sender_id === sellerId && newMessage.receiver_id === selectedBuyer))
+        ) {
+          console.log('Adding new message to current conversation:', newMessage);
+          setMessages(prev => [...prev, {
+            ...newMessage,
+            sender_name: newMessage.sender_id === sellerId ? 'You' : 'Buyer'
+          }]);
+        } else {
+          console.log('Message not relevant to current conversation:', {
+            messageCar: newMessage.car_id,
+            selectedCar,
+            messageSender: newMessage.sender_id,
+            messageReceiver: newMessage.receiver_id,
+            selectedBuyer,
+            sellerId
+          });
+        }
+      })
+      .subscribe();
+
+    return () => {
+      console.log('Unsubscribing from real-time updates');
+      subscription.unsubscribe();
+    };
+  }, [selectedCar, selectedBuyer, sellerId]);
+
   useEffect(() => {
     if (messagesEndRef.current && messages.length > 0) {
       messagesEndRef.current.scrollIntoView({ behavior: 'auto' });
@@ -124,12 +566,13 @@ function UnifiedSellerChat({ sellerId, myCars, buyersByCar }) {
 
   // Auto-select first buyer if available
   useEffect(() => {
-    if (allBuyers.length > 0 && !selectedBuyer) {
+    if (allBuyers.length > 0 && !selectedBuyer && !selectedCar) {
       const firstBuyer = allBuyers[0];
+      console.log('Auto-selecting first buyer:', firstBuyer);
       setSelectedCar(firstBuyer.carId);
       setSelectedBuyer(firstBuyer.id);
     }
-  }, [allBuyers, selectedBuyer]);
+  }, [allBuyers, selectedBuyer, selectedCar]);
 
   if (allBuyers.length === 0) {
     return (
@@ -167,10 +610,27 @@ function UnifiedSellerChat({ sellerId, myCars, buyersByCar }) {
           <select
             value={selectedBuyer || ''}
             onChange={(e) => {
-              const buyer = allBuyers.find(b => b.id === e.target.value);
+              const selectedBuyerId = e.target.value;
+              console.log('Dropdown changed to:', selectedBuyerId);
+              console.log('Selected buyer ID type:', typeof selectedBuyerId);
+              console.log('Available buyers:', allBuyers);
+              
+              // Fix type mismatch: Convert to string for comparison
+              const buyer = allBuyers.find(b => String(b.id) === String(selectedBuyerId));
+              console.log('Found buyer:', buyer);
+              console.log('Buyer ID type:', typeof buyer?.id);
+              console.log('Comparison:', `String(${buyer?.id}) === String(${selectedBuyerId})`);
+              
               if (buyer) {
+                console.log('Setting selected buyer:', buyer);
                 setSelectedCar(buyer.carId);
                 setSelectedBuyer(buyer.id);
+                
+                // Clear messages when switching conversations
+                setMessages([]);
+              } else {
+                console.log('No buyer found for ID:', selectedBuyerId);
+                console.log('All buyer IDs:', allBuyers.map(b => ({ id: b.id, type: typeof b.id })));
               }
             }}
             style={{
@@ -181,14 +641,48 @@ function UnifiedSellerChat({ sellerId, myCars, buyersByCar }) {
               minWidth: '200px'
             }}
           >
-            {allBuyers.map(buyer => (
-              <option key={buyer.id} value={buyer.id}>
-                {buyer.full_name || 'Unknown'} - {buyer.carTitle}
-              </option>
-            ))}
+            <option value="">Select a buyer to chat...</option>
+            {(() => {
+              console.log('=== RENDERING DROPDOWN ===');
+              console.log('allBuyers:', allBuyers);
+              console.log('allBuyers.length:', allBuyers?.length);
+              console.log('allBuyers type:', typeof allBuyers);
+              console.log('allBuyers is array:', Array.isArray(allBuyers));
+              
+              if (!allBuyers || !Array.isArray(allBuyers) || allBuyers.length === 0) {
+                console.log('No buyers to render');
+                return <option value="" disabled>No buyers available</option>;
+              }
+              
+              console.log(`Rendering ${allBuyers.length} buyers...`);
+              
+              return allBuyers.map((buyer, index) => {
+                console.log(`Rendering buyer ${index + 1}/${allBuyers.length}:`, buyer);
+                console.log(`Buyer ID: ${buyer.id} (type: ${typeof buyer.id})`);
+                
+                if (!buyer || !buyer.id) {
+                  console.log(`Invalid buyer at index ${index}:`, buyer);
+                  return null;
+                }
+                
+                const optionText = buyer.displayName || `${buyer.full_name || 'Unknown'} - ${buyer.carTitle || 'Unknown Car'}`;
+                console.log(`Option ${index + 1} text:`, optionText);
+                console.log(`Option ${index + 1} value:`, buyer.id);
+                
+                return (
+                  <option 
+                    key={`buyer_${buyer.id}_${index}`} 
+                    value={String(buyer.id)} // Ensure value is string
+                    data-buyer-info={JSON.stringify(buyer)}
+                  >
+                    {optionText}
+                  </option>
+                );
+              }).filter(Boolean); // Remove any null options
+            })()}
           </select>
           <span style={{ fontSize: '12px', opacity: 0.8 }}>
-            {allBuyers.length} buyer{allBuyers.length > 1 ? 's' : ''}
+            {allBuyers.length} buyer{allBuyers.length > 1 ? 's' : ''} available
           </span>
         </div>
       </div>
@@ -206,7 +700,22 @@ function UnifiedSellerChat({ sellerId, myCars, buyersByCar }) {
           </div>
         ) : messages.length === 0 ? (
           <div style={{ textAlign: 'center', color: '#888', padding: '20px' }}>
-            No messages yet. Start the conversation!
+            <p>No messages yet. Start the conversation!</p>
+            {/* Debug: Show selected buyer and car info */}
+            <div style={{ 
+              background: '#f0f0f0', 
+              padding: '10px', 
+              borderRadius: '6px', 
+              marginTop: '10px',
+              fontSize: '12px',
+              color: '#666'
+            }}>
+              <p><strong>Debug Info:</strong></p>
+              <p>Selected Car: {selectedCar || 'None'}</p>
+              <p>Selected Buyer: {selectedBuyer || 'None'}</p>
+              <p>Seller ID: {sellerId || 'None'}</p>
+              <p>Total Buyers: {allBuyers.length}</p>
+            </div>
           </div>
         ) : (
           messages.map((msg, idx) => (
@@ -247,6 +756,7 @@ function UnifiedSellerChat({ sellerId, myCars, buyersByCar }) {
         borderTop: '1px solid #e0e0e0',
         background: '#fff'
       }}>
+        <div style={{ display: 'flex', gap: '8px', flexDirection: 'column' }}>
         <div style={{ display: 'flex', gap: '8px' }}>
           <input
             type="text"
@@ -278,6 +788,55 @@ function UnifiedSellerChat({ sellerId, myCars, buyersByCar }) {
             }}
           >
             Send
+            </button>
+          </div>
+          
+          {/* Test Message Button */}
+          <button
+            onClick={async () => {
+              if (!selectedBuyer || !selectedCar) {
+                alert('Please select a buyer first');
+                return;
+              }
+              
+              try {
+                const testMessage = `Test message from seller at ${new Date().toLocaleTimeString()}`;
+                
+                const { error } = await supabase
+                  .from('messages')
+                  .insert([{
+                    car_id: selectedCar,
+                    sender_id: sellerId,
+                    receiver_id: selectedBuyer,
+                    message: testMessage
+                  }]);
+
+                if (error) {
+                  console.error('Error sending test message:', error);
+                  alert('Error sending test message: ' + error.message);
+                } else {
+                  console.log('Test message sent successfully');
+                  alert('✅ Test message sent successfully!');
+                  // Refresh messages
+                  fetchMessages();
+                }
+              } catch (error) {
+                console.error('Error in test message:', error);
+                alert('Error sending test message: ' + error.message);
+              }
+            }}
+            style={{
+              padding: '8px 12px',
+              background: '#28a745',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '12px',
+              alignSelf: 'flex-start'
+            }}
+          >
+            🧪 Send Test Message
           </button>
         </div>
       </div>
@@ -304,10 +863,10 @@ export default function SellerDashboard() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [imageIndexes, setImageIndexes] = useState({});
   const [showChatModal, setShowChatModal] = useState(false);
-
-  // Calculate stats
-  const soldCars = myCars.filter(car => car.status === 'sold').length;
-  const availableCars = myCars.filter(car => car.status === 'available').length;
+  const [pendingApprovals, setPendingApprovals] = useState([]);
+  const [availableCars, setAvailableCars] = useState(0);
+  const [soldCars, setSoldCars] = useState(0);
+  const [buyersLoading, setBuyersLoading] = useState(true); // Add loading state for buyers
 
   // Helper to get all images for a car
   const getAllImages = (car) => {
@@ -328,14 +887,57 @@ export default function SellerDashboard() {
   useEffect(() => {
     if (!sellerId) return;
     const fetchUnread = async () => {
-      const { count } = await supabase
+      try {
+        // Get unread messages count for the seller
+        const { count, error } = await supabase
         .from('messages')
         .select('id', { count: 'exact', head: true })
         .eq('receiver_id', sellerId)
         .eq('read', false);
+
+        if (error) {
+          console.error('Error fetching unread count:', error);
+          setUnreadCount(0);
+        } else {
+          console.log('Unread messages count:', count);
       setUnreadCount(count || 0);
+        }
+      } catch (error) {
+        console.error('Error in fetchUnread:', error);
+        setUnreadCount(0);
+      }
     };
+    
     fetchUnread();
+    
+    // Set up real-time subscription for unread messages
+    const subscription = supabase
+      .channel('unread_messages')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages',
+        filter: `receiver_id=eq.${sellerId}`
+      }, (payload) => {
+        console.log('New message received, updating unread count');
+        setUnreadCount(prev => prev + 1);
+      })
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'messages',
+        filter: `receiver_id=eq.${sellerId}`
+      }, (payload) => {
+        // If message is marked as read, decrease unread count
+        if (payload.new.read === true && payload.old.read === false) {
+          setUnreadCount(prev => Math.max(0, prev - 1));
+        }
+      })
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [sellerId]);
 
   useEffect(() => {
@@ -355,17 +957,58 @@ export default function SellerDashboard() {
       setUserProfile(profile);
       console.log('User profile:', profile);
       
-      // Fetch seller's cars directly from cars table
+      // Fetch seller's cars with approval status
       const { data: cars, error: carsError } = await supabase
         .from('cars')
-        .select('*')
-        .eq('user_id', user.id);
+        .select(`
+          *,
+          admin_approvals(
+            approval_status,
+            approved_at,
+            admin_id
+          )
+        `)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
       
       console.log('Fetched cars:', cars);
       console.log('Cars error:', carsError);
       console.log('Number of cars fetched:', cars?.length || 0);
       
       setMyCars(cars || []);
+      
+      // Check for pending approvals - improved logic
+      const pendingCars = cars?.filter(car => {
+        // If car has admin_approvals, check latest approval status
+        if (car.admin_approvals && car.admin_approvals.length > 0) {
+          const latestApproval = car.admin_approvals[car.admin_approvals.length - 1];
+          console.log(`Car ${car.title} approval status:`, latestApproval.approval_status);
+          // Car is pending if status is not 'approved' or 'rejected'
+          return latestApproval.approval_status !== 'approved' && latestApproval.approval_status !== 'rejected';
+        }
+        // If no approval record, consider it pending
+        console.log(`Car ${car.title} has no approval record - considered pending`);
+        return true;
+      }) || [];
+      
+      console.log('Pending approvals count:', pendingCars.length);
+      setPendingApprovals(pendingCars);
+      
+      // Calculate available and sold cars
+      const availableCars = cars?.filter(car => {
+        const hasApproval = car.admin_approvals && car.admin_approvals.length > 0;
+        const isApproved = hasApproval && car.admin_approvals.some(approval => approval.approval_status === 'approved');
+        return car.status === 'available' && isApproved;
+      }) || [];
+      
+      const soldCars = cars?.filter(car => car.status === 'sold') || [];
+      
+      console.log('Available (approved) cars:', availableCars.length);
+      console.log('Sold cars:', soldCars.length);
+      
+      // Set state variables
+      setAvailableCars(availableCars.length);
+      setSoldCars(soldCars.length);
       
       // Fetch sales (purchases where seller is current user)
       const { data: salesData, error: salesError } = await supabase
@@ -389,27 +1032,62 @@ export default function SellerDashboard() {
   useEffect(() => {
     if (!myCars || myCars.length === 0 || !sellerId) return;
     const fetchAllBuyers = async () => {
+      console.log('=== fetchAllBuyers START ===');
+      console.log('Total cars to process:', myCars.length);
+      console.log('myCars:', myCars.map(c => ({ id: c.id, title: c.title })));
+      console.log('sellerId:', sellerId);
+      
       const buyersMap = {};
+      
       for (const car of myCars) {
+        console.log(`\n--- Processing Car: ${car.title} (${car.id}) ---`);
+        
+        // Fetch buyers who sent messages TO the seller for THIS car
         const { data, error } = await supabase
           .from('messages')
           .select('sender_id, sender:profiles!messages_sender_id_fkey(full_name)')
           .eq('car_id', car.id)
           .eq('receiver_id', sellerId);
-        // Deduplicate buyers by sender_id
-        const uniqueBuyers = {};
-        (data || []).forEach(row => {
-          if (!uniqueBuyers[row.sender_id]) {
-            uniqueBuyers[row.sender_id] = {
+        
+        if (error) {
+          console.error('Error fetching messages for car:', car.id, error);
+          continue;
+        }
+        
+        console.log(`Messages for car ${car.title}:`, data);
+        console.log(`Total messages for this car:`, data?.length || 0);
+        
+        // Process message buyers for this car
+        const carBuyers = [];
+        (data || []).forEach((row, index) => {
+          if (row.sender_id && row.sender_id !== sellerId) {
+            const buyer = {
               id: row.sender_id,
-              full_name: row.sender?.full_name
+              full_name: row.sender?.full_name || 'Unknown Buyer',
+              carId: car.id,
+              carTitle: car.title || 'Unknown Car'
             };
+            
+            console.log(`Adding message buyer ${index + 1}/${data.length} for car ${car.title}:`, buyer);
+            carBuyers.push(buyer);
           }
         });
-        buyersMap[car.id] = Object.values(uniqueBuyers);
+        
+        buyersMap[car.id] = carBuyers;
+        console.log(`Total buyers for car ${car.title}:`, carBuyers.length);
+        console.log(`Buyers for car ${car.title}:`, carBuyers);
       }
+      
+      console.log('\n=== FINAL RESULTS ===');
+      console.log('Final buyersMap:', buyersMap);
+      console.log('Total cars processed:', Object.keys(buyersMap).length);
+      console.log('Cars with buyers:', Object.keys(buyersMap).filter(carId => buyersMap[carId].length > 0));
+      console.log('Total unique buyers across all cars:', new Set(Object.values(buyersMap).flat().map(b => b.id)).size);
+      
       setBuyersByCar(buyersMap);
+      console.log('=== fetchAllBuyers END ===\n');
     };
+    
     fetchAllBuyers();
   }, [myCars, sellerId]);
 
@@ -526,6 +1204,31 @@ export default function SellerDashboard() {
     setUser(refreshedUser);
   };
 
+  // Mark messages as read when chat modal is opened
+  const handleChatModalOpen = async () => {
+    setShowChatModal(true);
+    
+    // Mark all unread messages as read
+    if (unreadCount > 0 && sellerId) {
+      try {
+        const { error } = await supabase
+          .from('messages')
+          .update({ read: true })
+          .eq('receiver_id', sellerId)
+          .eq('read', false);
+        
+        if (error) {
+          console.error('Error marking messages as read:', error);
+        } else {
+          console.log('Messages marked as read');
+          setUnreadCount(0);
+        }
+      } catch (error) {
+        console.error('Error in handleChatModalOpen:', error);
+      }
+    }
+  };
+
   if (loading) {
     return (
       <div>
@@ -540,15 +1243,7 @@ export default function SellerDashboard() {
 
   return (
     <div>
-      {/* Notification bell with unread count */}
-      <div style={{ position: 'fixed', top: 24, right: 32, zIndex: 100 }}>
-        <span style={{ position: 'relative', display: 'inline-block' }}>
-          <span role="img" aria-label="Notifications" style={{ fontSize: 28 }}>🔔</span>
-          {unreadCount > 0 && (
-            <span style={{ position: 'absolute', top: -8, right: -8, background: 'red', color: 'white', borderRadius: '50%', padding: '2px 7px', fontSize: 14, fontWeight: 'bold' }}>{unreadCount}</span>
-          )}
-        </span>
-      </div>
+
       <Navbar logoText="Seller Dashboard" />
       <div className={styles.dashboardContainer}>
         <div className={styles.sidebar}>
@@ -585,19 +1280,7 @@ export default function SellerDashboard() {
             >
               Profile
             </button>
-            <button 
-              className={`${styles.navItem} ${styles.chatBtn}`}
-              onClick={() => setShowChatModal(true)}
-            >
-              Chat {unreadCount > 0 && <span style={{ 
-                background: '#ff6b6b', 
-                color: 'white', 
-                borderRadius: '50%', 
-                padding: '2px 6px', 
-                fontSize: '10px',
-                marginLeft: '8px'
-              }}>{unreadCount}</span>}
-            </button>
+
             <button 
               className={`${styles.navItem} ${activeTab === 'aihelp' ? styles.active : ''}`}
               onClick={() => setActiveTab('aihelp')}
@@ -627,7 +1310,7 @@ export default function SellerDashboard() {
                 </div>
                 <div className={styles.statCard}>
                   <h3>{availableCars}</h3>
-                  <p>Cars Available</p>
+                  <p>Cars Available & Approved</p>
                 </div>
                 <div className={styles.statCard}>
                   <h3>{sales.length}</h3>
@@ -636,110 +1319,79 @@ export default function SellerDashboard() {
               </div>
 
               <div className={styles.recentCars}>
-                <h2>All Cars</h2>
-                {myCars.length === 0 ? (
-                  <div className={styles.emptyState}>
-                    <p>No cars listed yet. Start by adding your first car!</p>
-                    <button 
-                      className={styles.addCarBtn}
-                      onClick={() => router.push('/add-car')}
-                    >
-                      Add Your First Car
-                    </button>
-                  </div>
-                ) : (
-                  <div className={styles.carsGrid}>
-                    {myCars.map(car => (
-                      <div key={car.id} className={styles.carCard}>
-                        {/* Gallery block */}
-                        <div className={styles.carImageContainer}>
-                          {/* Main image */}
-                          <img
-                            src={getAllImages(car)[imageIndexes[car.id] || 0]}
-                            alt={car.title}
-                          />
-                          {/* Thumbnails row - only show if more than 1 image */}
-                          {getAllImages(car).length > 1 && (
-                            <div className={styles.thumbnailsRow}>
-                              {getAllImages(car).map((img, idx) => (
-                                <img
-                                  key={idx}
-                                  src={img}
-                                  alt={`Thumbnail ${idx + 1}`}
-                                  className={
-                                    styles.thumbnail +
-                                    ((imageIndexes[car.id] || 0) === idx ? ' ' + styles.activeThumbnail : '')
-                                  }
-                                  onClick={() => setImageIndexes(prev => ({ ...prev, [car.id]: idx }))}
-                                />
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                        <div className={styles.carInfo}>
-                          <h3>{car.title}</h3>
-                          <p>{car.description}</p>
-                          <p className={styles.price}>${car.price?.toLocaleString()}</p>
-                          <p className={car.status === 'sold' ? styles.sold : styles.available}>
-                            {car.status === 'sold' ? 'Sold' : 'Available'}
-                          </p>
-                          {car.status === 'sold' && sales.find(s => (s.car_id === (car.car_id || car.id))) && (
-                            <div className={styles.buyerInfo}>
-                              <span>Buyer: <b>{sales.find(s => (s.car_id === (car.car_id || car.id)))?.buyer_name || 'N/A'}</b></span>
-                              {sales.find(s => (s.car_id === (car.car_id || car.id)))?.buyer_email && (
-                                <span style={{ marginLeft: 8, color: '#888' }}>({sales.find(s => (s.car_id === (car.car_id || car.id)))?.buyer_email})</span>
-                              )}
-                            </div>
-                          )}
-                        </div>
+                <h2>Available & Approved Cars</h2>
+                {(() => {
+                  // Filter only available and approved cars
+                  const availableApprovedCars = myCars.filter(car => {
+                    const hasApproval = car.admin_approvals && car.admin_approvals.length > 0;
+                    const isApproved = hasApproval && car.admin_approvals.some(approval => approval.approval_status === 'approved');
+                    return car.status === 'available' && isApproved;
+                  });
+
+                  if (availableApprovedCars.length === 0) {
+                    return (
+                      <div className={styles.emptyState}>
+                        <p>No available and approved cars yet. Your cars are either pending approval or sold.</p>
+                        <button 
+                          className={styles.addCarBtn}
+                          onClick={() => router.push('/add-car')}
+                        >
+                          Add New Car
+                        </button>
                       </div>
-                    ))}
-                  </div>
-                )}
+                    );
+                  }
+
+                  return (
+                    <div className={styles.carsGrid}>
+                      {availableApprovedCars.map(car => (
+                        <div key={car.id} className={styles.carCard} style={{ marginBottom: 32 }}>
+                          {/* Gallery block */}
+                          <div className={styles.carImageContainer}>
+                            {/* Main image */}
+                            <img
+                              src={getAllImages(car)[imageIndexes[car.id] || 0]}
+                              alt={car.title}
+                            />
+                            {/* Thumbnails row - only show if more than 1 image */}
+                            {getAllImages(car).length > 1 && (
+                              <div className={styles.thumbnailsRow}>
+                                {getAllImages(car).map((img, idx) => (
+                                  <img
+                                    key={idx}
+                                    src={img}
+                                    alt={`Thumbnail ${idx + 1}`}
+                                    className={
+                                      styles.thumbnail +
+                                      ((imageIndexes[car.id] || 0) === idx ? ' ' + styles.activeThumbnail : '')
+                                    }
+                                    onClick={() => setImageIndexes(prev => ({ ...prev, [car.id]: idx }))}
+                                  />
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                          <div className={styles.carInfo}>
+                            <h3>{car.title}</h3>
+                            <p>{car.description}</p>
+                            <p className={styles.price}>${car.price?.toLocaleString()}</p>
+                            <p className={car.status === 'sold' ? styles.sold : styles.available}>
+                              {car.status === 'sold' ? 'Sold' : 'Available'}
+                            </p>
+                            {car.admin_approvals && car.admin_approvals.length > 0 && (
+                              <p className={`${styles.approvalStatus} ${styles[car.admin_approvals[car.admin_approvals.length - 1].approval_status]}`}>
+                                Approval: {car.admin_approvals[car.admin_approvals.length - 1].approval_status}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
               </div>
 
-              {/* Unified Chat Section */}
-              {showChatModal && (
-                <div style={{
-                  position: 'fixed',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                  background: 'rgba(0,0,0,0.5)',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  zIndex: 1000
-                }}>
-                  <div style={{
-                    background: '#fff',
-                    borderRadius: '12px',
-                    boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
-                    width: '90%',
-                    maxWidth: '600px',
-                    maxHeight: '90vh',
-                    display: 'flex',
-                    flexDirection: 'column'
-                  }}>
-                    <div style={{
-                      background: '#667eea',
-                      color: 'white',
-                      padding: '16px 20px',
-                      borderBottom: '1px solid #e0e0e0',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center'
-                    }}>
-                      <h3 style={{ margin: '0' }}>💬 Chat with Buyers</h3>
-                      <button onClick={() => setShowChatModal(false)} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', fontSize: '24px' }}>×</button>
-                    </div>
-                    <div style={{ flex: 1, overflowY: 'auto', padding: '16px' }}>
-                      <UnifiedSellerChat sellerId={sellerId} myCars={myCars} buyersByCar={buyersByCar} />
-                    </div>
-                  </div>
-                </div>
-              )}
+              
             </div>
           )}
 
@@ -759,8 +1411,24 @@ export default function SellerDashboard() {
                 <div className={styles.carsGrid}>
                   {myCars.map(car => {
                     const sale = sales.find(s => (s.car_id === (car.car_id || car.id)));
+                    
+                    // Determine approval status
+                    let approvalStatus = 'pending';
+                    let approvalStatusClass = 'pending';
+                    
+                    if (car.status === 'sold') {
+                      // Sold cars are automatically considered approved
+                      approvalStatus = 'approved';
+                      approvalStatusClass = 'approved';
+                    } else if (car.admin_approvals && car.admin_approvals.length > 0) {
+                      // Check latest approval status
+                      const latestApproval = car.admin_approvals[car.admin_approvals.length - 1];
+                      approvalStatus = latestApproval.approval_status;
+                      approvalStatusClass = latestApproval.approval_status;
+                    }
+                    
                     return (
-                      <div key={car.car_id || car.id} className={styles.carCard}>
+                      <div key={car.car_id || car.id} className={styles.carCard} style={{ marginBottom: 32 }}>
                         {/* Gallery block */}
                         <div className={styles.carImageContainer}>
                           {/* Main image */}
@@ -790,9 +1458,20 @@ export default function SellerDashboard() {
                           <h3>{car.title}</h3>
                           <p>{car.description}</p>
                           <p className={styles.price}>${car.price?.toLocaleString()}</p>
-                          <p className={car.status === 'sold' ? styles.sold : styles.available}>
-                            {car.status === 'sold' ? 'Sold' : 'Available'}
-                          </p>
+                          
+                          {/* Car Status */}
+                          <div className={styles.carStatusRow}>
+                            <p className={car.status === 'sold' ? styles.sold : styles.available}>
+                              {car.status === 'sold' ? 'Sold' : 'Available'}
+                            </p>
+                            
+                            {/* Approval Status */}
+                            <p className={`${styles.approvalStatus} ${styles[approvalStatusClass]}`}>
+                              {car.status === 'sold' ? '✅ Auto-Approved' : `Approval: ${approvalStatus}`}
+                            </p>
+                          </div>
+                          
+                          {/* Buyer Info for Sold Cars */}
                           {car.status === 'sold' && sales.find(s => s.car_id === car.id) && (
                             <div className={styles.buyerInfo}>
                               {(() => {
@@ -842,6 +1521,7 @@ export default function SellerDashboard() {
                               })()}
                             </div>
                           )}
+                          
                           <div className={styles.carActions}>
                             <button 
                               className={styles.editBtn}
@@ -855,6 +1535,16 @@ export default function SellerDashboard() {
                             >
                               Delete
                             </button>
+                          </div>
+                          
+                          {/* Chat Section for each car */}
+                          <div style={{ marginTop: 12 }}>
+                            <CarChat 
+                              carId={car.car_id || car.id} 
+                              sellerId={sellerId} 
+                              buyerId={null} 
+                              currentUserId={sellerId} 
+                            />
                           </div>
                         </div>
                       </div>

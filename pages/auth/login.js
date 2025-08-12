@@ -11,36 +11,60 @@ export default function LoginPage() {
   const router = useRouter();
 
   useEffect(() => {
-    supabase.auth.getUser().then(async ({ data: { user } }) => {
+    checkExistingUser();
+  }, []);
+
+  const checkExistingUser = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         // Fetch user profile
         const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-        if (profile?.user_type === 'seller') {
-          router.replace('/seller-dashboard');
-        } else {
-          router.replace('/buyer-dashboard');
+        if (profile) {
+          console.log('User already logged in:', profile.user_type);
+          
+          // Redirect based on user type
+          if (profile.user_type === 'seller') {
+            router.replace('/seller-dashboard');
+          } else if (profile.user_type === 'admin') {
+            router.replace('/admin-dashboard');
+          } else {
+            router.replace('/buyer-dashboard');
+          }
         }
       }
-    });
-  }, []);
+    } catch (error) {
+      console.error('Error checking existing user:', error);
+    }
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setMessage('');
     setLoading(true);
+    
     try {
       if (!email || !password) {
         setMessage('❌ Please enter both email and password.');
         setLoading(false);
         return;
       }
+
+      console.log('Attempting login for email:', email);
+
       // Supabase Auth login
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ 
+        email, 
+        password 
+      });
+
       if (error) {
+        console.error('Login error:', error);
         setMessage('❌ ' + error.message);
         setLoading(false);
         return;
       }
+
       // Fetch user profile
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -48,19 +72,38 @@ export default function LoginPage() {
         setLoading(false);
         return;
       }
-      const { data: profile, error: profileError } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+
+      console.log('User authenticated successfully:', user.id);
+
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
       if (profileError || !profile) {
-        setMessage('❌ Profile not found.');
+        console.error('Profile fetch error:', profileError);
+        setMessage('❌ Profile not found. Please contact support.');
         setLoading(false);
         return;
       }
+
+      console.log('Profile loaded:', profile.user_type);
+
       // Redirect based on user_type
-          if (profile.user_type === 'seller') {
-            router.push('/seller-dashboard');
+      if (profile.user_type === 'seller') {
+        console.log('Redirecting to seller dashboard');
+        router.push('/seller-dashboard');
+      } else if (profile.user_type === 'admin') {
+        console.log('Redirecting to admin dashboard');
+        router.push('/admin-dashboard');
       } else {
+        console.log('Redirecting to buyer dashboard');
         router.push('/buyer-dashboard');
       }
+
     } catch (err) {
+      console.error('Unexpected login error:', err);
       setMessage('❌ Login failed. Please try again.');
     } finally {
       setLoading(false);
@@ -71,50 +114,50 @@ export default function LoginPage() {
     <main className={styles.authContainer}>
       <div className={styles.authCardWithGraphic}>
         <div className={styles.authCardLeft}>
-        <div className={styles.authHeader}>
-          <h1>Sign In</h1>
-          <p>Access your account to buy or sell cars</p>
-        </div>
-        <form onSubmit={handleLogin} className={styles.authForm}>
-          <div className={styles.formGroup}>
-            <label>Email</label>
-            <input
-              type="email"
-              placeholder="Enter your email"
-              required
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              className={styles.input}
+          <div className={styles.authHeader}>
+            <h1>Sign In</h1>
+            <p>Access your account to buy, sell, or manage cars</p>
+          </div>
+          <form onSubmit={handleLogin} className={styles.authForm}>
+            <div className={styles.formGroup}>
+              <label>Email</label>
+              <input
+                type="email"
+                placeholder="Enter your email"
+                required
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                className={styles.input}
+                disabled={loading}
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label>Password</label>
+              <input
+                type="password"
+                placeholder="Enter your password"
+                required
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                className={styles.input}
+                disabled={loading}
+              />
+            </div>
+            <button 
+              type="submit" 
+              className={styles.submitBtn}
               disabled={loading}
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label>Password</label>
-            <input
-              type="password"
-              placeholder="Enter your password"
-              required
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              className={styles.input}
-              disabled={loading}
-            />
-          </div>
-          <button 
-            type="submit" 
-            className={styles.submitBtn}
-            disabled={loading}
-          >
-            {loading ? 'Signing In...' : 'Login'}
-          </button>
-        </form>
-        {message && (
-          <div className={`${styles.message} ${message.startsWith('✅') ? styles.success : styles.error}`}>
-            {message}
-          </div>
-        )}
-        <div className={styles.authFooter}>
-          <p>Don't have an account? <a href="/auth/signup">Sign Up</a></p>
+            >
+              {loading ? 'Signing In...' : 'Login'}
+            </button>
+          </form>
+          {message && (
+            <div className={`${styles.message} ${message.startsWith('✅') ? styles.success : styles.error}`}>
+              {message}
+            </div>
+          )}
+          <div className={styles.authFooter}>
+            <p>Don't have an account? <a href="/auth/signup">Sign Up</a></p>
           </div>
         </div>
         <div className={styles.authCardRight}>
@@ -122,6 +165,20 @@ export default function LoginPage() {
           <div className={styles.signupText}>
             <h2>Welcome Back!</h2>
             <p>Sign in to access your dashboard, buy or sell cars, and manage your listings on our secure marketplace.</p>
+            <div className={styles.userTypes}>
+              <div className={styles.userType}>
+                <span className={styles.userTypeIcon}>🛒</span>
+                <span>Buyers</span>
+              </div>
+              <div className={styles.userType}>
+                <span className={styles.userTypeIcon}>🏪</span>
+                <span>Sellers</span>
+              </div>
+              <div className={styles.userType}>
+                <span className={styles.userTypeIcon}>👨‍💼</span>
+                <span>Admins</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

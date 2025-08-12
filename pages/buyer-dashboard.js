@@ -312,12 +312,16 @@ export default function BuyerDashboard() {
       setPurchases(buyerPurchases || []);
       }
       
-      // Fetch available cars with seller details - using seller_id as seller reference
+      // Fetch available cars with seller details and approval status
       const { data: cars, error: carsError } = await supabase
         .from('cars')
         .select(`
           *,
-          seller_id
+          seller_id,
+          admin_approvals(
+            approval_status,
+            approved_at
+          )
         `)
         .eq('status', 'available');
       
@@ -347,7 +351,34 @@ export default function BuyerDashboard() {
         );
         
         console.log('Cars with seller details:', carsWithSellerDetails);
-        setAvailableCars(carsWithSellerDetails);
+        
+        // Filter approved cars for buyer
+        const approvedCars = carsWithSellerDetails.filter(car => {
+          console.log('Car:', car.title, 'Admin approvals:', car.admin_approvals);
+          
+          // Check if car has approval record
+          if (car.admin_approvals && car.admin_approvals.length > 0) {
+            const latestApproval = car.admin_approvals[car.admin_approvals.length - 1];
+            console.log('Latest approval for', car.title, ':', latestApproval);
+            
+            // Only show if latest approval is 'approved'
+            if (latestApproval.approval_status === 'approved') {
+              console.log('Car approved:', car.title);
+              return true;
+            } else {
+              console.log('Car not approved:', car.title);
+              return false;
+            }
+          }
+          
+          // If no approval record, don't show it (new cars need approval)
+          console.log('No approval record for', car.title, '- not showing');
+          return false;
+        });
+        
+        console.log('Approved cars for buyer:', approvedCars);
+        console.log('Number of approved cars:', approvedCars.length);
+        setAvailableCars(approvedCars);
       } else {
         setAvailableCars([]);
       }
@@ -757,9 +788,32 @@ export default function BuyerDashboard() {
         <div className={styles.mainContent}>
           {activeTab === 'browse' && (
             <div className={styles.browseCars}>
-              <div className={styles.sectionHeader}>
-                <h1>Available Cars</h1>
+              {/* Overview Stats Section */}
+              <div className={styles.overviewStats}>
+                <div className={styles.statsGrid}>
+                  <div className={styles.statCard}>
+                    <div className={styles.statIcon}>🚗</div>
+                    <h3>Available Cars</h3>
+                    <p className={styles.statNumber}>{availableCars.length}</p>
+                    <small>Cars ready for purchase</small>
+                  </div>
+                  
+                  <div className={styles.statCard}>
+                    <div className={styles.statIcon}>💰</div>
+                    <h3>Total Purchases</h3>
+                    <p className={styles.statNumber}>{purchases.length}</p>
+                    <small>Cars you've bought</small>
+                  </div>
+                  
+                  <div className={styles.statCard}>
+                    <div className={styles.statIcon}>👤</div>
+                    <h3>Your Profile</h3>
+                    <p className={styles.statNumber}>Active</p>
+                    <small>Account status</small>
+                  </div>
+                </div>
               </div>
+              
               {availableCars.length === 0 ? (
                 <div className={styles.emptyState}>
                   <p>No cars available for purchase at the moment.</p>

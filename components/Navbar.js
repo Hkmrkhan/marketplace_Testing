@@ -73,6 +73,13 @@ export default function Navbar({ logoText }) {
                     <li><button onClick={handleLogout} className={styles.navLink} style={{background:'none',border:'none',padding:0,margin:0,cursor:'pointer'}}>Logout</button></li>
                   </>
                 )}
+                {userProfile?.user_type === 'admin' && (
+                  <>
+                    <li><Link href="/cars" className={`${styles.navLink} ${router.pathname === '/cars' ? styles.active : ''}`}>All Cars</Link></li>
+                    <li><Link href="/admin-dashboard" className={`${styles.navLink} ${router.pathname === '/admin-dashboard' ? styles.active : ''}`}>Admin Dashboard</Link></li>
+                    <li><button onClick={handleLogout} className={styles.navLink} style={{background:'none',border:'none',padding:0,margin:0,cursor:'pointer'}}>Logout</button></li>
+                  </>
+                )}
               </ul>
             </>
           )}

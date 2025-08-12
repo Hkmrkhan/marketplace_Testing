@@ -14,24 +14,36 @@ export default function SignupPage() {
   const router = useRouter();
 
   useEffect(() => {
-    supabase.auth.getUser().then(async ({ data: { user } }) => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         // Fetch user profile
         const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-        if (profile?.user_type === 'seller') {
-          router.replace('/seller-dashboard');
-        } else {
-          router.replace('/buyer-dashboard');
+        
+        if (profile) {
+          console.log('User already logged in:', profile.user_type);
+          
+          // Redirect based on user type
+          if (profile.user_type === 'seller') {
+            router.replace('/seller-dashboard');
+          } else if (profile.user_type === 'admin') {
+            router.replace('/admin-dashboard');
+          } else {
+            router.replace('/buyer-dashboard');
+          }
         }
       }
-    });
-  }, []);
+    };
+    
+    checkUser();
+  }, [router]);
 
   const handleSignup = async (e) => {
     e.preventDefault();
     setMessage('');
     setLoading(true);
     
+    try {
       if (!email || !password || !fullName) {
         setMessage('❌ Please fill in all required fields.');
         setLoading(false);
@@ -43,7 +55,9 @@ export default function SignupPage() {
         return;
       }
       
-    // Supabase Auth signup
+      console.log('Starting signup process for user type:', userType);
+      
+      // Supabase Auth signup
       const { data, error } = await supabase.auth.signUp({ 
         email, 
         password,
@@ -56,24 +70,21 @@ export default function SignupPage() {
       });
       
       if (error) {
+        console.error('Auth signup error:', error);
         setMessage('❌ ' + error.message);
         setLoading(false);
         return;
       }
 
-      // Create profile with WhatsApp number
+      // Create profile manually
       if (data.user) {
-        console.log('Creating profile with data:', {
-          id: data.user.id,
-          full_name: fullName,
-          email: email,
-          user_type: userType,
-          whatsapp_number: whatsappNumber
-        });
+        console.log('User created successfully:', data.user.id);
+        console.log('Creating profile with user type:', userType);
         
-        // Clean WhatsApp number (remove spaces, dashes, etc.)
+        // Clean WhatsApp number
         const cleanWhatsappNumber = whatsappNumber ? whatsappNumber.replace(/[\s\-\(\)]/g, '') : null;
         
+        // Create profile
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .insert([{
@@ -84,56 +95,37 @@ export default function SignupPage() {
             whatsapp_number: cleanWhatsappNumber
           }])
           .select();
-
+          
         if (profileError) {
           console.error('Profile creation error:', profileError);
-          
-          // Try alternative approach - create profile without RLS check
-          try {
-            const { data: altProfileData, error: altError } = await supabase
-              .from('profiles')
-              .upsert([{
-                id: data.user.id,
-                full_name: fullName,
-                email: email,
-                user_type: userType,
-                whatsapp_number: cleanWhatsappNumber
-              }], { 
-                onConflict: 'id',
-                ignoreDuplicates: false 
-              })
-              .select();
-              
-            if (altError) {
-              console.error('Alternative profile creation also failed:', altError);
-              setMessage('❌ Profile creation failed: ' + profileError.message);
-              setLoading(false);
-              return;
-            } else {
-              console.log('Profile created successfully via upsert:', altProfileData);
-              console.log('WhatsApp number saved:', cleanWhatsappNumber);
-            }
-          } catch (upsertError) {
-            console.error('Upsert also failed:', upsertError);
-            setMessage('❌ Profile creation failed: ' + profileError.message);
-            setLoading(false);
-            return;
-          }
+          setMessage('❌ Profile creation failed: ' + profileError.message);
+          setLoading(false);
+          return;
         } else {
           console.log('Profile created successfully:', profileData);
-          console.log('WhatsApp number saved:', cleanWhatsappNumber);
+          console.log('User type confirmed:', userType);
         }
       }
       
-    setMessage('✅ Account created! Redirecting to your dashboard...');
-          setTimeout(() => {
-            if (userType === 'seller') {
-              router.push('/seller-dashboard');
-            } else {
-              router.push('/buyer-dashboard');
-            }
-    }, 1200);
-      setLoading(false);
+      setMessage('✅ Account created successfully! Redirecting...');
+      
+      // Redirect based on user type
+      setTimeout(() => {
+        if (userType === 'seller') {
+          router.push('/seller-dashboard');
+        } else if (userType === 'admin') {
+          router.push('/admin-dashboard');
+        } else {
+          router.push('/buyer-dashboard');
+        }
+      }, 1500);
+      
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      setMessage('❌ An unexpected error occurred: ' + error.message);
+    }
+    
+    setLoading(false);
   };
 
   return (
@@ -228,6 +220,21 @@ export default function SignupPage() {
                   <div className={styles.radioCard}>
                     <h3>Sell Cars</h3>
                     <p>List your cars and reach buyers</p>
+                  </div>
+                </label>
+                <label className={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    name="userType"
+                    value="admin"
+                    checked={userType === 'admin'}
+                    onChange={e => setUserType(e.target.value)}
+                    className={styles.radioInput}
+                    disabled={loading}
+                  />
+                  <div className={styles.radioCard}>
+                    <h3>Admin Access</h3>
+                    <p>Manage marketplace and approve listings</p>
                   </div>
                 </label>
               </div>

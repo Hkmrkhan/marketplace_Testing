@@ -26,12 +26,27 @@ export default function CarsPage() {
 
   const fetchCars = async () => {
     setLoading(true);
-    // Fetch from Supabase view 'cars_with_seller_enhanced'
+    // Fetch from Supabase view 'cars_with_seller_enhanced' - only approved cars
     const { data, error } = await supabase
       .from('cars_with_seller_enhanced')
       .select('*')
       .eq('status', 'available')
       .order('created_at', { ascending: false });
+    
+    // Filter approved cars on frontend
+    if (data) {
+      const approvedCars = data.filter(car => {
+        // If car has approval_status, check it's approved
+        if (car.approval_status) {
+          return car.approval_status === 'approved';
+        }
+        // If no approval_status, show it (existing cars)
+        return true;
+      });
+      setCars(approvedCars);
+    } else {
+      setCars([]);
+    }
     if (error) {
       setCars([]);
     } else {

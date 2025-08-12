@@ -248,6 +248,45 @@
   line-height: 1.6;
 }
 
+.userTypes {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.userType {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  min-width: 80px;
+}
+
+.userType:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.userTypeIcon {
+  font-size: 1.5rem;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+.userType span:last-child {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
 /* Laptop screens (1024px - 1366px) */
 @media (max-width: 1366px) {
   .authContainer {
@@ -279,6 +318,24 @@
   
   .signupText p {
     font-size: 0.95rem;
+  }
+  
+  .userTypes {
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  
+  .userType {
+    padding: 0.75rem;
+    min-width: 70px;
+  }
+  
+  .userTypeIcon {
+    font-size: 1.3rem;
+  }
+  
+  .userType span:last-child {
+    font-size: 0.8rem;
   }
   
   .authCard {
@@ -326,6 +383,24 @@
   
   .signupText p {
     font-size: 0.9rem;
+  }
+  
+  .userTypes {
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+  
+  .userType {
+    padding: 0.5rem;
+    min-width: 60px;
+  }
+  
+  .userTypeIcon {
+    font-size: 1.1rem;
+  }
+  
+  .userType span:last-child {
+    font-size: 0.75rem;
   }
   
   .authCard {
