@@ -203,8 +203,7 @@ export default function SignupPage() {
                     disabled={loading}
                   />
                   <div className={styles.radioCard}>
-                    <h3>Buy Cars</h3>
-                    <p>Browse and purchase cars from sellers</p>
+                    <h3>Buyer</h3>
                   </div>
                 </label>
                 <label className={styles.radioLabel}>
@@ -218,8 +217,7 @@ export default function SignupPage() {
                     disabled={loading}
                   />
                   <div className={styles.radioCard}>
-                    <h3>Sell Cars</h3>
-                    <p>List your cars and reach buyers</p>
+                    <h3>Seller</h3>
                   </div>
                 </label>
                 <label className={styles.radioLabel}>
@@ -233,8 +231,7 @@ export default function SignupPage() {
                     disabled={loading}
                   />
                   <div className={styles.radioCard}>
-                    <h3>Admin Access</h3>
-                    <p>Manage marketplace and approve listings</p>
+                    <h3>Admin</h3>
                   </div>
                 </label>
               </div>
