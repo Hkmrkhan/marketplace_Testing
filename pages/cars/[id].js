@@ -2,6 +2,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
+import StripeCheckout from '../../components/StripeCheckout';
 import { supabase } from '../../utils/supabaseClient';
 
 function ChatModal({ open, onClose, carId, sellerId, buyerId }) {
@@ -91,6 +92,8 @@ export default function CarDetails() {
   const [showChat, setShowChat] = useState(false);
   const [buyerId, setBuyerId] = useState(null);
   const [sellerWhatsapp, setSellerWhatsapp] = useState(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
 
   const fetchCar = async () => {
     if (!id) return;
@@ -99,44 +102,32 @@ export default function CarDetails() {
     const { data, error } = await supabase.from('cars_with_seller').select('*').eq('car_id', id).single();
     if (error || !data) {
       setError('Car not found');
-      setCar(null);
-    } else {
-      // Clean the description field
-      if (data.description) {
-        console.log('Original description:', data.description);
-        
-        // Remove the specific Supabase link pattern with @ symbol
-        data.description = data.description.replace(/@luxuryhttps:\/\/supabase\.com\/dashboard\/project\/[^\s]+/g, 'Luxury car');
-        // Remove the specific Supabase link pattern
-        data.description = data.description.replace(/luxuryhttps:\/\/supabase\.com\/dashboard\/project\/[^\s]+/g, 'Luxury car');
-        // Remove Bing image URLs
-        data.description = data.description.replace(/https:\/\/th\.bing\.com\/th\?id=[^\s]+/g, '');
-        // Remove any URLs or Supabase links from description
-        data.description = data.description.replace(/https?:\/\/[^\s]+/g, '').trim();
-        // Remove any database references or technical strings
-        data.description = data.description.replace(/supabase\.com\/dashboard\/project\/[^\s]+/g, '').trim();
-        data.description = data.description.replace(/schema=public/g, '').trim();
-        data.description = data.description.replace(/editor\/\d+/g, '').trim();
-        // Remove price from description if it's mixed in
-        data.description = data.description.replace(/\d{4,5}\s*$/g, '').trim();
-        // Clean up multiple spaces
-        data.description = data.description.replace(/\s+/g, ' ').trim();
-        
-        // If description still contains problematic patterns, completely replace it
-        if (data.description.includes('supabase.com') || data.description.includes('@luxury') || data.description.includes('schema=public') || data.description.includes('luxuryhttps')) {
-          data.description = 'Luxury car with premium features and excellent condition. Perfect for those looking for a high-end vehicle with all modern amenities. Contact seller for more details and test drive.';
-        }
-        
-        // If description is empty after cleaning, set a default
-        if (!data.description) {
-          data.description = 'Luxury car with premium features. Contact seller for more details.';
-        }
-        
-        console.log('Cleaned description:', data.description);
-      }
-      setCar(data);
+      setLoading(false);
+      return;
     }
+    setCar(data);
     setLoading(false);
+  };
+
+  const handlePaymentSuccess = async (paymentIntent) => {
+    console.log('=== PAYMENT SUCCESS HANDLER CALLED ===');
+    console.log('Payment Intent:', paymentIntent);
+    console.log('Car object:', car);
+    console.log('Buyer ID:', buyerId);
+    
+    setPaymentSuccess(true);
+    setShowPaymentModal(false);
+    
+    // Show success message
+    setBuyMessage('✅ Payment successful! Car purchased successfully. Updating car status...');
+    
+    // Refresh car data after a delay to show updated status
+    setTimeout(() => {
+      console.log('Refreshing car data...');
+      fetchCar();
+      setBuyMessage('✅ Car purchased successfully! Car status updated to sold.');
+      console.log('=== PAYMENT SUCCESS HANDLER COMPLETED ===');
+    }, 2000);
   };
 
   useEffect(() => {
@@ -167,46 +158,33 @@ export default function CarDetails() {
     }
   }, [car]);
 
-  const handleBuy = async () => {
-    setBuyMessage('');
-    try {
-      // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        setBuyMessage('❌ Please login to buy this car.');
-        return;
-      }
-      // Insert purchase
-      const { error: purchaseError } = await supabase.from('purchases').insert([
-        {
-          car_id: car.car_id,
-          buyer_id: user.id,
-          seller_id: car.seller_email ? undefined : null, // fallback if seller_id not available
-          amount: car.price
-        }
-      ]);
-      if (purchaseError) {
-        setBuyMessage('❌ Purchase failed: ' + purchaseError.message);
-        return;
-      }
-      // Update car status to 'sold'
-      const { error: carError, data: carUpdateData } = await supabase
-        .from('cars')
-        .update({ status: 'sold' })
-        .eq('id', car.id);
-
-      console.log('car.id:', car.id);
-      console.log('Car update result:', carUpdateData, carError);
-
-      if (carError) {
-        setBuyMessage('❌ Error updating car status: ' + carError.message);
-        return;
-      }
-      setBuyMessage('✅ Purchase successful! Redirecting to your dashboard...');
-      setTimeout(() => router.push('/buyer-dashboard'), 1500);
-    } catch (err) {
-      setBuyMessage('❌ Unexpected error: ' + err.message);
+  const handleBuy = () => {
+    if (!buyerId) {
+      setBuyMessage('❌ Please login to purchase this car');
+      return;
     }
+    
+    if (car.status === 'sold') {
+      setBuyMessage('❌ This car is already sold');
+      return;
+    }
+    
+    // Log car data for debugging
+    console.log('=== CAR DATA DEBUG ===');
+    console.log('Complete car object:', car);
+    console.log('Car ID:', car.id);
+    console.log('Car ID (alternative):', car.car_id);
+    console.log('Buyer ID:', buyerId);
+    console.log('Seller ID (seller_id):', car.seller_id);
+    console.log('Seller ID (profiles.id):', car.profiles?.id);
+    console.log('Seller ID (user_id):', car.user_id);
+    console.log('Car price:', car.price);
+    console.log('Car status:', car.status);
+    console.log('=== END DEBUG ===');
+    
+    // Show payment modal
+    setShowPaymentModal(true);
+    setBuyMessage('');
   };
 
   // Combine all images for the car
@@ -471,6 +449,68 @@ export default function CarDetails() {
         </div>
       )}
       <ChatModal open={showChat} onClose={() => setShowChat(false)} carId={car.car_id || car.id} sellerId={car.seller_id} buyerId={buyerId} />
+      
+      {/* Payment Modal */}
+      {showPaymentModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0,0,0,0.5)',
+          zIndex: 10000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <div style={{
+            background: 'white',
+            borderRadius: '12px',
+            padding: '2rem',
+            maxWidth: '500px',
+            width: '90%',
+            maxHeight: '80vh',
+            overflowY: 'auto',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.3)'
+          }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '1.5rem'
+            }}>
+              <h2 style={{ margin: 0, color: '#333' }}>Complete Purchase</h2>
+              <button
+                onClick={() => setShowPaymentModal(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '1.5rem',
+                  cursor: 'pointer',
+                  color: '#666'
+                }}
+              >
+                ×
+              </button>
+            </div>
+            
+            <div style={{ marginBottom: '1.5rem' }}>
+              <h3 style={{ margin: '0 0 0.5rem 0', color: '#333' }}>{car.title}</h3>
+              <p style={{ margin: '0 0 1rem 0', color: '#666' }}>
+                Price: <strong style={{ color: '#667eea', fontSize: '1.2rem' }}>${car.price?.toLocaleString()}</strong>
+              </p>
+            </div>
+            
+            <StripeCheckout 
+              car={car} 
+              userId={buyerId} 
+              onSuccess={handlePaymentSuccess}
+            />
+          </div>
+        </div>
+      )}
+      
       <Footer />
     </div>
   );

@@ -6,6 +6,7 @@ import styles from '../../styles/Auth.module.css';
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -133,15 +134,25 @@ export default function LoginPage() {
             </div>
             <div className={styles.formGroup}>
               <label>Password</label>
-              <input
-                type="password"
-                placeholder="Enter your password"
-                required
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                className={styles.input}
-                disabled={loading}
-              />
+              <div className={styles.passwordInputContainer}>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  required
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  className={styles.input}
+                  disabled={loading}
+                />
+                <button
+                  type="button"
+                  className={styles.passwordToggle}
+                  onClick={() => setShowPassword(!showPassword)}
+                  disabled={loading}
+                >
+                  {showPassword ? "🙈" : "👁️"}
+                </button>
+              </div>
             </div>
             <button 
               type="submit" 
@@ -173,10 +184,6 @@ export default function LoginPage() {
               <div className={styles.userType}>
                 <span className={styles.userTypeIcon}>🏪</span>
                 <span>Sellers</span>
-              </div>
-              <div className={styles.userType}>
-                <span className={styles.userTypeIcon}>👨‍💼</span>
-                <span>Admins</span>
               </div>
             </div>
           </div>

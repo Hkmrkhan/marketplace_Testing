@@ -6,8 +6,8 @@ import styles from '../../styles/Auth.module.css';
 export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
-  const [whatsappNumber, setWhatsappNumber] = useState('');
   const [userType, setUserType] = useState('buyer');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -26,8 +26,6 @@ export default function SignupPage() {
           // Redirect based on user type
           if (profile.user_type === 'seller') {
             router.replace('/seller-dashboard');
-          } else if (profile.user_type === 'admin') {
-            router.replace('/admin-dashboard');
           } else {
             router.replace('/buyer-dashboard');
           }
@@ -51,6 +49,11 @@ export default function SignupPage() {
       }
       if (password.length < 6) {
         setMessage('❌ Password must be at least 6 characters long.');
+        setLoading(false);
+        return;
+      }
+      if (password !== confirmPassword) {
+        setMessage('❌ Passwords do not match.');
         setLoading(false);
         return;
       }
@@ -81,9 +84,6 @@ export default function SignupPage() {
         console.log('User created successfully:', data.user.id);
         console.log('Creating profile with user type:', userType);
         
-        // Clean WhatsApp number
-        const cleanWhatsappNumber = whatsappNumber ? whatsappNumber.replace(/[\s\-\(\)]/g, '') : null;
-        
         // Create profile
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
@@ -91,41 +91,87 @@ export default function SignupPage() {
             id: data.user.id,
             full_name: fullName,
             email: email,
-            user_type: userType,
-            whatsapp_number: cleanWhatsappNumber
+            user_type: userType
           }])
           .select();
           
         if (profileError) {
           console.error('Profile creation error:', profileError);
-          setMessage('❌ Profile creation failed: ' + profileError.message);
+          setMessage('❌ Failed to create profile: ' + profileError.message);
           setLoading(false);
           return;
+        }
+
+        console.log('Profile created successfully:', profileData);
+
+        // Handle different user types
+        if (userType === 'seller') {
+          console.log('Setting up seller account...');
+          
+          try {
+            // Call existing Stripe account creation API
+            const response = await fetch('/api/create-stripe-account', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                userId: data.user.id,
+                userEmail: email,
+                country: 'US'
+              })
+            });
+
+            const stripeData = await response.json();
+            console.log('Stripe API response:', stripeData);
+            
+            if (response.ok && stripeData.accountId) {
+              console.log('✅ Stripe Connect account created successfully:', stripeData.accountId);
+              setMessage('✅ Account created! Setting up payment system...');
+              
+              // Wait for database update to complete
+              setTimeout(() => {
+                console.log('Redirecting to Stripe onboarding...');
+                window.location.href = stripeData.onboardingUrl;
+              }, 3000);
+              return;
+            } else {
+              console.error('Stripe account creation failed:', stripeData.error);
+              setMessage('⚠️ Account created but payment setup failed. You can complete it later.');
+              
+              // Still redirect to dashboard even if Stripe fails
+              setTimeout(() => {
+                router.push('/seller-dashboard');
+              }, 2000);
+              return;
+            }
+          } catch (stripeError) {
+            console.error('Stripe API error:', stripeError);
+            setMessage('⚠️ Account created but payment setup failed. You can complete it later.');
+            
+            // Still redirect to dashboard even if Stripe fails
+            setTimeout(() => {
+              router.push('/seller-dashboard');
+            }, 2000);
+            return;
+          }
         } else {
-          console.log('Profile created successfully:', profileData);
-          console.log('User type confirmed:', userType);
+          // For buyer, redirect to dashboard
+          setMessage('✅ Account created successfully! Redirecting...');
+          
+          setTimeout(() => {
+            router.push('/buyer-dashboard');
+          }, 2000);
         }
       }
       
-      setMessage('✅ Account created successfully! Redirecting...');
+      setLoading(false);
       
-      // Redirect based on user type
-      setTimeout(() => {
-        if (userType === 'seller') {
-          router.push('/seller-dashboard');
-        } else if (userType === 'admin') {
-          router.push('/admin-dashboard');
-        } else {
-          router.push('/buyer-dashboard');
-        }
-      }, 1500);
-      
-    } catch (error) {
-      console.error('Unexpected error:', error);
-      setMessage('❌ An unexpected error occurred: ' + error.message);
+    } catch (err) {
+      console.error('Signup error:', err);
+      setMessage('❌ ' + err.message);
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   return (
@@ -137,104 +183,89 @@ export default function SignupPage() {
             <p>Create your account to start buying or selling cars</p>
           </div>
           <form onSubmit={handleSignup} className={styles.authForm}>
+            <div style={{ 
+              backgroundColor: '#f8f9fa', 
+              padding: '10px', 
+              borderRadius: '5px', 
+              marginBottom: '20px',
+              fontSize: '14px',
+              color: '#666',
+              border: '1px solid #e9ecef'
+            }}>
+              <span style={{color: 'red'}}>*</span> Required fields
+            </div>
+            
             <div className={styles.formGroup}>
-              <label>Full Name</label>
+              <label htmlFor="fullName">Full Name <span style={{color: 'red'}}>*</span></label>
               <input
                 type="text"
-                placeholder="Enter your full name"
-                required
+                id="fullName"
                 value={fullName}
-                onChange={e => setFullName(e.target.value)}
+                onChange={(e) => setFullName(e.target.value)}
+                required
                 className={styles.input}
                 disabled={loading}
               />
             </div>
             <div className={styles.formGroup}>
-              <label>Email</label>
+              <label htmlFor="email">Email <span style={{color: 'red'}}>*</span></label>
               <input
                 type="email"
-                placeholder="Enter your email"
-                required
+                id="email"
                 value={email}
-                onChange={e => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
+                required
                 className={styles.input}
                 disabled={loading}
               />
             </div>
             <div className={styles.formGroup}>
-              <label>Password</label>
+              <label htmlFor="password">Password <span style={{color: 'red'}}>*</span></label>
               <input
                 type="password"
-                placeholder="Create a strong password"
-                required
+                id="password"
                 value={password}
-                onChange={e => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)}
+                required
                 className={styles.input}
                 disabled={loading}
               />
             </div>
             <div className={styles.formGroup}>
-              <label>WhatsApp Number (Optional)</label>
+              <label htmlFor="confirmPassword">Confirm Password <span style={{color: 'red'}}>*</span></label>
               <input
-                type="tel"
-                placeholder="e.g., 0341XXXXXXX or +92341XXXXXXX"
-                value={whatsappNumber}
-                onChange={e => setWhatsappNumber(e.target.value)}
+                type="password"
+                id="confirmPassword"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
                 className={styles.input}
                 disabled={loading}
-                pattern="[0-9+\-\s\(\)]+"
-                title="Enter your WhatsApp number with or without country code"
               />
-              <small style={{ color: '#666', fontSize: '12px', marginTop: '4px' }}>
-                Format: 0341XXXXXXX or +92341XXXXXXX
-              </small>
             </div>
-            <div className={styles.formGroup}>
-              <label>I want to:</label>
-              <div className={styles.userTypeSelector}>
-                <label className={styles.radioLabel}>
-                  <input
-                    type="radio"
-                    name="userType"
-                    value="buyer"
-                    checked={userType === 'buyer'}
-                    onChange={e => setUserType(e.target.value)}
-                    className={styles.radioInput}
-                    disabled={loading}
-                  />
-                  <div className={styles.radioCard}>
-                    <h3>Buyer</h3>
-                  </div>
-                </label>
-                <label className={styles.radioLabel}>
-                  <input
-                    type="radio"
-                    name="userType"
-                    value="seller"
-                    checked={userType === 'seller'}
-                    onChange={e => setUserType(e.target.value)}
-                    className={styles.radioInput}
-                    disabled={loading}
-                  />
-                  <div className={styles.radioCard}>
-                    <h3>Seller</h3>
-                  </div>
-                </label>
-                <label className={styles.radioLabel}>
-                  <input
-                    type="radio"
-                    name="userType"
-                    value="admin"
-                    checked={userType === 'admin'}
-                    onChange={e => setUserType(e.target.value)}
-                    className={styles.radioInput}
-                    disabled={loading}
-                  />
-                  <div className={styles.radioCard}>
-                    <h3>Admin</h3>
-                  </div>
-                </label>
-              </div>
+            {/* User Type Selection */}
+            <div className={styles.userTypeSelector}>
+              <label className={styles.radioCard}>
+                <input
+                  type="radio"
+                  name="userType"
+                  value="buyer"
+                  checked={userType === 'buyer'}
+                  onChange={(e) => setUserType(e.target.value)}
+                />
+                <h3>Buyer</h3>
+              </label>
+              
+              <label className={styles.radioCard}>
+                <input
+                  type="radio"
+                  name="userType"
+                  value="seller"
+                  checked={userType === 'seller'}
+                  onChange={(e) => setUserType(e.target.value)}
+                />
+                <h3>Seller</h3>
+              </label>
             </div>
             <button 
               type="submit" 

@@ -18,6 +18,10 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [message, setMessage] = useState('');
+  const [backfillLoading, setBackfillLoading] = useState(false);
+  const [backfillMessage, setBackfillMessage] = useState('');
+  const [cleanupLoading, setCleanupLoading] = useState(false);
+  const [cleanupMessage, setCleanupMessage] = useState('');
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -315,6 +319,224 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleBackfillCommissions = async () => {
+    setBackfillLoading(true);
+    setBackfillMessage('');
+    try {
+      console.log('Starting commission backfill...');
+      
+      // 1. Get all purchases with car details
+      const { data: purchases, error: purchasesError } = await supabase
+        .from('purchases')
+        .select(`
+          *,
+          cars!inner(
+            id,
+            title,
+            price,
+            image_url
+          ),
+          buyer:profiles!purchases_buyer_id_fkey(
+            full_name,
+            email
+          ),
+          seller:profiles!purchases_seller_id_fkey(
+            full_name,
+            email
+          )
+        `)
+        .order('purchase_date', { ascending: false });
+
+      if (purchasesError) {
+        console.error('Error fetching purchases:', purchasesError);
+        setBackfillMessage('❌ Failed to fetch purchases: ' + purchasesError.message);
+        setBackfillLoading(false);
+        return;
+      }
+
+      console.log(`Found ${purchases.length} purchases to process`);
+
+      let successCount = 0;
+      let errorCount = 0;
+      const results = [];
+
+      // 2. Process each purchase
+      for (const purchase of purchases) {
+        try {
+          console.log(`Processing purchase ${purchase.id} for car ${purchase.car_id}`);
+
+          // Check if commission already exists
+          const { data: existingCommission } = await supabase
+            .from('admin_commissions')
+            .select('id')
+            .eq('sale_id', purchase.id)
+            .single();
+
+          if (existingCommission) {
+            console.log(`Commission already exists for purchase ${purchase.id}, skipping...`);
+            continue;
+          }
+
+          // Calculate commission (10%)
+          const commissionAmount = Math.round(purchase.amount * 0.10 * 100) / 100;
+
+          // Create commission record
+          const { data: newCommission, error: newCommissionError } = await supabase
+            .from('admin_commissions')
+            .insert([{
+              sale_id: purchase.id,
+              car_id: purchase.car_id,
+              car_title: purchase.cars?.title || 'Car Purchase',
+              car_price: purchase.amount,
+              sale_amount: purchase.amount,
+              commission_amount: commissionAmount,
+              commission_rate: 10.00,
+              buyer_id: purchase.buyer_id,
+              buyer_name: purchase.buyer?.full_name || 'Unknown Buyer',
+              buyer_email: purchase.buyer?.email || null,
+              seller_id: purchase.seller_id,
+              seller_name: purchase.seller?.full_name || 'Unknown Seller',
+              seller_email: purchase.seller?.email || null,
+              sale_date: purchase.purchase_date,
+              created_at: new Date().toISOString()
+            }])
+            .select()
+            .single();
+
+          if (newCommissionError) {
+            console.error(`Error inserting commission for purchase ${purchase.id}:`, newCommissionError);
+            errorCount++;
+            results.push({
+              purchaseId: purchase.id,
+              status: 'failed',
+              error: newCommissionError.message
+            });
+          } else {
+            console.log(`✅ Commission created for purchase ${purchase.id}: $${commissionAmount}`);
+            successCount++;
+            results.push({
+              purchaseId: purchase.id,
+              status: 'success',
+              commissionAmount: commissionAmount
+            });
+          }
+
+          // Small delay to avoid overwhelming the database
+          await new Promise(resolve => setTimeout(resolve, 100));
+
+        } catch (error) {
+          console.error(`Error processing purchase ${purchase.id}:`, error);
+          errorCount++;
+          results.push({
+            purchaseId: purchase.id,
+            status: 'failed',
+            error: error.message
+          });
+        }
+      }
+
+      console.log(`Backfill completed: ${successCount} success, ${errorCount} failed`);
+      
+      if (successCount > 0) {
+        setBackfillMessage(`✅ Commission backfill completed. ${successCount} commissions created, ${errorCount} failed.`);
+        loadCommissionData(); // Reload commission data
+      } else {
+        setBackfillMessage(`❌ No commissions created. ${errorCount} failed. Check console for details.`);
+      }
+
+    } catch (error) {
+      console.error('Error during commission backfill:', error);
+      setBackfillMessage('❌ Error during commission backfill: ' + error.message);
+    } finally {
+      setBackfillLoading(false);
+    }
+  };
+
+  const handleCleanupDuplicates = async () => {
+    setCleanupLoading(true);
+    setCleanupMessage('');
+    try {
+      console.log('Starting database cleanup for duplicate purchases...');
+      
+      // 1. Identify duplicate purchase records based on sale_id and car_id
+      const { data: duplicates, error: duplicatesError } = await supabase
+        .from('purchases')
+        .select('sale_id, car_id, count')
+        .eq('sale_id', 'sale_id') // This query will find all rows where sale_id is the same as itself, effectively finding duplicates
+        .group('sale_id, car_id')
+        .having('count > 1');
+
+      if (duplicatesError) {
+        console.error('Error fetching duplicate purchases:', duplicatesError);
+        setCleanupMessage('❌ Failed to fetch duplicate purchases: ' + duplicatesError.message);
+        setCleanupLoading(false);
+        return;
+      }
+
+      console.log(`Found ${duplicates.length} duplicate purchase records.`);
+
+      let deletedCount = 0;
+      let errorCount = 0;
+      const results = [];
+
+      // 2. Delete the duplicate records
+      for (const dup of duplicates) {
+        try {
+          console.log(`Deleting duplicate purchase record for sale_id: ${dup.sale_id}, car_id: ${dup.car_id}`);
+          
+          const { error: deleteError } = await supabase
+            .from('purchases')
+            .delete()
+            .eq('sale_id', dup.sale_id)
+            .eq('car_id', dup.car_id);
+
+          if (deleteError) {
+            console.error(`Error deleting duplicate purchase record for sale_id: ${dup.sale_id}, car_id: ${dup.car_id}:`, deleteError);
+            errorCount++;
+            results.push({
+              saleId: dup.sale_id,
+              carId: dup.car_id,
+              status: 'failed',
+              error: deleteError.message
+            });
+          } else {
+            console.log(`✅ Deleted duplicate purchase record for sale_id: ${dup.sale_id}, car_id: ${dup.car_id}`);
+            deletedCount++;
+            results.push({
+              saleId: dup.sale_id,
+              carId: dup.car_id,
+              status: 'success'
+            });
+          }
+        } catch (error) {
+          console.error(`Error processing duplicate purchase record for sale_id: ${dup.sale_id}, car_id: ${dup.car_id}:`, error);
+          errorCount++;
+          results.push({
+            saleId: dup.sale_id,
+            carId: dup.car_id,
+            status: 'failed',
+            error: error.message
+          });
+        }
+      }
+
+      console.log(`Database cleanup completed. ${deletedCount} duplicate records deleted, ${errorCount} failed.`);
+      
+      if (deletedCount > 0) {
+        setCleanupMessage(`✅ Database cleanup completed. ${deletedCount} duplicate records deleted, ${errorCount} failed.`);
+        loadCommissionData(); // Reload commission data to reflect changes
+      } else {
+        setCleanupMessage(`❌ No duplicate records found to delete.`);
+      }
+
+    } catch (error) {
+      console.error('Error during database cleanup:', error);
+      setCleanupMessage('❌ Error during database cleanup: ' + error.message);
+    } finally {
+      setCleanupLoading(false);
+    }
+  };
+
   if (loading) {
     return (
         <div className={styles.loadingContainer}>
@@ -397,6 +619,24 @@ export default function AdminDashboard() {
                     {activeTab === 'overview' && (
             <div className={styles.section}>
               <h2>Dashboard Overview</h2>
+              
+              {/* Backfill Commissions Button */}
+              <div className={styles.backfillSection}>
+                <h3>💰 Commission Management</h3>
+                <p>Backfill admin commissions for all previous purchases (10% rate)</p>
+                <button 
+                  className={styles.backfillBtn}
+                  onClick={handleBackfillCommissions}
+                  disabled={backfillLoading}
+                >
+                  {backfillLoading ? 'Processing...' : '🔄 Backfill All Commissions'}
+                </button>
+                {backfillMessage && (
+                  <div className={`${styles.message} ${backfillMessage.includes('✅') ? styles.success : styles.error}`}>
+                    {backfillMessage}
+                  </div>
+                )}
+              </div>
               
               <div className={styles.statsGrid}>
                 <div className={styles.statCard}>

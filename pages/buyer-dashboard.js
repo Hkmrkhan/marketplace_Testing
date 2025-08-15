@@ -883,53 +883,7 @@ export default function BuyerDashboard() {
                           {console.log('Seller name:', car.seller?.full_name)}
                           {console.log('Has WhatsApp number?', !!car.seller?.whatsapp_number)}
                           
-                          {/* WhatsApp Contact Button */}
-                          {car.seller?.whatsapp_number ? (
-                            <button
-                              onClick={() => {
-                                const sellerName = car.seller?.full_name || 'Seller';
-                                const whatsappNumber = car.seller.whatsapp_number;
-                                const message = `Hi ${sellerName}, I'm interested in your car ${car.title}. Can you provide more details?`;
-                                const whatsappLink = `https://wa.me/${formatWhatsAppNumber(whatsappNumber)}?text=${encodeURIComponent(message)}`;
-                                window.open(whatsappLink, '_blank');
-                              }}
-                              style={{
-                                background: '#25D366',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: 8,
-                                padding: '8px 16px',
-                                fontSize: '12px',
-                                fontWeight: 'bold',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 6,
-                                marginTop: 8,
-                                width: '100%',
-                                justifyContent: 'center',
-                                transition: 'background 0.2s'
-                              }}
-                              onMouseOver={(e) => e.target.style.background = '#128C7E'}
-                              onMouseOut={(e) => e.target.style.background = '#25D366'}
-                            >
-                              <span>📱</span>
-                              Contact via WhatsApp
-                            </button>
-                          ) : (
-                            <div style={{ 
-                              marginTop: 8, 
-                              padding: '8px', 
-                              background: '#f0f0f0', 
-                              borderRadius: 8, 
-                              fontSize: '12px', 
-                              color: '#666',
-                              textAlign: 'center'
-                            }}>
-                              No WhatsApp contact available
-                              {console.log('No WhatsApp number for seller:', car.seller?.full_name)}
-                            </div>
-                          )}
+
                         </div>
                       </div>
                     );
@@ -984,41 +938,7 @@ export default function BuyerDashboard() {
                             {purchase.seller_email || purchase.seller?.email}
                           </div>
                         )}
-                        {/* WhatsApp Contact Button for Seller */}
-                        {(purchase.seller_whatsapp || purchase.seller?.whatsapp_number) && (
-                          <button
-                            onClick={() => {
-                              const sellerName = purchase.seller_name || purchase.seller?.full_name || 'Seller';
-                              const whatsappNumber = purchase.seller_whatsapp || purchase.seller?.whatsapp_number;
-                              const carTitle = purchase.title || purchase.cars?.title || 'Car';
-                              const message = `Hi ${sellerName}, regarding my purchase of ${carTitle}. How is everything going?`;
-                              const whatsappLink = `https://wa.me/${formatWhatsAppNumber(whatsappNumber)}?text=${encodeURIComponent(message)}`;
-                              window.open(whatsappLink, '_blank');
-                            }}
-                            style={{
-                              background: '#25D366',
-                              color: 'white',
-                              border: 'none',
-                              borderRadius: 6,
-                              padding: '6px 12px',
-                              fontSize: '11px',
-                              fontWeight: 'bold',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 4,
-                              marginTop: 6,
-                              width: '100%',
-                              justifyContent: 'center',
-                              transition: 'background 0.2s'
-                            }}
-                            onMouseOver={(e) => e.target.style.background = '#128C7E'}
-                            onMouseOut={(e) => e.target.style.background = '#25D366'}
-                          >
-                            <span>📱</span>
-                            Contact Seller
-                          </button>
-                        )}
+
                       </div>
                       <div className={styles.soldBadge}>Purchased</div>
                     </div>

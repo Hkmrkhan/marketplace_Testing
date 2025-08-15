@@ -7254,3 +7254,210 @@
     padding: 1rem;
   }
 }
+
+/* Stripe Setup Reminder */
+.stripeSetupReminder {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 1rem 0;
+  color: white;
+  box-shadow: 0 4px 15px rgba(238, 90, 36, 0.3);
+}
+
+.reminderIcon {
+  font-size: 1.5rem;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.reminderContent h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.reminderContent p {
+  margin: 0 0 1rem 0;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.completeSetupBtn {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.completeSetupBtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.completeSetupBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .stripeSetupReminder {
+    margin: 0.5rem 0;
+    padding: 0.75rem;
+  }
+  
+  .reminderContent h4 {
+    font-size: 0.9rem;
+  }
+  
+  .reminderContent p {
+    font-size: 0.8rem;
+  }
+}
+
+/* Profile Messages */
+.profileMessage {
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  animation: slideIn 0.3s ease;
+}
+
+.profileMessage.success {
+  background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+  color: white;
+}
+
+.profileMessage.error {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: white;
+}
+
+.messageText {
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.closeMessage {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 0.5rem;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+.closeMessage:hover {
+  opacity: 1;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Account Verification Reminder */
+.verificationReminder {
+  background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 1rem 0;
+  color: white;
+  box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+}
+
+.verifyAccountBtn {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.verifyAccountBtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.verifyAccountBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Bank Info Fix Section */
+.bankInfoFixSection {
+  background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 1rem 0;
+  color: white;
+  box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+}
+
+.reminderIcon {
+  font-size: 1.5rem;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.reminderContent h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.reminderContent p {
+  margin: 0 0 1rem 0;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.fixBankInfoBtn {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.completeSetupBtn:hover:not(:disabled),
+.fixBankInfoBtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.completeSetupBtn:disabled,
+.fixBankInfoBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

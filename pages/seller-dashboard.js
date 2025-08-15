@@ -867,6 +867,8 @@ export default function SellerDashboard() {
   const [availableCars, setAvailableCars] = useState(0);
   const [soldCars, setSoldCars] = useState(0);
   const [buyersLoading, setBuyersLoading] = useState(true); // Add loading state for buyers
+  const [stripeSetupLoading, setStripeSetupLoading] = useState(false); // Add loading state for Stripe setup
+
 
   // Helper to get all images for a car
   const getAllImages = (car) => {
@@ -1229,6 +1231,48 @@ export default function SellerDashboard() {
     }
   };
 
+  const handleCompleteStripeSetup = async () => {
+    setStripeSetupLoading(true);
+    try {
+      console.log('Initiating Stripe setup for user:', user.id);
+      
+      // Call the new create-seller-account API
+      const response = await fetch('/api/create-seller-account', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          email: user.email,
+          country: 'US'
+        })
+      });
+
+      const data = await response.json();
+      
+      if (response.ok && data.url) {
+        console.log('✅ Seller account created, redirecting to Stripe onboarding...');
+        setProfileMsg('✅ Seller account created! Redirecting to payment setup...');
+        
+        // Redirect to Stripe onboarding
+        setTimeout(() => {
+          window.location.href = data.url;
+        }, 2000);
+      } else {
+        console.error('Seller account creation failed:', data.error);
+        setProfileMsg('❌ Seller setup failed: ' + (data.error || 'Unknown error'));
+        setStripeSetupLoading(false);
+      }
+    } catch (error) {
+      console.error('Error in handleCompleteStripeSetup:', error);
+      setProfileMsg('❌ An unexpected error occurred: ' + error.message);
+      setStripeSetupLoading(false);
+    }
+  };
+
+
+
   if (loading) {
     return (
       <div>
@@ -1255,6 +1299,39 @@ export default function SellerDashboard() {
             <p>Car Seller</p>
           </div>
           
+          {/* Stripe Setup Reminder */}
+          {userProfile && !userProfile.stripe_account_id && (
+            <div className={styles.stripeSetupReminder}>
+              <div className={styles.reminderIcon}>⚠️</div>
+              <div className={styles.reminderContent}>
+                <h4>Payment Setup Required</h4>
+                <p>Complete your Stripe setup to receive payments</p>
+                <button 
+                  className={styles.completeSetupBtn}
+                  onClick={handleCompleteStripeSetup}
+                  disabled={stripeSetupLoading}
+                >
+                  {stripeSetupLoading ? 'Setting up...' : 'Complete Stripe Setup'}
+                </button>
+              </div>
+            </div>
+          )}
+
+
+
+          {/* Profile Messages */}
+          {profileMsg && (
+            <div className={`${styles.profileMessage} ${profileMsg.includes('✅') ? styles.success : styles.error}`}>
+              <span className={styles.messageText}>{profileMsg}</span>
+              <button 
+                className={styles.closeMessage}
+                onClick={() => setProfileMsg('')}
+              >
+                ×
+              </button>
+            </div>
+          )}
+
           <nav className={styles.sidebarNav}>
             <button 
               className={`${styles.navItem} ${activeTab === 'overview' ? styles.active : ''}`}
@@ -1482,40 +1559,7 @@ export default function SellerDashboard() {
                                     {sale.buyer_email && (
                                       <span style={{ marginLeft: 8, color: '#888' }}>({sale.buyer_email})</span>
                                     )}
-                                    {/* WhatsApp Contact Button for Buyer */}
-                                    {sale.buyer_whatsapp && (
-                                      <button
-                                        onClick={() => {
-                                          const buyerName = sale.buyer_name || 'Buyer';
-                                          const whatsappNumber = sale.buyer_whatsapp;
-                                          const message = `Hi ${buyerName}, regarding your purchase of ${car.title}. How is everything going?`;
-                                          const whatsappLink = `https://wa.me/${formatWhatsAppNumber(whatsappNumber)}?text=${encodeURIComponent(message)}`;
-                                          window.open(whatsappLink, '_blank');
-                                        }}
-                                        style={{
-                                          background: '#25D366',
-                                          color: 'white',
-                                          border: 'none',
-                                          borderRadius: 6,
-                                          padding: '6px 12px',
-                                          fontSize: '11px',
-                                          fontWeight: 'bold',
-                                          cursor: 'pointer',
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                          gap: 4,
-                                          marginTop: 6,
-                                          width: '100%',
-                                          justifyContent: 'center',
-                                          transition: 'background 0.2s'
-                                        }}
-                                        onMouseOver={(e) => e.target.style.background = '#128C7E'}
-                                        onMouseOut={(e) => e.target.style.background = '#25D366'}
-                                      >
-                                        <span>📱</span>
-                                        Contact Buyer
-                                      </button>
-                                    )}
+
                                   </>
                                 );
                               })()}
