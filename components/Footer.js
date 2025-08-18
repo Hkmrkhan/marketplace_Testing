@@ -39,7 +39,7 @@ export default function Footer({ userType }) {
         <div className={styles.footerSection}>
           <h4>Contact</h4>
           <div className={styles.contactInfo}>
-            <p>📧 support@carmarketplace.com</p>
+            <p>📧 hkmrkhan10@gmail.com</p>
             <p>📞 +92 300 1234567</p>
           </div>
         </div>
