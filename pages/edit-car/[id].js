@@ -44,6 +44,7 @@ export default function EditCarPage() {
         setMessage('You are not authorized to edit this car.');
         return;
       }
+      console.log('Fetched car data:', carData); // Debug log
       setCar(carData);
       setLoading(false);
     };
@@ -61,23 +62,37 @@ export default function EditCarPage() {
       setMessage('Car not found.');
       return;
     }
-    // Update car in Supabase
-    const { error } = await supabase.from('cars').update({
-      title: car.title,
-      description: car.description,
-      price: car.price,
-      image_url: car.image_url
-    }).eq('id', car.id);
-    if (error) {
-      setMessage('Failed to update car: ' + error.message);
-      return;
+    
+    try {
+      // Update car in Supabase with all fields
+      const { error } = await supabase.from('cars').update({
+        title: car.title,
+        description: car.description,
+        price: parseFloat(car.price),
+        miles: car.miles ? parseInt(car.miles) : 0,
+        reg_district: car.reg_district || 'Other',
+        year: car.year ? parseInt(car.year) : 2020,
+        image_url: car.image_url,
+        additional_images: car.additional_images?.filter(img => img && img.trim() !== '') || []
+      }).eq('id', car.id);
+      
+      if (error) {
+        setMessage('Failed to update car: ' + error.message);
+        return;
+      }
+      
+      setMessage('Car updated successfully!');
+      setTimeout(() => router.push('/seller-dashboard'), 1500);
+    } catch (error) {
+      console.error('Error updating car:', error);
+      setMessage('An unexpected error occurred: ' + error.message);
     }
-    setMessage('Car updated successfully!');
-    setTimeout(() => router.push('/seller-dashboard'), 1500);
   };
 
   if (loading) return <div>Loading...</div>;
   if (!car) return <div>{message || 'Car not found.'}</div>;
+  
+  console.log('Current car state in render:', car); // Debug log
 
   return (
     <div>
@@ -89,20 +104,23 @@ export default function EditCarPage() {
         </div>
         <form className={styles.form} onSubmit={handleSubmit}>
           <div className={styles.formGroup}>
-            <label className={styles.label}>Car Title</label>
+            <label className={styles.label}>Car Title <span className={styles.required}>*</span></label>
             <input
               type="text"
               name="title"
+              placeholder="e.g., Toyota Corolla 2020"
               value={car.title || ''}
               onChange={handleChange}
               className={styles.input}
               required
             />
           </div>
+          
           <div className={styles.formGroup}>
-            <label className={styles.label}>Description</label>
+            <label className={styles.label}>Description <span className={styles.required}>*</span></label>
             <textarea
               name="description"
+              placeholder="Describe your car's features, condition, and any special details..."
               value={car.description || ''}
               onChange={handleChange}
               className={styles.textarea}
@@ -110,12 +128,14 @@ export default function EditCarPage() {
               required
             />
           </div>
+          
           <div className={styles.formRow}>
             <div className={styles.formGroup}>
-              <label className={styles.label}>Price ($)</label>
+              <label className={styles.label}>Price ($) <span className={styles.required}>*</span></label>
               <input
                 type="number"
                 name="price"
+                placeholder="15000"
                 value={car.price || ''}
                 onChange={handleChange}
                 className={styles.input}
@@ -124,21 +144,96 @@ export default function EditCarPage() {
                 required
               />
             </div>
+            
             <div className={styles.formGroup}>
-              <label className={styles.label}>Image URL</label>
+              <label className={styles.label}>Miles</label>
               <input
-                type="url"
-                name="image_url"
-                value={car.image_url || ''}
+                type="number"
+                name="miles"
+                placeholder="50000"
+                value={car.miles || ''}
                 onChange={handleChange}
                 className={styles.input}
-                required
+                min="0"
               />
             </div>
           </div>
+          
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Registration City</label>
+              <select
+                name="reg_district"
+                value={car.reg_district || ''}
+                onChange={handleChange}
+                className={styles.input}
+              >
+                <option value="">Select City</option>
+                <option value="Islamabad">Islamabad</option>
+                <option value="Lahore">Lahore</option>
+                <option value="Karachi">Karachi</option>
+                <option value="Peshawar">Peshawar</option>
+                <option value="Quetta">Quetta</option>
+                <option value="Faisalabad">Faisalabad</option>
+                <option value="Multan">Multan</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Year</label>
+              <input
+                type="number"
+                name="year"
+                placeholder="2020"
+                value={car.year || ''}
+                onChange={handleChange}
+                className={styles.input}
+                min="1900"
+                max="2025"
+              />
+            </div>
+          </div>
+          
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Primary Image URL <span className={styles.required}>*</span></label>
+            <input
+              type="url"
+              name="image_url"
+              placeholder="https://example.com/car-image.jpg"
+              value={car.image_url || ''}
+              onChange={handleChange}
+              className={styles.input}
+              required
+            />
+          </div>
+          
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Additional Images (Optional)</label>
+            <div className={styles.imageInputs}>
+              {[0, 1, 2, 3].map((index) => (
+                <input
+                  key={index}
+                  type="url"
+                  name={`additional_image_${index}`}
+                  placeholder={`Additional image ${index + 1} URL`}
+                  value={car.additional_images?.[index] || ''}
+                  onChange={(e) => {
+                    const newAdditionalImages = [...(car.additional_images || [])];
+                    newAdditionalImages[index] = e.target.value;
+                    setCar({ ...car, additional_images: newAdditionalImages });
+                  }}
+                  className={styles.input}
+                />
+              ))}
+            </div>
+          </div>
+          
           <div className={styles.formActions}>
             <button type="submit" className={styles.submitBtn}>Update Car</button>
+            <button type="button" className={styles.cancelBtn} onClick={() => router.push('/seller-dashboard')}>Cancel</button>
           </div>
+          
           {message && <div style={{ marginTop: 16, color: message.startsWith('Car updated') ? 'green' : 'red' }}>{message}</div>}
         </form>
       </main>

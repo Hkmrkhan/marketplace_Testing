@@ -143,6 +143,117 @@
   transform: translateY(-1px);
 }
 
+.buttonGroup {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.cancelBtn,
+.backBtn {
+  background: #95a5a6;
+  color: #fff;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cancelBtn:hover,
+.backBtn:hover {
+  background: #7f8c8d;
+  transform: translateY(-2px);
+}
+
+.backBtn {
+  background: #3498db;
+}
+
+.backBtn:hover {
+  background: #2980b9;
+}
+
+/* Confirmation Dialog */
+.confirmationDialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.confirmationContent {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+}
+
+.confirmationContent h3 {
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1.3rem;
+}
+
+.confirmationContent p {
+  margin: 0 0 1.5rem 0;
+  color: #666;
+  font-size: 1rem;
+}
+
+.confirmationButtons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.confirmBtn,
+.denyBtn {
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.confirmBtn {
+  background: #e74c3c;
+  color: #fff;
+}
+
+.confirmBtn:hover {
+  background: #c0392b;
+  transform: translateY(-2px);
+}
+
+.denyBtn {
+  background: #3498db;
+  color: #fff;
+}
+
+.denyBtn:hover {
+  background: #2980b9;
+  transform: translateY(-2px);
+}
+
 /* Tablet screens */
 @media (max-width: 1024px) {
   .formContainer {

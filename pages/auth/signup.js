@@ -160,7 +160,7 @@ export default function SignupPage() {
           setMessage('✅ Account created successfully! Redirecting...');
           
           setTimeout(() => {
-            router.push('/buyer-dashboard');
+              router.push('/buyer-dashboard');
           }, 2000);
         }
       }

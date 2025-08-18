@@ -311,9 +311,9 @@ export default async function handler(req, res) {
               details += `\n📅 **Year:** ${car.year}`;
             }
             
-            // Add district info if available
+            // Add city info if available
             if (car.reg_district) {
-              details += `\n📍 **District:** ${car.reg_district}`;
+              details += `\n📍 **City:** ${car.reg_district}`;
             }
             
             details += `\n📝 **Description:** ${car.description?.substring(0, 80) || 'No description available'}...
@@ -341,9 +341,9 @@ ${carDetails}
               details += `\n📅 **Year:** ${car.year}`;
             }
             
-            // Add district info if available
+            // Add city info if available
             if (car.reg_district) {
-              details += `\n📍 **District:** ${car.reg_district}`;
+              details += `\n📍 **City:** ${car.reg_district}`;
             }
             
             details += `\n📊 **Category:** ${car.price_category}`;
@@ -377,9 +377,9 @@ ${carDetails}
               details += `\n📅 **Year:** ${cheapestAffordable.year}`;
             }
             
-            // Add district info if available
+            // Add city info if available
             if (cheapestAffordable.reg_district) {
-              details += `\n📍 **District:** ${cheapestAffordable.reg_district}`;
+              details += `\n📍 **City:** ${cheapestAffordable.reg_district}`;
             }
             
             details += `\n\n📈 **Higher options $${minPrice} se start hoti hai marketplace mein.**`;
@@ -421,10 +421,10 @@ ${carDetails}
           details += `\n📅 **Year:** ${cheapestCar.year}`;
         }
         
-        // Add district info if available
-        if (cheapestCar.reg_district) {
-          details += `\n📍 **District:** ${cheapestCar.reg_district}`;
-        }
+                    // Add city info if available
+            if (cheapestCar.reg_district) {
+              details += `\n📍 **City:** ${cheapestCar.reg_district}`;
+            }
         
         details += `\n📅 **Listed:** ${cheapestCar.days_since_listed} days ago
 📸 **Images:** ${cheapestCar.has_images ? 'Available' : 'Not uploaded'}
@@ -457,10 +457,10 @@ ${carDetails}
           details += `\n📅 **Year:** ${expensiveCar.year}`;
         }
         
-        // Add district info if available
-        if (expensiveCar.reg_district) {
-          details += `\n📍 **District:** ${expensiveCar.reg_district}`;
-        }
+                    // Add city info if available
+            if (expensiveCar.reg_district) {
+              details += `\n📍 **City:** ${expensiveCar.reg_district}`;
+            }
         
         details += `\n⭐ **Top quality aur features ke saath!**
 📸 **Images:** ${expensiveCar.additional_images_count + (expensiveCar.has_images ? 1 : 0)} photos available
@@ -497,9 +497,9 @@ ${carDetails}
               details += `\n📅 **Year:** ${car.year}`;
             }
             
-            // Add district info if available
+            // Add city info if available
             if (car.reg_district) {
-              details += `\n📍 **District:** ${car.reg_district}`;
+              details += `\n📍 **City:** ${car.reg_district}`;
             }
             
             details += `\n⭐ **${car.has_images ? 'Photos available' : 'No photos yet'}**`;

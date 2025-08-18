@@ -1,3 +1,9 @@
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  height: 100%;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -5,6 +11,9 @@ body {
   background: #f7f7f7;
   color: #222;
   line-height: 1.6;
+  overflow-x: hidden;
+  min-height: 100vh;
+  height: 100%;
 }
 
 a {
@@ -40,6 +49,12 @@ html {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1rem;
+  overflow-x: hidden;
+}
+
+.main-content {
+  overflow-x: hidden;
+  min-height: calc(100vh - 200px);
 }
 
 @media (max-width: 1366px) {
@@ -61,6 +76,32 @@ html {
     max-width: 100%;
     padding: 0 0.5rem;
   }
+}
+
+/* Scroll containers */
+.scroll-container {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #ccc #f1f1f1;
+}
+
+.scroll-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scroll-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #999;
 }
 
 /* Responsive images */

@@ -1,14 +1,21 @@
 import { useState } from 'react';
 import styles from '../styles/CarForm.module.css';
 
-export default function CarForm({ onSubmit }) {
+export default function CarForm({ onSubmit, onCancel }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [miles, setMiles] = useState('');
   const [reg_district, setRegDistrict] = useState('');
   const [year, setYear] = useState('');
-  const [images, setImages] = useState(['', '', '', '', '']); // Array for 5 images
+  const [images, setImages] = useState(['', '', '', '']); // 4 additional images
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+
+  // Check if form has any data
+  const hasFormData = () => {
+    return title.trim() || description.trim() || price.trim() || miles.trim() || 
+           reg_district.trim() || year.trim() || images.some(img => img.trim() !== '');
+  };
 
   const resetForm = () => {
     setTitle('');
@@ -17,7 +24,7 @@ export default function CarForm({ onSubmit }) {
     setMiles('');
     setRegDistrict('');
     setYear('');
-    setImages(['', '', '', '', '']);
+    setImages(['', '', '', '']);
   };
 
   const handleImageChange = (index, value) => {
@@ -26,10 +33,23 @@ export default function CarForm({ onSubmit }) {
     setImages(newImages);
   };
 
+  const handleCancel = () => {
+    setShowCancelConfirm(true);
+  };
+
+  const confirmCancel = () => {
+    setShowCancelConfirm(false);
+    onCancel();
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Filter out empty image URLs
+    // Filter out empty image URLs and ensure at least one image
     const validImages = images.filter(img => img.trim() !== '');
+    if (validImages.length === 0) {
+      alert('Please add at least one image for your car.');
+      return;
+    }
     onSubmit({ title, description, price, miles, reg_district, year, images: validImages }, resetForm);
   };
 
@@ -42,7 +62,7 @@ export default function CarForm({ onSubmit }) {
       
       <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.formGroup}>
-          <label className={styles.label}>Car Title</label>
+          <label className={styles.label}>Car Title <span className={styles.required}>*</span></label>
           <input
             type="text"
             placeholder="e.g., Toyota Corolla 2020"
@@ -54,7 +74,7 @@ export default function CarForm({ onSubmit }) {
         </div>
 
         <div className={styles.formGroup}>
-          <label className={styles.label}>Description</label>
+          <label className={styles.label}>Description <span className={styles.required}>*</span></label>
           <textarea
             placeholder="Describe your car's features, condition, and any special details..."
             value={description}
@@ -67,7 +87,7 @@ export default function CarForm({ onSubmit }) {
 
         <div className={styles.formRow}>
           <div className={styles.formGroup}>
-            <label className={styles.label}>Price ($)</label>
+            <label className={styles.label}>Price ($) <span className={styles.required}>*</span></label>
             <input
               type="number"
               placeholder="15000"
@@ -81,7 +101,7 @@ export default function CarForm({ onSubmit }) {
           </div>
           
           <div className={styles.formGroup}>
-            <label className={styles.label}>Miles</label>
+            <label className={styles.label}>Miles <span className={styles.required}>*</span></label>
             <input
               type="number"
               placeholder="50000"
@@ -90,11 +110,12 @@ export default function CarForm({ onSubmit }) {
               className={styles.input}
               min="0"
               step="1000"
+              required
             />
           </div>
           
           <div className={styles.formGroup}>
-            <label className={styles.label}>Year</label>
+            <label className={styles.label}>Year <span className={styles.required}>*</span></label>
             <select
               value={year}
               onChange={(e) => setYear(e.target.value)}
@@ -151,14 +172,14 @@ export default function CarForm({ onSubmit }) {
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>Registration District</label>
+            <label className={styles.label}>Registration City <span className={styles.required}>*</span></label>
             <select
               value={reg_district}
               onChange={(e) => setRegDistrict(e.target.value)}
               className={styles.input}
               required
             >
-              <option value="">Select District</option>
+              <option value="">Select City</option>
               <option value="Karachi">Karachi</option>
               <option value="Lahore">Lahore</option>
               <option value="Islamabad">Islamabad</option>
@@ -211,31 +232,79 @@ export default function CarForm({ onSubmit }) {
         </div>
 
           <div className={styles.formGroup}>
-          <label className={styles.label}>Car Images (Up to 5)</label>
-          <p className={styles.helperText}>Add image URLs for your car. At least one image is required.</p>
-          
-          {images.map((image, index) => (
-            <div key={index} className={styles.imageInputGroup}>
-              <label className={styles.imageLabel}>
-                Image {index + 1} {index === 0 && <span className={styles.required}>*</span>}
-              </label>
-            <input
-              type="url"
-                placeholder={`https://example.com/car-image-${index + 1}.jpg`}
-              value={image}
-                onChange={(e) => handleImageChange(index, e.target.value)}
-              className={styles.input}
-                required={index === 0} // Only first image is required
-            />
+            <label className={styles.label}>Car Images (Up to 5) <span className={styles.required}>*</span></label>
+            <p className={styles.helperText}>Add image URLs for your car. At least one image is required.</p>
+            
+            {images.map((image, index) => (
+              <div key={index} className={styles.imageInputGroup}>
+                <label className={styles.imageLabel}>
+                  Image {index + 1} {index === 0 && <span className={styles.required}>*</span>}
+                </label>
+                <input
+                  type="url"
+                  placeholder={`https://example.com/car-image-${index + 1}.jpg`}
+                  value={image}
+                  onChange={(e) => handleImageChange(index, e.target.value)}
+                  className={styles.input}
+                  required={index === 0} // Only first image is required
+                />
+              </div>
+            ))}
           </div>
-          ))}
-        </div>
 
         <div className={styles.formActions}>
           <button type="submit" className={styles.submitBtn}>
             Add Car to Marketplace
           </button>
+          <div className={styles.buttonGroup}>
+            {/* Show Cancel button only when form has data */}
+            {hasFormData() && (
+              <button 
+                type="button" 
+                className={styles.cancelBtn}
+                onClick={handleCancel}
+              >
+                Cancel
+              </button>
+            )}
+            {/* Show Back button only when form has no data */}
+            {!hasFormData() && (
+              <button 
+                type="button" 
+                className={styles.backBtn}
+                onClick={() => window.history.back()}
+              >
+                Back
+              </button>
+            )}
+          </div>
         </div>
+
+        {/* Cancel Confirmation Dialog */}
+        {showCancelConfirm && (
+          <div className={styles.confirmationDialog}>
+            <div className={styles.confirmationContent}>
+              <h3>Are you sure you want to cancel?</h3>
+              <p>All your entered data will be lost.</p>
+              <div className={styles.confirmationButtons}>
+                <button 
+                  type="button" 
+                  className={styles.confirmBtn}
+                  onClick={confirmCancel}
+                >
+                  Yes
+                </button>
+                <button 
+                  type="button" 
+                  className={styles.denyBtn}
+                  onClick={() => setShowCancelConfirm(false)}
+                >
+                  No
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </form>
     </div>
   );

@@ -285,15 +285,15 @@ export default function CarFilter({ onFilterChange, filters }) {
             </div>
           </div>
 
-          {/* District Filter */}
+          {/* City Filter */}
           <div className={styles.filterGroup}>
-            <label className={styles.filterLabel}>Registration District</label>
+            <label className={styles.filterLabel}>Registration City</label>
             <select
               value={filters.reg_district || ''}
               onChange={(e) => handleFilterChange('reg_district', e.target.value)}
               className={styles.filterSelect}
             >
-              <option value="">All Districts</option>
+                             <option value="">All Cities</option>
               <option value="Karachi">Karachi</option>
               <option value="Lahore">Lahore</option>
               <option value="Islamabad">Islamabad</option>

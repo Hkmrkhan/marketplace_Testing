@@ -287,10 +287,10 @@ export default function CarsPage() {
         }
       }
       
-      // District filter
-      if (filters.reg_district && filters.reg_district.trim() !== '') {
-        if (!car.reg_district || car.reg_district !== filters.reg_district) {
-          console.log('Filtered out by district:', car.reg_district, '!=', filters.reg_district);
+              // City filter
+        if (filters.reg_district && filters.reg_district.trim() !== '') {
+          if (!car.reg_district || car.reg_district !== filters.reg_district) {
+            console.log('Filtered out by city:', car.reg_district, '!=', filters.reg_district);
           return false;
         }
       }

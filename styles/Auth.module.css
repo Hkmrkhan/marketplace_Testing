@@ -225,6 +225,76 @@
   text-decoration: underline;
 }
 
+/* Forgot Password Styles */
+.forgotPasswordLink {
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.forgotPasswordBtn {
+  background: none;
+  border: none;
+  color: #667eea;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.forgotPasswordBtn:hover {
+  color: #5a6fd8;
+}
+
+.backToLoginLink {
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.backToLoginBtn {
+  background: none;
+  border: none;
+  color: #667eea;
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.backToLoginBtn:hover {
+  color: #5a6fd8;
+}
+
+.resetEmailSent {
+  text-align: center;
+  margin: 2rem 0;
+  padding: 2rem;
+  background: #f8f9fa;
+  border-radius: 16px;
+  border: 2px solid #e8f5e8;
+}
+
+.successIcon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.resetEmailSent h3 {
+  margin: 0 0 1rem 0;
+  color: #28a745;
+  font-size: 1.5rem;
+}
+
+.resetEmailSent p {
+  margin: 0 0 1.5rem 0;
+  color: #666;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.resetEmailSent strong {
+  color: #333;
+}
+
 .authCardWithGraphic {
   display: flex;
   background: #fff;

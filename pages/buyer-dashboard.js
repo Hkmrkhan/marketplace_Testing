@@ -5,6 +5,7 @@ import Footer from '../components/Footer';
 import AIChat from '../components/AIChat';
 import { supabase } from '../utils/supabaseClient';
 import styles from '../styles/Dashboard.module.css';
+import authStyles from '../styles/Auth.module.css';
 import dynamic from 'next/dynamic';
 const StripeCheckoutModal = dynamic(() => import('../components/StripeCheckout'), { ssr: false });
 
@@ -33,7 +34,7 @@ const formatWhatsAppNumber = (number) => {
   return cleaned;
 };
 
-function CarChat({ carId, sellerId, buyerId, currentUserId }) {
+function CarChat({ carId, sellerId, buyerId, currentUserId, onOpenChat, unreadCount, onMarkAsRead }) {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
@@ -113,85 +114,63 @@ function CarChat({ carId, sellerId, buyerId, currentUserId }) {
   if (loadingMessages) return <div style={{ padding: '10px', textAlign: 'center', color: '#666' }}>Loading messages...</div>;
 
   return (
-    <div className="car-chat-box" style={{
-      width: '100%',
-      maxWidth: 340,
-      minWidth: 260,
-      height: 200,
-      background: '#fff',
-      borderRadius: 10,
-      boxShadow: '0 2px 8px rgba(0,0,0,0.07)',
-      padding: '12px 12px 8px 12px',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'flex-end',
-      margin: '0 auto'
-    }}>
-      <div className="car-chat-messages" style={{
-        height: 130,
-        overflowY: 'auto',
-        border: '1px solid #eee',
-        borderRadius: 10,
-        padding: 12,
-        background: '#f8f9fb',
-        marginBottom: 8,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 8
-      }}>
-        {messages.length === 0 ? (
-          <div className="car-chat-empty" style={{ color: '#888', textAlign: 'center', marginTop: 40 }}>No messages yet.</div>
-        ) : (
-          messages.map((msg, index) => (
-            <div key={index} style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: msg.sender_id === currentUserId ? 'flex-end' : 'flex-start',
-              marginBottom: 4
-            }}>
-              <div style={{
-                background: msg.sender_id === currentUserId ? '#007bff' : '#e9ecef',
-                color: msg.sender_id === currentUserId ? 'white' : '#333',
-                padding: '6px 10px',
-                borderRadius: 12,
-                maxWidth: '80%',
-                fontSize: '12px',
-                lineHeight: 1.3,
-                wordWrap: 'break-word'
-              }}>
-                <div style={{
-                  fontWeight: 'bold',
-                  fontSize: '11px',
-                  marginBottom: 2,
-                  opacity: 0.9
-                }}>
-                  {msg.sender_name}
-                </div>
-                {msg.message}
-              </div>
-            </div>
-          ))
-        )}
-        <div ref={messagesEndRef} />
-      </div>
-      <div className={styles.inputContainer}>
-        <textarea
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          onKeyPress={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-          placeholder="Type your message..."
-          className={styles.messageInput}
-          rows="1"
-          disabled={sending}
-        />
+      <div className="chat-icon-wrapper" style={{ position: 'relative', display: 'inline-block' }}>
         <button
-          onClick={sendMessage}
-          disabled={!newMessage.trim() || sending}
-          className={styles.sendButton}
+        onClick={() => onOpenChat(carId, sellerId, messages, setMessages, newMessage, setNewMessage, sending, sendMessage)}
+        style={{
+          background: '#007bff',
+          color: 'white',
+          border: 'none',
+          borderRadius: '50%',
+          width: '50px',
+          height: '50px',
+      display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          fontSize: '20px',
+          boxShadow: '0 2px 8px rgba(0,123,255,0.3)',
+          transition: 'all 0.3s ease'
+        }}
+        onMouseOver={(e) => {
+          e.target.style.transform = 'scale(1.1)';
+          e.target.style.boxShadow = '0 4px 12px rgba(0,123,255,0.4)';
+        }}
+        onMouseOut={(e) => {
+          e.target.style.transform = 'scale(1)';
+          e.target.style.boxShadow = '0 2px 8px rgba(0,123,255,0.3)';
+        }}
+        title="Chat with seller"
+      >
+        💬
+      </button>
+      
+      {/* Message Count Badge */}
+      {unreadCount > 0 && (
+        <span 
+          className="badge" 
+          style={{
+            position: 'absolute',
+            top: '-5px',
+            right: '-5px',
+            background: 'red',
+            color: 'white',
+            borderRadius: '50%',
+            padding: '3px 6px',
+                fontSize: '12px',
+                  fontWeight: 'bold',
+            minWidth: '20px',
+            height: '20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            border: '2px solid white',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+          }}
         >
-          {sending ? '⏳' : '➤'}
-        </button>
-      </div>
+          {unreadCount}
+        </span>
+      )}
     </div>
   );
 }
@@ -204,16 +183,181 @@ export default function BuyerDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('browse');
   const router = useRouter();
-  const [editingProfile, setEditingProfile] = useState(false);
+  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
   const [editName, setEditName] = useState('');
   const [editEmail, setEditEmail] = useState('');
+  const [originalName, setOriginalName] = useState('');
+  const [originalEmail, setOriginalEmail] = useState('');
   const [profileMsg, setProfileMsg] = useState('');
   const [checkoutCar, setCheckoutCar] = useState(null);
   const [showChat, setShowChat] = useState(false);
   const [chatCarId, setChatCarId] = useState(null);
   const [chatSellerId, setChatSellerId] = useState(null);
+  const [chatData, setChatData] = useState(null);
   const [buyerId, setBuyerId] = useState(null);
+  const [unreadCounts, setUnreadCounts] = useState({}); // Track unread counts per car
+  
+  // Local chat state for modal
+  const [localMessage, setLocalMessage] = useState('');
+  const [sending, setSending] = useState(false);
+  const [localMessages, setLocalMessages] = useState([]); // Local messages for modal
   const [imageIndexes, setImageIndexes] = useState({}); // carId: index
+
+  // Chat functions
+  const onOpenChat = (carId, sellerId, messages, setMessages, newMessage, setNewMessage, sending, sendMessage) => {
+    setChatCarId(carId);
+    setChatSellerId(sellerId);
+    setShowChat(true);
+    
+    // Copy existing messages to local state
+    setLocalMessages(messages || []);
+    
+    // Store chat data for modal
+    setChatData({ 
+      messages, 
+      setMessages, 
+      newMessage, 
+      setNewMessage, 
+      sending, 
+      sendMessage
+    });
+    
+    // Mark messages as read for this specific car
+    if (carId && user?.id) {
+      markMessagesAsRead(carId, user.id);
+    }
+  };
+
+  // Fetch unread message counts for all cars
+  const fetchUnreadCounts = async () => {
+    if (!user?.id) {
+      console.log('❌ Buyer: No user ID available for fetchUnreadCounts');
+      return;
+    }
+    
+    try {
+      console.log('📡 Buyer: Fetching unread messages for user:', user.id);
+      
+      const { data, error } = await supabase
+        .from('messages')
+        .select('car_id, id')
+        .eq('receiver_id', user.id)
+        .eq('is_read', false);
+      
+      if (error) {
+        console.error('❌ Buyer: Error fetching unread counts:', error);
+        return;
+      }
+      
+      console.log('✅ Buyer: Unread messages data received:', data);
+      console.log('📊 Buyer: Raw data length:', data?.length || 0);
+      
+      const counts = {};
+      data?.forEach(msg => {
+        console.log('📝 Buyer: Processing message:', msg);
+        counts[msg.car_id] = (counts[msg.car_id] || 0) + 1;
+      });
+      
+      console.log('🎯 Buyer: Final unread counts per car:', counts);
+      console.log('🔢 Buyer: Total cars with unread messages:', Object.keys(counts).length);
+      
+      setUnreadCounts(counts);
+    } catch (error) {
+      console.error('❌ Buyer: Error in fetchUnreadCounts:', error);
+    }
+  };
+
+  // Handle sending message from modal
+  const handleSendMessage = async () => {
+    if (!localMessage.trim() || !chatCarId || !chatSellerId || !user?.id) return;
+    
+    try {
+      setSending(true);
+      
+      // Create new message object
+      const newMessageObj = {
+        id: Date.now(), // Temporary ID for local display
+        car_id: chatCarId,
+        sender_id: user.id,
+        receiver_id: chatSellerId,
+        message: localMessage.trim(),
+        sender_name: 'You',
+        receiver_name: 'Seller',
+        created_at: new Date().toISOString()
+      };
+      
+      // Add message to local messages immediately (optimistic update)
+      setLocalMessages(prev => [...prev, newMessageObj]);
+      
+      // Send message to database
+      const { error } = await supabase
+        .from('messages')
+        .insert([{
+          car_id: chatCarId,
+          sender_id: user.id,
+          receiver_id: chatSellerId,
+          message: localMessage.trim()
+        }]);
+      
+      if (error) {
+        console.error('Error sending message:', error);
+        // Remove message from local state if database save failed
+        setLocalMessages(prev => prev.filter(msg => msg.id !== newMessageObj.id));
+        return;
+      }
+      
+      // Clear input
+      setLocalMessage('');
+      
+      // Refresh messages in CarChat component
+      if (chatData?.setMessages) {
+        chatData.setMessages(prev => [...prev, newMessageObj]);
+      }
+      
+    } catch (error) {
+      console.error('Error in handleSendMessage:', error);
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const closeChat = () => {
+    setShowChat(false);
+    setChatCarId(null);
+    setChatSellerId(null);
+    setChatData(null);
+    // Reset local chat state
+    setLocalMessage('');
+    setSending(false);
+  };
+
+  const markMessagesAsRead = async (carId, buyerId) => {
+    try {
+      console.log('🔍 Buyer: Marking messages as read for car:', carId, 'buyer:', buyerId);
+      
+      const { error } = await supabase
+        .from('messages')
+        .update({ is_read: true })
+        .eq('car_id', carId)
+        .eq('receiver_id', buyerId)
+        .eq('is_read', false);
+      
+      if (error) {
+        console.error('❌ Buyer: Error marking messages as read:', error);
+      } else {
+        console.log('✅ Buyer: Messages marked as read for car:', carId);
+        // Reset unread count for this car
+        setUnreadCounts(prev => ({
+          ...prev,
+          [carId]: 0
+        }));
+      }
+    } catch (error) {
+      console.error('❌ Buyer: Error in markMessagesAsRead:', error);
+    }
+  };
+
+
 
   // Helper to get all images for a car
   const getAllImages = (car) => {
@@ -325,8 +469,9 @@ export default function BuyerDashboard() {
         `)
         .eq('status', 'available');
       
-      console.log('Cars with seller_id:', cars);
-      console.log('Cars error:', carsError);
+      console.log('🚗 Cars fetched:', cars?.length || 0, 'cars');
+      console.log('❌ Cars error:', carsError);
+      console.log('📊 Sample car data:', cars?.[0]);
       
       // Now fetch seller details for each car
       if (cars && cars.length > 0) {
@@ -376,8 +521,8 @@ export default function BuyerDashboard() {
           return false;
         });
         
-        console.log('Approved cars for buyer:', approvedCars);
-        console.log('Number of approved cars:', approvedCars.length);
+        console.log('✅ Approved cars for buyer:', approvedCars.length, 'cars');
+        console.log('📋 Approved cars list:', approvedCars.map(c => c.title));
         setAvailableCars(approvedCars);
       } else {
         setAvailableCars([]);
@@ -396,6 +541,57 @@ export default function BuyerDashboard() {
     };
     fetchBuyer();
   }, []);
+
+  // Fetch unread counts when user changes
+  useEffect(() => {
+    if (user?.id) {
+      console.log('🔍 Buyer: fetchUnreadCounts useEffect triggered, user.id:', user.id);
+      fetchUnreadCounts();
+    }
+  }, [user?.id]);
+
+  // Set up real-time subscription for unread messages
+  useEffect(() => {
+    if (!user?.id) return;
+    
+    console.log('🔍 Buyer: Setting up real-time subscription for user:', user.id);
+    
+    const subscription = supabase
+      .channel('buyer_unread_messages')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages',
+        filter: `receiver_id=eq.${user.id}`
+      }, (payload) => {
+        console.log('📨 Buyer: New message received, updating unread count for car:', payload.new.car_id);
+        setUnreadCounts(prev => ({
+          ...prev,
+          [payload.new.car_id]: (prev[payload.new.car_id] || 0) + 1
+        }));
+      })
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'messages',
+        filter: `receiver_id=eq.${user.id}`
+      }, (payload) => {
+        // If message is marked as read, decrease unread count for that car
+        if (payload.new.is_read === true && payload.old.is_read === false) {
+          console.log('✅ Buyer: Message marked as read, decreasing unread count for car:', payload.new.car_id);
+          setUnreadCounts(prev => ({
+            ...prev,
+            [payload.new.car_id]: Math.max(0, (prev[payload.new.car_id] || 0) - 1)
+          }));
+        }
+      })
+      .subscribe();
+
+    return () => {
+      console.log('🔍 Buyer: Cleaning up real-time subscription');
+      subscription.unsubscribe();
+    };
+  }, [user?.id]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -613,7 +809,9 @@ export default function BuyerDashboard() {
   const handleEditProfile = () => {
     setEditName(userProfile?.full_name || '');
     setEditEmail(user?.email || '');
-    setEditingProfile(true);
+    setOriginalName(userProfile?.full_name || '');
+    setOriginalEmail(user?.email || '');
+    setShowEditProfileModal(true);
     setProfileMsg('');
   };
 
@@ -627,7 +825,9 @@ export default function BuyerDashboard() {
     // Update profile in Supabase
     const { error: profileError } = await supabase
       .from('profiles')
-      .update({ full_name: editName })
+      .update({ 
+        full_name: editName
+      })
       .eq('id', user.id);
     if (profileError) {
       setProfileMsg('❌ ' + profileError.message);
@@ -640,8 +840,11 @@ export default function BuyerDashboard() {
       return;
     }
     setProfileMsg('✅ Profile updated successfully!');
-    setUserProfile({ ...userProfile, full_name: editName });
-    setEditingProfile(false);
+    setUserProfile({ 
+      ...userProfile, 
+      full_name: editName
+    });
+    setShowEditProfileModal(false);
     // Optionally, refresh user info
     const { data: { user: refreshedUser } } = await supabase.auth.getUser();
     setUser(refreshedUser);
@@ -752,6 +955,8 @@ export default function BuyerDashboard() {
             <h3>{userProfile?.full_name || 'Buyer'}</h3>
             <p>Car Buyer</p>
           </div>
+          
+
           <nav className={styles.sidebarNav}>
             <button 
               className={`${styles.navItem} ${activeTab === 'browse' ? styles.active : ''}`}
@@ -777,12 +982,7 @@ export default function BuyerDashboard() {
             >
               🤖 AI Assistant
             </button>
-            <button 
-              className={`${styles.navItem} ${styles.logoutBtn}`}
-              onClick={handleLogout}
-            >
-              Logout
-            </button>
+
           </nav>
         </div>
         <div className={styles.mainContent}>
@@ -821,44 +1021,68 @@ export default function BuyerDashboard() {
               ) : (
                 <div className={styles.carsGrid}>
                   {availableCars.map(car => {
-                    console.log('Car in map:', car); // Debug: Check seller_id in each car
+                    const carImages = getAllImages(car);
+                    const currentImageIndex = imageIndexes[car.id] || 0;
+                    
+                    console.log('🚗 Car in map:', car.title, 'ID:', car.id); // Debug: Check car details
+                    console.log('🖼️ Car images:', carImages, 'Count:', carImages.length); // Debug: Check images array
+                    console.log('📍 Current image index:', currentImageIndex, 'Total images:', carImages.length); // Debug: Check current index
+                    
                     return (
-                      <div key={car.id} style={{ marginBottom: 32 }}>
-                          <h3>{car.title}</h3>
-                        {/* Gallery block - same as seller dashboard */}
+                      <div key={car.id} className={styles.carCard}>
+                        <h3 className={styles.carTitle}>{car.title}</h3>
+                        
+                        {/* Gallery block - improved version */}
                         <div className={styles.carImageContainer}>
                           {/* Main image */}
                           <img
-                            src={getAllImages(car)[imageIndexes[car.id] || 0]}
+                            src={carImages[currentImageIndex] || '/carp2.png'}
                             alt={car.title}
+                            className={styles.mainImage}
+                            onError={(e) => {
+                              e.target.src = '/carp2.png';
+                              console.log('Image failed to load, using fallback');
+                            }}
                           />
                         </div>
+                        
                         {/* Thumbnails row - only show if more than 1 image */}
-                        {getAllImages(car).length > 1 && (
+                        {carImages.length > 1 && (
                           <div className={styles.thumbnailsRow}>
-                            {getAllImages(car).map((img, idx) => (
+                            {carImages.map((img, idx) => (
                               <img
                                 key={idx}
                                 src={img}
                                 alt={`Thumbnail ${idx + 1}`}
                                 className={
                                   styles.thumbnail +
-                                  ((imageIndexes[car.id] || 0) === idx ? ' ' + styles.activeThumbnail : '')
+                                  (currentImageIndex === idx ? ' ' + styles.activeThumbnail : '')
                                 }
-                                onClick={() => setImageIndexes(prev => ({ ...prev, [car.id]: idx }))}
+                                onClick={() => {
+                                  console.log('Clicking thumbnail:', idx, 'for car:', car.id);
+                                  setImageIndexes(prev => ({ ...prev, [car.id]: idx }));
+                                }}
+                                onError={(e) => {
+                                  e.target.src = '/carp2.png';
+                                  console.log('Thumbnail failed to load, using fallback');
+                                }}
                               />
                             ))}
                           </div>
                         )}
-                          <p>{car.description}</p>
+                        
+                        <div className={styles.carDetails}>
+                          <p className={styles.carDescription}>{car.description}</p>
                           <p className={styles.price}>${car.price}</p>
                         <p className={car.status === 'sold' ? styles.sold : styles.available}>
                           {car.status === 'sold' ? 'Sold' : 'Available'}
                         </p>
+                          
                           <div className={styles.sellerInfo}>
                             <span>Seller: <b>{car.seller?.full_name || 'N/A'}</b></span>
                             {car.seller?.email && <span style={{ marginLeft: 8, color: '#888' }}>({car.seller.email})</span>}
                           </div>
+                          
                           {car.status === 'available' ? (
                             <button 
                               className={styles.buyBtn}
@@ -871,19 +1095,19 @@ export default function BuyerDashboard() {
                               Sold
                           </div>
                         )}
-                        {/* Chat and WhatsApp buttons for each car */}
-                        <div style={{ marginTop: 12 }}>
-                          <CarChat carId={car.id} sellerId={car.seller_id} buyerId={buyerId} currentUserId={user?.id} />
                           
-                          {/* Debug: Log seller data */}
-                          {console.log('Car:', car.title)}
-                          {console.log('Car seller data:', car.seller)}
-                          {console.log('Seller ID:', car.seller_id)}
-                          {console.log('WhatsApp number:', car.seller?.whatsapp_number)}
-                          {console.log('Seller name:', car.seller?.full_name)}
-                          {console.log('Has WhatsApp number?', !!car.seller?.whatsapp_number)}
-                          
-
+                          {/* Chat button for each car */}
+                          <div style={{ marginTop: 12 }}>
+                            <CarChat 
+                              carId={car.id} 
+                              sellerId={car.seller_id} 
+                              buyerId={buyerId} 
+                              currentUserId={user?.id} 
+                              onOpenChat={onOpenChat}
+                              unreadCount={unreadCounts[car.id] || 0}
+                              onMarkAsRead={() => setUnreadCounts(prev => ({ ...prev, [car.id]: 0 }))}
+                            />
+                            </div>
                         </div>
                       </div>
                     );
@@ -901,36 +1125,57 @@ export default function BuyerDashboard() {
                 </div>
               ) : (
                 <div className={styles.purchases}>
-                  {purchases.map((purchase) => (
-                    <div key={purchase.id} style={{ marginBottom: 32 }}>
-                      <h3>{purchase.title || purchase.cars?.title || "Car"}</h3>
-                      {/* Gallery block for purchased cars - same as seller dashboard */}
+                  {purchases.map((purchase) => {
+                    const purchaseImages = getAllImages(purchase);
+                    const currentImageIndex = imageIndexes[purchase.id] || 0;
+                    
+                    return (
+                      <div key={purchase.id} className={styles.carCard}>
+                        <h3 className={styles.carTitle}>{purchase.title || purchase.cars?.title || "Car"}</h3>
+                        
+                        {/* Gallery block for purchased cars - improved version */}
                       <div className={styles.carImageContainer}>
                         {/* Main image */}
                         <img
-                          src={getAllImages(purchase)[imageIndexes[purchase.id] || 0]}
+                            src={purchaseImages[currentImageIndex] || '/carp2.png'}
                           alt={purchase.title || purchase.cars?.title || "Car"}
+                            className={styles.mainImage}
+                            onError={(e) => {
+                              e.target.src = '/carp2.png';
+                              console.log('Purchase image failed to load, using fallback');
+                            }}
                         />
-                        {/* Thumbnails row */}
-                        {getAllImages(purchase).length > 1 && (
+                          
+                          {/* Thumbnails row - only show if more than 1 image */}
+                          {purchaseImages.length > 1 && (
                           <div className={styles.thumbnailsRow}>
-                            {getAllImages(purchase).map((img, idx) => (
+                              {purchaseImages.map((img, idx) => (
                               <img
                                 key={idx}
                                 src={img}
                                 alt={`Thumbnail ${idx + 1}`}
                                 className={
                                   styles.thumbnail +
-                                  ((imageIndexes[purchase.id] || 0) === idx ? ' ' + styles.activeThumbnail : '')
-                                }
-                                onClick={() => setImageIndexes(prev => ({ ...prev, [purchase.id]: idx }))}
+                                    (currentImageIndex === idx ? ' ' + styles.activeThumbnail : '')
+                                  }
+                                  onClick={() => {
+                                    console.log('Clicking purchase thumbnail:', idx, 'for purchase:', purchase.id);
+                                    setImageIndexes(prev => ({ ...prev, [purchase.id]: idx }));
+                                  }}
+                                  onError={(e) => {
+                                    e.target.src = '/carp2.png';
+                                    console.log('Purchase thumbnail failed to load, using fallback');
+                                  }}
                               />
                             ))}
                           </div>
                           )}
                         </div>
-                      <p>{purchase.description || purchase.cars?.description}</p>
+                        
+                        <div className={styles.carDetails}>
+                          <p className={styles.carDescription}>{purchase.description || purchase.cars?.description}</p>
                       <p className={styles.price}>${purchase.price || purchase.cars?.price || 'N/A'}</p>
+                          
                       <div className={styles.sellerInfo}>
                         <div>Seller: <b>{purchase.seller_name || purchase.seller?.full_name || 'Unknown'}</b></div>
                         {(purchase.seller_email || purchase.seller?.email) && (
@@ -938,11 +1183,13 @@ export default function BuyerDashboard() {
                             {purchase.seller_email || purchase.seller?.email}
                           </div>
                         )}
-
                       </div>
+                          
                       <div className={styles.soldBadge}>Purchased</div>
                     </div>
-                  ))}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -963,35 +1210,7 @@ export default function BuyerDashboard() {
                 </div>
                 <button className={styles.editProfileBtn} onClick={handleEditProfile}>Edit Profile</button>
               </div>
-              {editingProfile && (
-                <form onSubmit={handleProfileUpdate} className={styles.authForm} style={{ maxWidth: 400, margin: '1rem auto' }}>
-                  <div className={styles.formGroup}>
-                    <label>Full Name</label>
-                    <input
-                      type="text"
-                      value={editName}
-                      onChange={e => setEditName(e.target.value)}
-                      className={styles.input}
-                      required
-                    />
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label>Email</label>
-                    <input
-                      type="email"
-                      value={editEmail}
-                      onChange={e => setEditEmail(e.target.value)}
-                      className={styles.input}
-                      required
-                    />
-                  </div>
-                  <button type="submit" className={styles.submitBtn}>Save</button>
-                  <button type="button" className={styles.submitBtn} style={{ background: '#ccc', color: '#333', marginLeft: 8 }} onClick={() => setEditingProfile(false)}>Cancel</button>
-                  {profileMsg && (
-                    <div className={`${styles.message} ${profileMsg.startsWith('✅') ? styles.success : styles.error}`} style={{ marginTop: 10 }}>{profileMsg}</div>
-                  )}
-                </form>
-              )}
+
             </div>
           )}
           {activeTab === 'aihelp' && (
@@ -1011,6 +1230,217 @@ export default function BuyerDashboard() {
           )}
         </div>
       </div>
+      {/* Chat Modal */}
+      {showChat && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+          background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+          padding: '20px'
+        }}>
+          <div style={{ 
+            background: '#fff', 
+            padding: 0, 
+            borderRadius: 12, 
+            width: '100%', 
+            maxWidth: 500, 
+            maxHeight: '90vh',
+            display: 'flex',
+            flexDirection: 'column',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+            overflow: 'hidden'
+          }}>
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center', 
+              padding: '16px 20px',
+              background: '#007bff',
+              color: 'white'
+            }}>
+              <h2 style={{ margin: 0, color: 'white', fontSize: '18px', fontWeight: '600' }}>💬 Chat with Seller</h2>
+              <button 
+                onClick={closeChat}
+                style={{
+                  background: 'rgba(255,255,255,0.2)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  cursor: 'pointer',
+                  fontSize: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.background = 'rgba(255,255,255,0.3)';
+                  e.target.style.transform = 'scale(1.1)';
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.background = 'rgba(255,255,255,0.2)';
+                  e.target.style.transform = 'scale(1)';
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            
+            {/* Chat Interface */}
+            <div style={{ 
+              flex: 1, 
+              overflowY: 'auto', 
+              padding: '16px',
+              background: '#f8f9fa',
+              minHeight: '250px'
+            }}>
+              {localMessages.length > 0 ? (
+                <>
+                  {localMessages.length === 0 ? (
+                    <div style={{ 
+                      textAlign: 'center', 
+                      color: '#888', 
+                      marginTop: '80px',
+                      fontSize: '14px'
+                    }}>
+                      <div style={{ fontSize: '32px', marginBottom: '12px' }}>💬</div>
+                      No messages yet.<br/>
+                      <small style={{ fontSize: '12px', opacity: 0.7 }}>Start the conversation!</small>
+                    </div>
+                  ) : (
+                    localMessages.map((msg, index) => (
+                      <div key={index} style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: msg.sender_id === user?.id ? 'flex-end' : 'flex-start',
+                        marginBottom: 16
+                      }}>
+                        <div style={{
+                          background: msg.sender_id === user?.id ? '#007bff' : '#fff',
+                          color: msg.sender_id === user?.id ? 'white' : '#333',
+                          padding: '10px 14px',
+                          borderRadius: '16px',
+                          maxWidth: '80%',
+                          fontSize: '13px',
+                          lineHeight: 1.4,
+                          wordWrap: 'break-word',
+                          boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
+                          border: msg.sender_id === user?.id ? 'none' : '1px solid #e0e0e0'
+                        }}>
+                          <div style={{
+                            fontWeight: 'bold',
+                            fontSize: '11px',
+                            marginBottom: 4,
+                            opacity: 0.9
+                          }}>
+                            {msg.sender_name}
+                          </div>
+                          {msg.message}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </>
+              ) : (
+                <div style={{ 
+                  textAlign: 'center', 
+                  color: '#888', 
+                  marginTop: '80px',
+                  fontSize: '14px'
+                }}>
+                  <div style={{ fontSize: '32px', marginBottom: '12px' }}>⏳</div>
+                  Loading chat...
+                </div>
+              )}
+            </div>
+            
+            {/* Chat Input */}
+            <div style={{ 
+              display: 'flex', 
+              gap: 12, 
+              alignItems: 'flex-end',
+              padding: '16px 20px',
+              background: '#fff',
+              borderTop: '1px solid #eee',
+              position: 'relative',
+              zIndex: 10
+            }}>
+              <textarea
+                value={localMessage}
+                onChange={(e) => setLocalMessage(e.target.value)}
+                onKeyPress={(e) => { 
+                  if (e.key === 'Enter' && !e.shiftKey) { 
+                    e.preventDefault(); 
+                    handleSendMessage(); 
+                  } 
+                }}
+                placeholder="Type your message..."
+                style={{
+                  flex: 1,
+                  padding: '12px',
+                  border: '1px solid #ddd',
+                  borderRadius: '8px',
+                  resize: 'none',
+                  minHeight: '50px',
+                  fontFamily: 'inherit',
+                  fontSize: '13px',
+                  transition: 'all 0.2s ease',
+                  outline: 'none',
+                  position: 'relative',
+                  zIndex: 10
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#007bff';
+                  e.target.style.boxShadow = '0 0 0 2px rgba(0, 123, 255, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#ddd';
+                  e.target.style.boxShadow = 'none';
+                }}
+                rows="2"
+                disabled={sending}
+              />
+              <button
+                onClick={handleSendMessage}
+                disabled={!localMessage.trim() || sending}
+                style={{
+                  background: localMessage.trim() && !sending ? '#007bff' : '#ccc',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '40px',
+                  height: '40px',
+                  cursor: localMessage.trim() && !sending ? 'pointer' : 'not-allowed',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  position: 'relative',
+                  zIndex: 10
+                }}
+                onMouseOver={(e) => {
+                  if (localMessage.trim() && !sending) {
+                    e.target.style.transform = 'scale(1.1)';
+                    e.target.style.boxShadow = '0 2px 8px rgba(0, 123, 255, 0.3)';
+                  }
+                }}
+                onMouseOut={(e) => {
+                  if (localMessage.trim() && !sending) {
+                    e.target.style.transform = 'scale(1)';
+                    e.target.style.boxShadow = 'none';
+                  }
+                }}
+              >
+                {sending ? '⏳' : '➤'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {checkoutCar && (
         <div style={{
           position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
@@ -1031,6 +1461,130 @@ export default function BuyerDashboard() {
           </div>
         </div>
       )}
+
+      {/* Edit Profile Modal */}
+      {showEditProfileModal && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+          background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+          padding: '20px'
+        }}>
+          <div style={{ 
+            background: '#fff', 
+            padding: 0, 
+            borderRadius: 20, 
+            width: '100%', 
+            maxWidth: 500, 
+            maxHeight: '90vh',
+            display: 'flex',
+            flexDirection: 'column',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+            overflow: 'hidden'
+          }}>
+            {/* Modal Header */}
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center', 
+              padding: '24px 32px',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              color: 'white'
+            }}>
+              <h2 style={{ margin: 0, color: 'white', fontSize: '24px', fontWeight: '700' }}>Edit Profile</h2>
+              <button 
+                onClick={() => setShowEditProfileModal(false)}
+                style={{
+                  background: 'rgba(255,255,255,0.2)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '36px',
+                  height: '36px',
+                  cursor: 'pointer',
+                  fontSize: '18px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.background = 'rgba(255,255,255,0.3)';
+                  e.target.style.transform = 'scale(1.1)';
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.background = 'rgba(255,255,255,0.2)';
+                  e.target.style.transform = 'scale(1)';
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            
+            {/* Modal Body */}
+            <div style={{ padding: '32px', overflowY: 'auto' }}>
+              <form onSubmit={handleProfileUpdate} className={authStyles.authForm} style={{ margin: 0 }}>
+                <div className={authStyles.formGroup}>
+                  <label>Full Name <span style={{ color: 'red' }}>*</span></label>
+                  <input
+                    type="text"
+                    value={editName}
+                    onChange={e => setEditName(e.target.value)}
+                    className={authStyles.input}
+                    placeholder="Enter your full name"
+                    required
+                  />
+                </div>
+                <div className={authStyles.formGroup}>
+                  <label>Email <span style={{ color: 'red' }}>*</span></label>
+                  <input
+                    type="email"
+                    value={editEmail}
+                    onChange={e => setEditEmail(e.target.value)}
+                    className={authStyles.input}
+                    placeholder="Enter your email address"
+                    required
+                  />
+                </div>
+                
+                <div style={{ display: 'flex', gap: '16px', marginTop: '32px' }}>
+                  <button 
+                    type="submit" 
+                    className={authStyles.submitBtn} 
+                    style={{ 
+                      flex: 1,
+                      background: (editName !== originalName || editEmail !== originalEmail) ? '#667eea' : '#ccc',
+                      color: (editName !== originalName || editEmail !== originalEmail) ? 'white' : '#666',
+                      cursor: (editName !== originalName || editEmail !== originalEmail) ? 'pointer' : 'not-allowed'
+                    }}
+                    disabled={editName === originalName && editEmail === originalEmail}
+                  >
+                    Save Changes
+                  </button>
+                  <button 
+                    type="button" 
+                    className={authStyles.submitBtn} 
+                    style={{ 
+                      background: '#ccc', 
+                      color: '#333',
+                      flex: 1
+                    }} 
+                    onClick={() => setShowEditProfileModal(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+                
+                {profileMsg && (
+                  <div className={`${authStyles.message} ${profileMsg.startsWith('✅') ? authStyles.success : authStyles.error}`} style={{ marginTop: 20 }}>
+                    {profileMsg}
+                  </div>
+                )}
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer userType="buyer" />
     </div>
   );

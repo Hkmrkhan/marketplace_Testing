@@ -5,7 +5,6 @@ import Footer from '../components/Footer';
 import AIChat from '../components/AIChat';
 import { supabase } from '../utils/supabaseClient';
 import styles from '../styles/Dashboard.module.css';
-import authStyles from '../styles/Auth.module.css';
 
 // CarChat Component for Seller Dashboard
 function CarChat({ carId, sellerId, buyerId, currentUserId, onOpenChat, unreadCount, onMarkAsRead }) {
@@ -14,8 +13,6 @@ function CarChat({ carId, sellerId, buyerId, currentUserId, onOpenChat, unreadCo
   const [sending, setSending] = useState(false);
   const [loadingMessages, setLoadingMessages] = useState(true);
   const messagesEndRef = useRef(null);
-
-
 
   const fetchMessages = async () => {
     try {
@@ -56,7 +53,7 @@ function CarChat({ carId, sellerId, buyerId, currentUserId, onOpenChat, unreadCo
         .insert([{
           car_id: carId,
           sender_id: currentUserId,
-          receiver_id: buyerId,
+          receiver_id: selectedBuyer,
           message: newMessage.trim()
         }]);
 
@@ -75,12 +72,47 @@ function CarChat({ carId, sellerId, buyerId, currentUserId, onOpenChat, unreadCo
   };
 
   useEffect(() => {
-    if (carId && currentUserId && buyerId) {
+    fetchBuyers();
+  }, [carId, sellerId]);
+
+  useEffect(() => {
+    if (selectedBuyer) {
       fetchMessages();
     }
-  }, [carId, currentUserId, buyerId]);
+  }, [selectedBuyer, carId, currentUserId]);
 
+  // Real-time subscription for new messages
+  useEffect(() => {
+    if (!selectedBuyer || !carId) return;
 
+    const subscription = supabase
+      .channel(`car_chat:${carId}:${selectedBuyer}`)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages',
+        filter: `car_id=eq.${carId}`
+      }, (payload) => {
+        const newMessage = payload.new;
+        
+        // Only add message if it's relevant to current conversation
+        if (
+          newMessage.car_id === carId &&
+          ((newMessage.sender_id === selectedBuyer && newMessage.receiver_id === currentUserId) ||
+           (newMessage.sender_id === currentUserId && newMessage.receiver_id === selectedBuyer))
+        ) {
+          setMessages(prev => [...prev, {
+            ...newMessage,
+            sender_name: newMessage.sender_id === currentUserId ? 'You' : 'Buyer'
+          }]);
+        }
+      })
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [selectedBuyer, carId, currentUserId]);
 
   useEffect(() => {
     if (messagesEndRef.current && messages.length > 0) {
@@ -88,68 +120,64 @@ function CarChat({ carId, sellerId, buyerId, currentUserId, onOpenChat, unreadCo
     }
   }, [messages.length]);
 
-    return (
-      <div className="chat-icon-wrapper" style={{ position: 'relative', display: 'inline-block' }}>
-        <button
-          onClick={() => onOpenChat(carId, sellerId, buyerId, messages, setMessages, newMessage, setNewMessage, sending, sendMessage)}
-            style={{
-            background: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '50%',
-            width: '50px',
-            height: '50px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            fontSize: '20px',
-            boxShadow: '0 2px 8px rgba(0,123,255,0.3)',
-            transition: 'all 0.3s ease'
-          }}
-          onMouseOver={(e) => {
-            e.target.style.transform = 'scale(1.1)';
-            e.target.style.boxShadow = '0 4px 12px rgba(0,123,255,0.4)';
-          }}
-          onMouseOut={(e) => {
-            e.target.style.transform = 'scale(1)';
-            e.target.style.boxShadow = '0 2px 8px rgba(0,123,255,0.3)';
-          }}
-          title="Chat with buyer"
-        >
-          💬
-        </button>
-        
-        {/* Message Count Badge */}
-        {console.log('CarChat Badge Debug:', { carId, unreadCount, showBadge: unreadCount > 0 })}
-        {unreadCount > 0 && (
-          <span 
-            className="badge" 
-            style={{
-              position: 'absolute',
-              top: '-5px',
-              right: '-5px',
-              background: 'red',
-              color: 'white',
-              borderRadius: '50%',
-              padding: '3px 6px',
-                fontSize: '12px',
-                  fontWeight: 'bold',
-              minWidth: '20px',
-              height: '20px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              border: '2px solid white',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-            }}
-          >
-            {unreadCount}
-          </span>
-        )}
+  return (
+    <div style={{ position: 'relative' }}>
+      <button
+        onClick={() => onOpenChat(carId, sellerId, buyerId, messages, setMessages, newMessage, setNewMessage, sending, sendMessage)}
+        style={{
+          background: '#007bff',
+          color: 'white',
+          border: 'none',
+          borderRadius: '50%',
+          width: '50px',
+          height: '50px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          fontSize: '20px',
+          boxShadow: '0 2px 8px rgba(0,123,255,0.3)',
+          transition: 'all 0.3s ease'
+        }}
+        onMouseOver={(e) => {
+          e.target.style.transform = 'scale(1.1)';
+          e.target.style.boxShadow = '0 4px 12px rgba(0,123,255,0.4)';
+        }}
+        onMouseOut={(e) => {
+          e.target.style.transform = 'scale(1)';
+          e.target.style.boxShadow = '0 2px 8px rgba(0,123,255,0.3)';
+        }}
+        title="Chat with buyer"
+      >
+        💬
+      </button>
+      
+      {/* Message Count Badge */}
+      {unreadCount > 0 && (
+        <div style={{
+          position: 'absolute',
+          top: '-8px',
+          right: '-8px',
+          background: '#ff4757',
+          color: 'white',
+          borderRadius: '50%',
+          width: '24px',
+          height: '24px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '12px',
+          fontWeight: 'bold',
+          border: '2px solid white',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+        }}>
+          {unreadCount}
+        </div>
+      )}
     </div>
   );
 }
+
 
 
 
@@ -686,145 +714,21 @@ export default function SellerDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [showProfileForm, setShowProfileForm] = useState(false);
   const [profileFormData, setProfileFormData] = useState({});
-  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
+  const [editingProfile, setEditingProfile] = useState(false);
   const [editName, setEditName] = useState('');
   const [editEmail, setEditEmail] = useState('');
-  const [originalName, setOriginalName] = useState('');
-  const [originalEmail, setOriginalEmail] = useState('');
   const [profileMsg, setProfileMsg] = useState('');
   const [buyersByCar, setBuyersByCar] = useState({});
   const [sellerId, setSellerId] = useState(null);
-  const [unreadCounts, setUnreadCounts] = useState({}); // Track unread counts per car
+  const [unreadCount, setUnreadCount] = useState(0);
   const [imageIndexes, setImageIndexes] = useState({});
   const [showChatModal, setShowChatModal] = useState(false);
-  const [chatCarId, setChatCarId] = useState(null);
-  const [chatBuyerId, setChatBuyerId] = useState(null);
-  const [chatData, setChatData] = useState(null);
-  const [localMessage, setLocalMessage] = useState('');
-  const [sending, setSending] = useState(false);
-  const [localMessages, setLocalMessages] = useState([]);
   const [pendingApprovals, setPendingApprovals] = useState([]);
   const [availableCars, setAvailableCars] = useState(0);
   const [soldCars, setSoldCars] = useState(0);
   const [buyersLoading, setBuyersLoading] = useState(true); // Add loading state for buyers
   const [stripeSetupLoading, setStripeSetupLoading] = useState(false); // Add loading state for Stripe setup
 
-
-  // Chat functions
-  const onOpenChat = (carId, sellerId, buyerId, messages, setMessages, newMessage, setNewMessage, sending, sendMessage) => {
-    setChatCarId(carId);
-    setChatBuyerId(buyerId);
-    setShowChatModal(true);
-    
-    // Copy existing messages to local state
-    setLocalMessages(messages || []);
-    
-    // Store chat data for modal
-    setChatData({ 
-      messages, 
-      setMessages, 
-      newMessage, 
-      setNewMessage, 
-      sending, 
-      sendMessage
-    });
-    
-    // Mark messages as read for this specific car
-    if (carId && sellerId) {
-      markMessagesAsRead(carId, sellerId);
-    }
-  };
-
-  const closeChat = () => {
-    setShowChatModal(false);
-    setChatCarId(null);
-    setChatBuyerId(null);
-    setChatData(null);
-    setLocalMessage('');
-    setSending(false);
-    setLocalMessages([]);
-  };
-
-  const markMessagesAsRead = async (carId, sellerId) => {
-    try {
-      console.log('🔍 Marking messages as read for car:', carId, 'seller:', sellerId);
-      
-      const { error } = await supabase
-        .from('messages')
-        .update({ is_read: true })
-        .eq('car_id', carId)
-        .eq('receiver_id', sellerId)
-        .eq('is_read', false);
-      
-      if (error) {
-        console.error('❌ Error marking messages as read:', error);
-      } else {
-        console.log('✅ Messages marked as read for car:', carId);
-        // Reset unread count for this car
-        setUnreadCounts(prev => ({
-          ...prev,
-          [carId]: 0
-        }));
-      }
-    } catch (error) {
-      console.error('❌ Error in markMessagesAsRead:', error);
-    }
-  };
-
-
-
-  const handleSendMessage = async () => {
-    if (!localMessage.trim() || !chatCarId || !chatBuyerId || !user?.id) return;
-    
-    try {
-      setSending(true);
-      
-      // Create new message object
-      const newMessageObj = {
-        id: Date.now(),
-        car_id: chatCarId,
-        sender_id: user.id,
-        receiver_id: chatBuyerId,
-        message: localMessage.trim(),
-        sender_name: 'You',
-        receiver_name: 'Buyer',
-        created_at: new Date().toISOString()
-      };
-      
-      // Add message to local messages immediately (optimistic update)
-      setLocalMessages(prev => [...prev, newMessageObj]);
-      
-      // Send message to database
-      const { error } = await supabase
-        .from('messages')
-        .insert([{
-          car_id: chatCarId,
-          sender_id: user.id,
-          receiver_id: chatBuyerId,
-          message: localMessage.trim()
-        }]);
-      
-      if (error) {
-        console.error('Error sending message:', error);
-        // Remove message from local state if database save failed
-        setLocalMessages(prev => prev.filter(msg => msg.id !== newMessageObj.id));
-        return;
-      }
-      
-      // Clear input
-      setLocalMessage('');
-      
-      // Refresh messages in CarChat component
-      if (chatData?.setMessages) {
-        chatData.setMessages(prev => [...prev, newMessageObj]);
-      }
-      
-    } catch (error) {
-      console.error('Error in handleSendMessage:', error);
-    } finally {
-      setSending(false);
-    }
-  };
 
   // Helper to get all images for a car
   const getAllImages = (car) => {
@@ -836,57 +740,33 @@ export default function SellerDashboard() {
 
   useEffect(() => {
     const fetchSeller = async () => {
-      console.log('🔍 fetchSeller useEffect triggered');
       const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        console.log('✅ User found, setting sellerId:', user.id);
-        setSellerId(user.id);
-      } else {
-        console.log('❌ No user found');
-      }
+      if (user) setSellerId(user.id);
     };
     fetchSeller();
   }, []);
 
   useEffect(() => {
-    console.log('🔍 fetchUnread useEffect triggered, sellerId:', sellerId);
-    if (!sellerId) {
-      console.log('❌ sellerId not available, returning early');
-      return;
-    }
-    
+    if (!sellerId) return;
     const fetchUnread = async () => {
       try {
-        console.log('📡 Fetching unread messages for sellerId:', sellerId);
-        
-        // Get unread messages count per car for the seller
-        const { data, error } = await supabase
+        // Get unread messages count for the seller
+        const { count, error } = await supabase
         .from('messages')
-        .select('car_id, id')
+        .select('id', { count: 'exact', head: true })
         .eq('receiver_id', sellerId)
-        .eq('is_read', false);
+        .eq('read', false);
 
         if (error) {
-          console.error('❌ Error fetching unread counts:', error);
-          setUnreadCounts({});
+          console.error('Error fetching unread count:', error);
+          setUnreadCount(0);
         } else {
-          console.log('✅ Unread messages data received:', data);
-          console.log('📊 Raw data length:', data?.length || 0);
-          
-          // Group unread messages by car_id
-          const counts = {};
-          data?.forEach(msg => {
-            console.log('📝 Processing message:', msg);
-            counts[msg.car_id] = (counts[msg.car_id] || 0) + 1;
-          });
-          
-          console.log('🎯 Final unread counts per car:', counts);
-          console.log('🔢 Total cars with unread messages:', Object.keys(counts).length);
-          setUnreadCounts(counts);
+          console.log('Unread messages count:', count);
+      setUnreadCount(count || 0);
         }
       } catch (error) {
-        console.error('❌ Error in fetchUnread:', error);
-        setUnreadCounts({});
+        console.error('Error in fetchUnread:', error);
+        setUnreadCount(0);
       }
     };
     
@@ -901,11 +781,8 @@ export default function SellerDashboard() {
         table: 'messages',
         filter: `receiver_id=eq.${sellerId}`
       }, (payload) => {
-        console.log('New message received, updating unread count for car:', payload.new.car_id);
-        setUnreadCounts(prev => ({
-          ...prev,
-          [payload.new.car_id]: (prev[payload.new.car_id] || 0) + 1
-        }));
+        console.log('New message received, updating unread count');
+        setUnreadCount(prev => prev + 1);
       })
       .on('postgres_changes', {
         event: 'UPDATE',
@@ -913,12 +790,9 @@ export default function SellerDashboard() {
         table: 'messages',
         filter: `receiver_id=eq.${sellerId}`
       }, (payload) => {
-        // If message is marked as read, decrease unread count for that car
-        if (payload.new.is_read === true && payload.old.is_read === false) {
-          setUnreadCounts(prev => ({
-            ...prev,
-            [payload.new.car_id]: Math.max(0, (prev[payload.new.car_id] || 0) - 1)
-          }));
+        // If message is marked as read, decrease unread count
+        if (payload.new.read === true && payload.old.read === false) {
+          setUnreadCount(prev => Math.max(0, prev - 1));
         }
       })
       .subscribe();
@@ -1158,9 +1032,7 @@ export default function SellerDashboard() {
   const handleEditProfile = () => {
     setEditName(userProfile?.full_name || '');
     setEditEmail(user?.email || '');
-    setOriginalName(userProfile?.full_name || '');
-    setOriginalEmail(user?.email || '');
-    setShowEditProfileModal(true);
+    setEditingProfile(true);
     setProfileMsg('');
   };
 
@@ -1171,42 +1043,27 @@ export default function SellerDashboard() {
       setProfileMsg('❌ Name and email are required.');
       return;
     }
-    
-        try {
-      // Update profile in Supabase with basic fields
+    // Update profile in Supabase
     const { error: profileError } = await supabase
       .from('profiles')
-        .update({ 
-          full_name: editName
-        })
+      .update({ full_name: editName })
       .eq('id', user.id);
-        
     if (profileError) {
       setProfileMsg('❌ ' + profileError.message);
       return;
     }
-      
     // Update email in auth
     const { error: emailError } = await supabase.auth.updateUser({ email: editEmail });
     if (emailError) {
       setProfileMsg('❌ ' + emailError.message);
       return;
     }
-      
     setProfileMsg('✅ Profile updated successfully!');
-      setUserProfile({ 
-        ...userProfile, 
-        full_name: editName
-      });
-      setShowEditProfileModal(false);
-      
+    setUserProfile({ ...userProfile, full_name: editName });
+    setEditingProfile(false);
     // Optionally, refresh user info
     const { data: { user: refreshedUser } } = await supabase.auth.getUser();
     setUser(refreshedUser);
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      setProfileMsg('❌ An unexpected error occurred: ' + error.message);
-    }
   };
 
   // Mark messages as read when chat modal is opened
@@ -1301,8 +1158,6 @@ export default function SellerDashboard() {
             <h3>{userProfile?.full_name || 'Seller'}</h3>
             <p>Car Seller</p>
           </div>
-            
-
           
           {/* Stripe Setup Reminder */}
           {userProfile && !userProfile.stripe_account_id && (
@@ -1586,20 +1441,9 @@ export default function SellerDashboard() {
                             <CarChat 
                               carId={car.car_id || car.id} 
                               sellerId={sellerId} 
-                              buyerId={buyersByCar[car.car_id || car.id]?.[0]?.id} 
+                              buyerId={null} 
                               currentUserId={sellerId} 
-                              onOpenChat={onOpenChat}
-                              unreadCount={unreadCounts[car.car_id || car.id] || 0}
-                              onMarkAsRead={() => {}}
                             />
-                            {console.log('🎯 Main Component Badge Debug:', { 
-                              carId: car.car_id || car.id, 
-                              carTitle: car.title,
-                              unreadCounts, 
-                              count: unreadCounts[car.car_id || car.id] || 0,
-                              showBadge: (unreadCounts[car.car_id || car.id] || 0) > 0,
-                              allUnreadCounts: unreadCounts
-                            })}
                           </div>
                         </div>
                       </div>
@@ -1626,7 +1470,35 @@ export default function SellerDashboard() {
                 </div>
                 <button className={styles.editProfileBtn} onClick={handleEditProfile}>Edit Profile</button>
               </div>
-
+              {editingProfile && (
+                <form onSubmit={handleProfileUpdate} className={styles.authForm} style={{ maxWidth: 400, margin: '1rem auto' }}>
+                  <div className={styles.formGroup}>
+                    <label>Full Name</label>
+                    <input
+                      type="text"
+                      value={editName}
+                      onChange={e => setEditName(e.target.value)}
+                      className={styles.input}
+                      required
+                    />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label>Email</label>
+                    <input
+                      type="email"
+                      value={editEmail}
+                      onChange={e => setEditEmail(e.target.value)}
+                      className={styles.input}
+                      required
+                    />
+                  </div>
+                  <button type="submit" className={styles.submitBtn}>Save</button>
+                  <button type="button" className={styles.submitBtn} style={{ background: '#ccc', color: '#333', marginLeft: 8 }} onClick={() => setEditingProfile(false)}>Cancel</button>
+                  {profileMsg && (
+                    <div className={`${styles.message} ${profileMsg.startsWith('✅') ? styles.success : styles.error}`} style={{ marginTop: 10 }}>{profileMsg}</div>
+                  )}
+                </form>
+              )}
             </div>
           )}
           {activeTab === 'aihelp' && (
@@ -1646,338 +1518,6 @@ export default function SellerDashboard() {
           )}
         </div>
       </div>
-
-      {/* Chat Modal */}
-      {showChatModal && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000,
-          padding: '20px'
-        }}>
-          <div style={{
-            background: 'white',
-            borderRadius: '16px',
-            width: '100%',
-            maxWidth: '500px',
-            maxHeight: '80vh',
-            display: 'flex',
-            flexDirection: 'column',
-            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.2)',
-            overflow: 'hidden'
-          }}>
-            {/* Chat Header */}
-            <div style={{
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              color: 'white',
-              padding: '20px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              borderTopLeftRadius: '16px',
-              borderTopRightRadius: '16px'
-            }}>
-              <div>
-                <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>💬 Chat with Buyer</h3>
-                <small style={{ opacity: 0.9, fontSize: '12px' }}>Car ID: {chatCarId}</small>
-              </div>
-              <button
-                onClick={closeChat}
-                style={{
-                  background: 'rgba(255, 255, 255, 0.2)',
-                  border: 'none',
-                  color: 'white',
-                  borderRadius: '50%',
-                  width: '32px',
-                  height: '32px',
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseOver={(e) => {
-                  e.target.style.background = 'rgba(255, 255, 255, 0.3)';
-                }}
-                onMouseOut={(e) => {
-                  e.target.style.background = 'rgba(255, 255, 255, 0.2)';
-                }}
-              >
-                ✕
-              </button>
-            </div>
-            
-            {/* Chat Interface */}
-            <div style={{ 
-              flex: 1, 
-              overflowY: 'auto', 
-              padding: '16px',
-              background: '#f8f9fa',
-              minHeight: '250px'
-            }}>
-              {localMessages.length === 0 ? (
-                <div style={{ 
-                  textAlign: 'center', 
-                  color: '#888', 
-                  marginTop: '80px',
-                  fontSize: '14px'
-                }}>
-                  <div style={{ fontSize: '32px', marginBottom: '12px' }}>💬</div>
-                  No messages yet.<br/>
-                  <small style={{ fontSize: '12px', opacity: '0.7' }}>Start the conversation!</small>
-                </div>
-              ) : (
-                localMessages.map((msg, index) => (
-                  <div key={msg.id || index} style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: msg.sender_id === user?.id ? 'flex-end' : 'flex-start',
-                    marginBottom: 16
-                  }}>
-                    <div style={{
-                      background: msg.sender_id === user?.id ? '#007bff' : '#fff',
-                      color: msg.sender_id === user?.id ? 'white' : '#333',
-                      padding: '10px 14px',
-                      borderRadius: '16px',
-                      maxWidth: '80%',
-                      fontSize: '13px',
-                      lineHeight: 1.4,
-                      wordWrap: 'break-word',
-                      boxShadow: '0 1px 4px rgba(0,0,0,0.1)',
-                      border: msg.sender_id === user?.id ? 'none' : '1px solid #e0e0e0'
-                    }}>
-                      <div style={{
-                        fontWeight: 'bold',
-                        fontSize: '11px',
-                        marginBottom: 4,
-                        opacity: 0.9
-                      }}>
-                        {msg.sender_name}
-                      </div>
-                      {msg.message}
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-            
-            {/* Chat Input */}
-            <div style={{ 
-              display: 'flex', 
-              gap: 12, 
-              alignItems: 'flex-end',
-              padding: '16px 20px',
-              background: '#fff',
-              borderTop: '1px solid #eee',
-              position: 'relative',
-              zIndex: 10
-            }}>
-              <textarea
-                value={localMessage}
-                onChange={(e) => setLocalMessage(e.target.value)}
-                onKeyPress={(e) => { 
-                  if (e.key === 'Enter' && !e.shiftKey) { 
-                    e.preventDefault(); 
-                    handleSendMessage(); 
-                  } 
-                }}
-                placeholder="Type your message..."
-                style={{
-                  flex: 1,
-                  padding: '12px',
-                  border: '1px solid #ddd',
-                  borderRadius: '8px',
-                  resize: 'none',
-                  minHeight: '50px',
-                  fontFamily: 'inherit',
-                  fontSize: '13px',
-                  transition: 'all 0.2s ease',
-                  outline: 'none',
-                  position: 'relative',
-                  zIndex: 10
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = '#007bff';
-                  e.target.style.boxShadow = '0 0 0 2px rgba(0, 123, 255, 0.1)';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = '#ddd';
-                  e.target.style.boxShadow = 'none';
-                }}
-                rows="2"
-                disabled={sending}
-              />
-              <button
-                onClick={handleSendMessage}
-                disabled={!localMessage.trim() || sending}
-                style={{
-                  background: localMessage.trim() && !sending ? '#007bff' : '#ccc',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '50%',
-                  width: '40px',
-                  height: '40px',
-                  cursor: localMessage.trim() && !sending ? 'pointer' : 'not-allowed',
-                  fontSize: '16px',
-                  fontWeight: '600',
-                  transition: 'all 0.2s ease',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  position: 'relative',
-                  zIndex: 10
-                }}
-                onMouseOver={(e) => {
-                  if (localMessage.trim() && !sending) {
-                    e.target.style.transform = 'scale(1.1)';
-                    e.target.style.boxShadow = '0 2px 8px rgba(0, 123, 255, 0.3)';
-                  }
-                }}
-                onMouseOut={(e) => {
-                  if (localMessage.trim() && !sending) {
-                    e.target.style.transform = 'scale(1)';
-                    e.target.style.boxShadow = 'none';
-                  }
-                }}
-              >
-                {sending ? '⏳' : '➤'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Profile Modal */}
-      {showEditProfileModal && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-          background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
-          padding: '20px'
-        }}>
-          <div style={{ 
-            background: '#fff', 
-            padding: 0, 
-            borderRadius: 20, 
-            width: '100%', 
-            maxWidth: 500, 
-            maxHeight: '90vh',
-            display: 'flex',
-            flexDirection: 'column',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
-            overflow: 'hidden'
-          }}>
-            {/* Modal Header */}
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center', 
-              padding: '24px 32px',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              color: 'white'
-            }}>
-              <h2 style={{ margin: 0, color: 'white', fontSize: '24px', fontWeight: '700' }}>Edit Profile</h2>
-              <button 
-                onClick={() => setShowEditProfileModal(false)}
-                style={{
-                  background: 'rgba(255,255,255,0.2)',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '50%',
-                  width: '36px',
-                  height: '36px',
-                  cursor: 'pointer',
-                  fontSize: '18px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseOver={(e) => {
-                  e.target.style.background = 'rgba(255,255,255,0.3)';
-                  e.target.style.transform = 'scale(1.1)';
-                }}
-                onMouseOut={(e) => {
-                  e.target.style.background = 'rgba(255,255,255,0.2)';
-                  e.target.style.transform = 'scale(1)';
-                }}
-              >
-                ✕
-              </button>
-            </div>
-            
-                        {/* Modal Body */}
-            <div style={{ padding: '32px', overflowY: 'auto' }}>
-              <form onSubmit={handleProfileUpdate} className={authStyles.authForm} style={{ margin: 0 }}>
-                <div className={authStyles.formGroup}>
-                  <label>Full Name <span style={{ color: 'red' }}>*</span></label>
-                    <input
-                      type="text"
-                      value={editName}
-                      onChange={e => setEditName(e.target.value)}
-                    className={authStyles.input}
-                    placeholder="Enter your full name"
-                      required
-                    />
-                  </div>
-                <div className={authStyles.formGroup}>
-                  <label>Email <span style={{ color: 'red' }}>*</span></label>
-                    <input
-                      type="email"
-                      value={editEmail}
-                      onChange={e => setEditEmail(e.target.value)}
-                    className={authStyles.input}
-                    placeholder="Enter your email address"
-                      required
-                    />
-                  </div>
-                
-                <div style={{ display: 'flex', gap: '16px', marginTop: '32px' }}>
-                  <button 
-                    type="submit" 
-                    className={authStyles.submitBtn} 
-                    style={{ 
-                      flex: 1,
-                      background: (editName !== originalName || editEmail !== originalEmail) ? '#667eea' : '#ccc',
-                      color: (editName !== originalName || editEmail !== originalEmail) ? 'white' : '#666',
-                      cursor: (editName !== originalName || editEmail !== originalEmail) ? 'pointer' : 'not-allowed'
-                    }}
-                    disabled={editName === originalName && editEmail === originalEmail}
-                  >
-                    Save Changes
-                  </button>
-                  <button 
-                    type="button" 
-                    className={authStyles.submitBtn} 
-                    style={{ 
-                      background: '#ccc', 
-                      color: '#333',
-                      flex: 1
-                    }} 
-                    onClick={() => setShowEditProfileModal(false)}
-                  >
-                    Cancel
-                  </button>
-                </div>
-                
-                  {profileMsg && (
-                  <div className={`${authStyles.message} ${profileMsg.startsWith('✅') ? authStyles.success : authStyles.error}`} style={{ marginTop: 20 }}>
-                    {profileMsg}
-                  </div>
-                  )}
-                </form>
-            </div>
-              </div>
-            </div>
-          )}
-
       <Footer userType="seller" />
     </div>
   );

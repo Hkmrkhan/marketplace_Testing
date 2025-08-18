@@ -147,7 +147,10 @@ export default function AddCarPage() {
           </div>
           
           <div className={styles.formSection}>
-            <CarForm onSubmit={handleAddCar} />
+            <CarForm 
+              onSubmit={handleAddCar} 
+              onCancel={() => router.push('/seller-dashboard')}
+            />
             {message && (
               <div className={`${styles.message} ${message.startsWith('✅') ? styles.success : styles.error}`}>
                 {message}

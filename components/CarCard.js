@@ -47,9 +47,9 @@ export default function CarCard({ car }) {
         {car.year && (
           <p className={styles.year}>📅 {car.year}</p>
         )}
-        {car.reg_district && car.reg_district !== 'Other' && (
-          <p className={styles.district}>📍 {car.reg_district}</p>
-        )}
+                    {car.reg_district && car.reg_district !== 'Other' && (
+              <p className={styles.city}>📍 {car.reg_district}</p>
+            )}
         <p className={car.status === 'sold' ? styles.sold : styles.available}>
           {car.status === 'sold' ? 'Sold' : 'Available'}
         </p>
