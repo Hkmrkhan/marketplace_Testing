@@ -25,9 +25,15 @@ export default function ContactPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Here you can add the logic to send the message to hkmrkhan10@gmail.com
-    console.log('Sending message:', formData);
-    alert('Message sent successfully! We will get back to you soon.');
+    
+    // Create WhatsApp message
+    const message = `*New Contact Form Message*%0A%0A*Name:* ${formData.name}%0A*Email:* ${formData.email}%0A%0A*Message:*%0A${formData.message}%0A%0A*Sent from:* Car Marketplace Website`;
+    
+    // Redirect to WhatsApp
+    const whatsappUrl = `https://wa.me/923208196396?text=${message}`;
+    window.open(whatsappUrl, '_blank');
+    
+    // Reset form
     setFormData({ name: '', email: '', message: '' });
   };
 
@@ -53,7 +59,7 @@ export default function ContactPage() {
             </div>
             <div className={styles.contactItem}>
               <span className={styles.contactIcon}>📞</span>
-              <span className={styles.contactText}>+92 300 1234567</span>
+              <span className={styles.contactText}>+923208196396</span>
             </div>
           </div>
         </div>

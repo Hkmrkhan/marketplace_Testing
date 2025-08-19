@@ -6,6 +6,7 @@ import { supabase } from '../utils/supabaseClient';
 import styles from '../styles/AdminDashboard.module.css';
 
 export default function AdminDashboard() {
+  const router = useRouter();
   const [user, setUser] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
   const [pendingCars, setPendingCars] = useState([]);
@@ -22,6 +23,12 @@ export default function AdminDashboard() {
   const [backfillMessage, setBackfillMessage] = useState('');
   const [cleanupLoading, setCleanupLoading] = useState(false);
   const [cleanupMessage, setCleanupMessage] = useState('');
+  
+  // Confirmation states for admin actions
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [carToDelete, setCarToDelete] = useState(null);
+  const [showEditConfirm, setShowEditConfirm] = useState(false);
+  const [carToEdit, setCarToEdit] = useState(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -339,6 +346,35 @@ export default function AdminDashboard() {
 
       // Reload users to reflect changes
       await loadAllUsers();
+
+    } catch (error) {
+      console.error('Error:', error);
+      setMessage('❌ Error: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAdminDeleteCar = async (carId) => {
+    try {
+      setLoading(true);
+      
+      // Delete car from database
+      const { error } = await supabase
+        .from('cars')
+        .delete()
+        .eq('id', carId);
+
+      if (error) {
+        console.error('Error deleting car:', error);
+        setMessage('❌ Error deleting car: ' + error.message);
+        return;
+      }
+
+      setMessage('✅ Car deleted successfully!');
+
+      // Reload cars to reflect changes
+      await loadAllCars();
 
     } catch (error) {
       console.error('Error:', error);
@@ -845,6 +881,30 @@ export default function AdminDashboard() {
                             <small>Approved at: {car.admin_approvals[0].approved_at ? new Date(car.admin_approvals[0].approved_at).toLocaleDateString() : 'N/A'}</small>
                           </div>
                         )}
+                        
+                        {/* Admin Edit Button for Available Cars */}
+                        <div className={styles.adminCarActions}>
+                          <button 
+                            onClick={() => {
+                              setCarToEdit(car);
+                              setShowEditConfirm(true);
+                            }}
+                            className={styles.adminEditBtn}
+                            title="Edit car information"
+                          >
+                            ✏️ Edit Car
+                          </button>
+                          <button 
+                            onClick={() => {
+                              setCarToDelete(car);
+                              setShowDeleteConfirm(true);
+                            }}
+                            className={styles.adminDeleteBtn}
+                            title="Delete car"
+                          >
+                            🗑️ Delete Car
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -1076,6 +1136,91 @@ export default function AdminDashboard() {
           )}
               </div>
             </div>
+      
+      {/* Confirmation Notifications */}
+      {showDeleteConfirm && carToDelete && (
+        <div className={styles.confirmationOverlay}>
+          <div className={styles.confirmationModal}>
+            <div className={styles.confirmationHeader}>
+              <h3>🗑️ Delete Car Confirmation</h3>
+              <button 
+                onClick={() => setShowDeleteConfirm(false)}
+                className={styles.closeModalBtn}
+              >
+                ✕
+              </button>
+            </div>
+            <div className={styles.confirmationBody}>
+              <p>Are you sure you want to delete this car?</p>
+              <div className={styles.carPreview}>
+                <strong>{carToDelete.title}</strong>
+                <span>${carToDelete.price?.toLocaleString()}</span>
+              </div>
+              <p><strong>⚠️ Warning:</strong> This action cannot be undone!</p>
+            </div>
+            <div className={styles.confirmationActions}>
+              <button 
+                onClick={() => setShowDeleteConfirm(false)}
+                className={styles.cancelBtn}
+              >
+                ❌ Cancel
+              </button>
+              <button 
+                onClick={() => {
+                  handleAdminDeleteCar(carToDelete.id);
+                  setShowDeleteConfirm(false);
+                  setCarToDelete(null);
+                }}
+                className={styles.confirmBtn}
+              >
+                ✅ Confirm Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showEditConfirm && carToEdit && (
+        <div className={styles.confirmationOverlay}>
+          <div className={styles.confirmationModal}>
+            <div className={styles.confirmationHeader}>
+              <h3>✏️ Edit Car Confirmation</h3>
+              <button 
+                onClick={() => setShowEditConfirm(false)}
+                className={styles.closeModalBtn}
+              >
+                ✕
+              </button>
+            </div>
+            <div className={styles.confirmationBody}>
+              <p>Are you sure you want to edit this car?</p>
+              <div className={styles.carPreview}>
+                <strong>{carToEdit.title}</strong>
+                <span>${carToEdit.price?.toLocaleString()}</span>
+              </div>
+              <p>You will be redirected to the edit page.</p>
+            </div>
+            <div className={styles.confirmationActions}>
+              <button 
+                onClick={() => setShowEditConfirm(false)}
+                className={styles.cancelBtn}
+              >
+                ❌ Cancel
+              </button>
+              <button 
+                onClick={() => {
+                  router.push(`/edit-car/${carToEdit.id}`);
+                  setShowEditConfirm(false);
+                  setCarToEdit(null);
+                }}
+                className={styles.confirmBtn}
+              >
+                ✅ Proceed to Edit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       
       <Footer />
     </div>

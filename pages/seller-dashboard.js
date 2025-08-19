@@ -1566,20 +1566,21 @@ export default function SellerDashboard() {
                             </div>
                           )}
                           
-                          <div className={styles.carActions}>
-                            <button 
-                              className={styles.editBtn}
-                              onClick={() => router.push(`/edit-car/${car.car_id || car.id}`)}
-                              disabled={car.status === 'sold'}
-                              style={car.status === 'sold' ? { background: '#ccc', color: '#888', cursor: 'not-allowed' } : {}}
-                            >Edit</button>
-                            <button
-                              className={styles.deleteBtn}
-                              onClick={() => handleDeleteCar(car.car_id || car.id)}
-                            >
-                              Delete
-                            </button>
-                          </div>
+                          {/* Only show actions for non-sold cars */}
+                          {car.status !== 'sold' && (
+                            <div className={styles.carActions}>
+                              <button 
+                                className={styles.editBtn}
+                                onClick={() => router.push(`/edit-car/${car.car_id || car.id}`)}
+                              >Edit</button>
+                              <button
+                                className={styles.deleteBtn}
+                                onClick={() => handleDeleteCar(car.car_id || car.id)}
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          )}
                           
                           {/* Chat Section for each car */}
                           <div style={{ marginTop: 12 }}>

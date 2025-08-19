@@ -492,7 +492,7 @@ ${carDetails}
 📝 **Description:** ${cheapestCar.description?.substring(0, 100) || 'Description not available'}...
 📞 **Contact:** ${cheapestCar.seller_whatsapp ? 'WhatsApp available' : 'Use marketplace chat'}
 
-🛒 **Cars page se direct purchase kar sakte hain!**`;
+🛒 **How to buy:** Browse cars here → Login as buyer → Purchase from dashboard**`;
         
         response = details;
       } else {

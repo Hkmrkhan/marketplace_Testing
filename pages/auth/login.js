@@ -353,16 +353,13 @@ export default function LoginPage() {
                   <div className={styles.contactInfo}>
                     <div className={styles.contactItem}>
                       <span>📧 Email:</span>
-                      <span>hkmrkhan</span>
+                      <span>hkmrKhan10@gmail.com</span>
                     </div>
                     <div className={styles.contactItem}>
                       <span>📱 WhatsApp:</span>
-                      <span>+92 300 1234567</span>
+                      <span>+923208196396</span>
                     </div>
-                    <div className={styles.contactItem}>
-                      <span>🌐 Website:</span>
-                      <span>www.carmarketplace.com/contact</span>
-                    </div>
+
                   </div>
                   <div className={styles.contactActions}>
                     <button 

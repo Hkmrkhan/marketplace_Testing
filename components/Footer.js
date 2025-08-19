@@ -40,7 +40,7 @@ export default function Footer({ userType }) {
           <h4>Contact</h4>
           <div className={styles.contactInfo}>
             <p>📧 hkmrkhan10@gmail.com</p>
-            <p>📞 +92 300 1234567</p>
+            <p>📞 +923208196396</p>
           </div>
         </div>
         {/* Dynamic Info Section */}

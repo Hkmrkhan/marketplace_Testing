@@ -37,12 +37,19 @@ export default function EditCarPage() {
         setLoading(false);
         return;
       }
-      // Only allow if current user is the seller/owner
-      if (carData.user_id !== user.id) {
+      // Allow if current user is the seller/owner OR if user is admin
+      if (carData.user_id !== user.id && profile?.user_type !== 'admin') {
         setCar(null);
         setLoading(false);
         setMessage('You are not authorized to edit this car.');
         return;
+      }
+      
+      // Debug log for admin access
+      if (profile?.user_type === 'admin') {
+        console.log('🔓 Admin access granted for car:', carData.id);
+      } else {
+        console.log('🔓 Seller access granted for car:', carData.id);
       }
       console.log('Fetched car data:', carData); // Debug log
       setCar(carData);
@@ -82,7 +89,12 @@ export default function EditCarPage() {
       }
       
       setMessage('Car updated successfully!');
-      setTimeout(() => router.push('/seller-dashboard'), 1500);
+      // Redirect based on user type
+      if (userProfile?.user_type === 'admin') {
+        setTimeout(() => router.push('/admin-dashboard'), 1500);
+      } else {
+        setTimeout(() => router.push('/seller-dashboard'), 1500);
+      }
     } catch (error) {
       console.error('Error updating car:', error);
       setMessage('An unexpected error occurred: ' + error.message);
@@ -93,6 +105,13 @@ export default function EditCarPage() {
   if (!car) return <div>{message || 'Car not found.'}</div>;
   
   console.log('Current car state in render:', car); // Debug log
+  console.log('🔍 Edit Page Debug:', {
+    userType: userProfile?.user_type,
+    carSellerId: car?.user_id,
+    currentUserId: userProfile?.id,
+    isAdmin: userProfile?.user_type === 'admin',
+    canEdit: userProfile?.user_type === 'admin' || car?.user_id === userProfile?.id
+  });
 
   return (
     <div>
