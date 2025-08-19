@@ -132,6 +132,8 @@
   margin-top: 0.5rem;
 }
 
+/* Buy button styles removed - no longer needed */
+
 .thumbnailsRow {
   display: flex;
   gap: 8px;

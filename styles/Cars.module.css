@@ -48,9 +48,29 @@
 }
 
 .headerText p {
-  margin: 5px 0 0 0;
-  color: #666;
   font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.userGuidance {
+  margin-top: 1rem;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+}
+
+.userGuidance p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #374151;
+  font-weight: 500;
+}
+
+.userGuidance strong {
+  color: #667eea;
 }
 
 .headerBadge {

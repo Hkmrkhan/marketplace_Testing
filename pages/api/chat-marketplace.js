@@ -120,18 +120,79 @@ export default async function handler(req, res) {
     let avgPrice = 0;
 
     try {
-      const { data: cars } = await supabase
+      // Try to get cars with city information
+      let { data: cars } = await supabase
         .from('ai_marketplace_data')
         .select('*')
         .eq('is_available', true)
         .order('created_at', { ascending: false })
-        .limit(25);
+        .limit(50);
+
+      // If no data from AI view, try cars_with_seller_enhanced
+      if (!cars || cars.length === 0) {
+        console.log('No data from ai_marketplace_data, trying fallback view...');
+        const { data: fallbackCars } = await supabase
+          .from('cars_with_seller_enhanced')
+          .select('*')
+          .eq('status', 'available')
+          .order('created_at', { ascending: false })
+          .limit(50);
+        
+        if (fallbackCars) {
+          console.log('Using fallback view, transforming data...');
+          // Transform fallback data to match AI view format
+          cars = fallbackCars.map(car => ({
+            ...car,
+            numeric_price: parseFloat(car.price) || 0,
+            formatted_price: `$${car.price}`,
+            price_category: car.price < 1000 ? 'budget' : 
+                           car.price < 5000 ? 'mid-range' : 
+                           car.price < 10000 ? 'premium' : 'luxury',
+            ai_price_range: car.price < 1000 ? 'Budget' : 
+                           car.price < 5000 ? 'Mid-Range' : 
+                           car.price < 10000 ? 'Premium' : 'Luxury',
+            is_available: car.status === 'available',
+            days_since_listed: Math.floor((Date.now() - new Date(car.created_at).getTime()) / (1000 * 60 * 60 * 24)),
+            // Map city fields properly
+            reg_district: car.reg_district || car.registration_district || car.city || 'Unknown'
+          }));
+        }
+      }
 
       availableCars = cars || [];
-      const prices = availableCars.map(car => car.numeric_price || 0).filter(price => price > 0);
-      minPrice = prices.length > 0 ? Math.min(...prices) : 0;
-      maxPrice = prices.length > 0 ? Math.max(...prices) : 0;
-      avgPrice = prices.length > 0 ? Math.round(prices.reduce((a, b) => a + b, 0) / prices.length) : 0;
+      
+      // Debug: Log city information
+      const cityFields = availableCars.map(car => ({
+        id: car.id || car.car_id,
+        reg_district: car.reg_district,
+        registration_district: car.registration_district,
+        city: car.city,
+        title: car.title || car.car_title
+      })).slice(0, 5); // Show first 5 cars for debugging
+      
+      console.log('City field debugging (first 5 cars):', cityFields);
+      console.log('Available city fields:', Object.keys(availableCars[0] || {}).filter(key => key.toLowerCase().includes('city') || key.toLowerCase().includes('district')));
+      
+      // Better price calculation
+      const prices = availableCars
+        .map(car => car.numeric_price || parseFloat(car.price) || 0)
+        .filter(price => price > 0 && !isNaN(price));
+      
+      if (prices.length > 0) {
+        minPrice = Math.min(...prices);
+        maxPrice = Math.max(...prices);
+        avgPrice = Math.round(prices.reduce((a, b) => a + b, 0) / prices.length);
+      } else {
+        // Fallback prices if no valid prices found
+        minPrice = 100;
+        maxPrice = 15000;
+        avgPrice = 5000;
+      }
+
+      console.log('Fetched cars:', availableCars.length);
+      console.log('Price range:', minPrice, '-', maxPrice);
+      console.log('$5000+ cars:', availableCars.filter(car => (car.numeric_price || parseFloat(car.price) || 0) >= 5000).length);
+      
     } catch (dbError) {
       console.error('Database fetch error:', dbError);
       // Use fallback data if database fails
@@ -239,7 +300,7 @@ export default async function handler(req, res) {
 
 💡 **Both roles** ke liye separate dashboards aur features available hain!
 
-🚀 **[Signup/Login kar ke full marketplace experience enjoy karo!]**`;
+🚀 **Signup/Login kar ke full marketplace experience enjoy karo!**`;
       }
       
       return res.status(200).json({ response });
@@ -259,22 +320,22 @@ export default async function handler(req, res) {
 👤 **Choose Your Journey:**
 
 🛒 **Want to BUY a car?**
-• Ask: "buyer signup" or "buy car"
+• Ask: **"buyer signup"** or **"buy car"**
 • Get personalized recommendations
 • Direct seller contact
 
 🏪 **Want to SELL your car?**
-• Ask: "seller registration" or "sell car"  
+• Ask: **"seller registration"** or **"sell car"**  
 • Market analysis & pricing tips
 • Professional listing tools
 
 💬 **Just browsing?**
-• Ask: "cheapest car kya hai?"
-• Ask: "market status check karo"
-• Ask: "budget $500 options?"
+• Ask: **"cheapest car kya hai?"**
+• Ask: **"market status check karo"**
+• Ask: **"budget $500 options?"**
 
 🚀 **Ready to start?** Simply type:
-"buyer account", "seller account", or "market browse"
+**"buyer account"**, **"seller account"**, or **"market browse"**
 
 💡 **Full marketplace features unlock after signup!**`;
       
@@ -604,20 +665,112 @@ ${!userId ? '\n🚀 **For detailed seller analytics:** Signup as seller!' : ''}`
 🚀 **Join marketplace:** Signup as buyer or seller for personalized features!`;
     }
     
-    else if (lowerMessage.includes('total') || lowerMessage.includes('kitni cars') || lowerMessage.includes('marketplace status')) {
-      const categoryStats = {
-        budget: availableCars.filter(car => car.price_category === 'budget').length,
-        midRange: availableCars.filter(car => car.price_category === 'mid-range').length,
-        premium: availableCars.filter(car => car.price_category === 'premium').length,
-        luxury: availableCars.filter(car => car.price_category === 'luxury').length
-      };
-      const sellersCount = [...new Set(availableCars.map(car => car.seller_id))].length;
-      const recentListings = availableCars.filter(car => car.days_since_listed <= 7).length;
+    else if (lowerMessage.includes('total') || lowerMessage.includes('kitni cars') || lowerMessage.includes('marketplace status') ||
+             lowerMessage.includes('market status') || lowerMessage.includes('status')) {
       
-      response = `📊 **Complete Marketplace Status Report:**
+      // Enhanced market status with detailed price breakdowns
+      const categoryStats = {
+        budget: availableCars.filter(car => {
+          const price = car.numeric_price || parseFloat(car.price) || 0;
+          return price > 0 && price <= 1000;
+        }).length,
+        midRange: availableCars.filter(car => {
+          const price = car.numeric_price || parseFloat(car.price) || 0;
+          return price > 1000 && price <= 5000;
+        }).length,
+        premium: availableCars.filter(car => {
+          const price = car.numeric_price || parseFloat(car.price) || 0;
+          return price > 5000 && price <= 10000;
+        }).length,
+        luxury: availableCars.filter(car => {
+          const price = car.numeric_price || parseFloat(car.price) || 0;
+          return price > 10000;
+        }).length
+      };
+      
+      // Detailed price breakdowns
+      const priceBreakdowns = {
+        under1k: availableCars.filter(car => {
+          const price = car.numeric_price || parseFloat(car.price) || 0;
+          return price > 0 && price <= 1000;
+        }).length,
+        oneTo2k: availableCars.filter(car => {
+          const price = car.numeric_price || parseFloat(car.price) || 0;
+          return price > 1000 && price <= 2000;
+        }).length,
+        twoTo5k: availableCars.filter(car => {
+          const price = car.numeric_price || parseFloat(car.price) || 0;
+          return price > 2000 && price <= 5000;
+        }).length,
+        fiveTo10k: availableCars.filter(car => {
+          const price = car.numeric_price || parseFloat(car.price) || 0;
+          return price > 5000 && price <= 10000;
+        }).length,
+        tenTo15k: availableCars.filter(car => {
+          const price = car.numeric_price || parseFloat(car.price) || 0;
+          return price > 10000 && price <= 15000;
+        }).length,
+        above15k: availableCars.filter(car => {
+          const price = car.numeric_price || parseFloat(car.price) || 0;
+          return price > 15000;
+        }).length
+      };
+      
+      const sellersCount = [...new Set(availableCars.map(car => car.seller_id))].length;
+      const recentListings = availableCars.filter(car => {
+        const days = car.days_since_listed || 0;
+        return days <= 7;
+      }).length;
+      
+      // Calculate price distribution
+      const totalCarsWithPrices = availableCars.filter(car => {
+        const price = car.numeric_price || parseFloat(car.price) || 0;
+        return price > 0;
+      }).length;
+      
+      // City-based breakdown
+      const cityStats = {};
+      availableCars.forEach(car => {
+        const city = car.reg_district || 'Unknown';
+        if (!cityStats[city]) {
+          cityStats[city] = {
+            count: 0,
+            avgPrice: 0,
+            totalPrice: 0
+          };
+        }
+        const price = car.numeric_price || parseFloat(car.price) || 0;
+        cityStats[city].count++;
+        cityStats[city].totalPrice += price;
+      });
+      
+      // Calculate average prices for cities
+      Object.keys(cityStats).forEach(city => {
+        if (cityStats[city].count > 0) {
+          cityStats[city].avgPrice = Math.round(cityStats[city].totalPrice / cityStats[city].count);
+        }
+      });
+      
+      // Sort cities by car count
+      const sortedCities = Object.entries(cityStats)
+        .sort(([,a], [,b]) => b.count - a.count)
+        .slice(0, 5); // Top 5 cities
+      
+      console.log('Enhanced market status analysis:', {
+        totalCars: availableCars.length,
+        carsWithPrices: totalCarsWithPrices,
+        categoryStats,
+        priceBreakdowns,
+        cityStats: sortedCities,
+        priceRange: `${minPrice} - ${maxPrice}`,
+        avgPrice
+      });
+      
+      let response = `📊 **Complete Marketplace Status Report:**
 
 🚗 **Inventory Overview:**
 • **Total available cars:** ${availableCars.length}
+• **Cars with valid prices:** ${totalCarsWithPrices}
 • **Active sellers:** ${sellersCount}
 • **Recent listings (7 days):** ${recentListings}
 
@@ -627,15 +780,31 @@ ${!userId ? '\n🚀 **For detailed seller analytics:** Signup as seller!' : ''}`
 • **Cheapest option:** $${minPrice}
 • **Premium option:** $${maxPrice}
 
-🎯 **Category Breakdown:**
-• **Budget cars (≤$1K):** ${categoryStats.budget}
-• **Mid-range ($1K-$5K):** ${categoryStats.midRange}
-• **Premium ($5K-$10K):** ${categoryStats.premium}
-• **Luxury ($10K+):** ${categoryStats.luxury}
+🎯 **Detailed Price Breakdown:**
+• **Budget (≤$1K):** ${priceBreakdowns.under1k} cars
+• **$1K-$2K:** ${priceBreakdowns.oneTo2k} cars
+• **$2K-$5K:** ${priceBreakdowns.twoTo5k} cars
+• **$5K-$10K:** ${priceBreakdowns.fiveTo10k} cars **⭐**
+• **$10K-$15K:** ${priceBreakdowns.tenTo15k} cars **💎**
+• **$15K+:** ${priceBreakdowns.above15k} cars **🏆**
+
+🏙️ **Top Cities by Car Availability:**
+${sortedCities.map(([city, stats]) => 
+  `• **${city}:** ${stats.count} cars (avg: $${stats.avgPrice})`
+).join('\n')}
 
 📈 **Market Activity:** ${recentListings > availableCars.length * 0.3 ? 'High activity - fresh inventory!' : 'Stable market with quality options'}
 
-💡 **Best time to** ${userProfile?.user_type === 'buyer' ? 'buy - good selection available!' : userProfile?.user_type === 'seller' ? 'sell - active market!' : 'join - active marketplace!'}`;
+💡 **Best time to** ${userProfile?.user_type === 'buyer' ? 'buy - good selection available!' : userProfile?.user_type === 'seller' ? 'sell - active market!' : 'join - active marketplace!'}
+
+🔍 **Quick Queries:**
+• Ask **"premium cars"** for $5000+ analysis
+• Ask **"luxury cars"** for $10000+ analysis
+• Ask **"cars in [city]"** for city-specific options
+• Ask **"budget cars"** for affordable options
+• Ask **"market trends"** for detailed insights`;
+      
+      return res.status(200).json({ message: response, success: true });
     }
     
     else if (lowerMessage.includes('seller') && userProfile?.user_type === 'buyer') {
@@ -658,6 +827,360 @@ ${!userId ? '\n🚀 **For detailed seller analytics:** Signup as seller!' : ''}`
 • Car page contact forms
 
 💡 Pro tip: Cars page se direct seller contact kar sakte hain!`;
+    }
+    
+    // City-based filtering queries - COMPLETELY REWRITTEN
+    else if (lowerMessage.includes('city') || lowerMessage.includes('shahar') || lowerMessage.includes('city mein') ||
+             lowerMessage.includes('karachi') || lowerMessage.includes('lahore') || lowerMessage.includes('islamabad') ||
+             lowerMessage.includes('rawalpindi') || lowerMessage.includes('peshawar') || lowerMessage.includes('quetta') ||
+             lowerMessage.includes('multan') || lowerMessage.includes('faisalabad') || lowerMessage.includes('sialkot') ||
+             lowerMessage.includes('gujranwala') || lowerMessage.includes('bahawalpur') || lowerMessage.includes('sargodha') ||
+             /\w+\s+city\s+cars/i.test(message) || /\w+\s+shahar\s+cars/i.test(message) || 
+             /\w+\s+mein\s+cars/i.test(message) || /\w+\s+ke\s+cars/i.test(message) ||
+             /\w+\s+mein\s+kya\s+hai/i.test(message) || /\w+\s+ke\s+options/i.test(message)) {
+      
+      console.log('🚀 City query detected:', message);
+      
+      // Helper function to get city from car data
+      const getCarCity = (car) => {
+        return car.reg_district || car.registration_district || car.city || car.reg_city || 'Unknown';
+      };
+      
+      // Get all unique cities from available cars
+      const allCities = [...new Set(availableCars.map(car => getCarCity(car)).filter(city => 
+        city && city !== 'Other' && city !== 'Unknown' && city !== 'null' && city !== ''
+      ))];
+      
+      console.log('🏙️ Available cities in database:', allCities);
+      
+      // Extract city name from message with multiple patterns
+      const cities = [
+        'karachi', 'lahore', 'islamabad', 'rawalpindi', 'peshawar', 'quetta', 
+        'multan', 'faisalabad', 'sialkot', 'gujranwala', 'bahawalpur', 'sargodha'
+      ];
+      
+      let cityMatch = null;
+      
+      // Pattern 1: "cars in [city]"
+      const cityInPattern = message.match(/cars?\s+in\s+(\w+)/i);
+      if (cityInPattern) {
+        const potentialCity = cityInPattern[1].toLowerCase();
+        cityMatch = cities.find(city => city.includes(potentialCity) || potentialCity.includes(city));
+        console.log('Pattern 1 match:', potentialCity, '→', cityMatch);
+      }
+      
+      // Pattern 2: "[city] mein cars"
+      if (!cityMatch) {
+        const cityMeinPattern = message.match(/(\w+)\s+mein\s+cars?/i);
+        if (cityMeinPattern) {
+          const potentialCity = cityMeinPattern[1].toLowerCase();
+          cityMatch = cities.find(city => city.includes(potentialCity) || potentialCity.includes(city));
+          console.log('Pattern 2 match:', potentialCity, '→', cityMatch);
+        }
+      }
+      
+      // Pattern 3: "[city] ke cars"
+      if (!cityMatch) {
+        const cityKePattern = message.match(/(\w+)\s+ke\s+cars?/i);
+        if (cityKePattern) {
+          const potentialCity = cityKePattern[1].toLowerCase();
+          cityMatch = cities.find(city => city.includes(potentialCity) || potentialCity.includes(city));
+          console.log('Pattern 3 match:', potentialCity, '→', cityMatch);
+        }
+      }
+      
+      // Pattern 4: "[city] mein kya hai"
+      if (!cityMatch) {
+        const cityKyaPattern = message.match(/(\w+)\s+mein\s+kya\s+hai/i);
+        if (cityKyaPattern) {
+          const potentialCity = cityKyaPattern[1].toLowerCase();
+          cityMatch = cities.find(city => city.includes(potentialCity) || potentialCity.includes(city));
+          console.log('Pattern 4 match:', potentialCity, '→', cityMatch);
+        }
+      }
+      
+      // Pattern 5: Direct city mention
+      if (!cityMatch) {
+        cityMatch = cities.find(city => lowerMessage.includes(city));
+        console.log('Pattern 5 (direct) match:', cityMatch);
+      }
+      
+      console.log('🎯 Final city match:', cityMatch);
+      
+      if (cityMatch) {
+        // Find cars in the specified city
+        const cityCars = availableCars.filter(car => {
+          const carCity = getCarCity(car);
+          return carCity.toLowerCase().includes(cityMatch) || cityMatch.includes(carCity.toLowerCase());
+        });
+        
+        console.log(`🏙️ Found ${cityCars.length} cars in ${cityMatch}`);
+        
+        if (cityCars.length > 0) {
+          // Calculate city statistics
+          const cityAvgPrice = Math.round(
+            cityCars.reduce((sum, car) => {
+              const price = car.numeric_price || parseFloat(car.price) || 0;
+              return sum + price;
+            }, 0) / cityCars.length
+          );
+          
+          const cityPriceBreakdown = {
+            budget: cityCars.filter(car => {
+              const price = car.numeric_price || parseFloat(car.price) || 0;
+              return price > 0 && price <= 1000;
+            }).length,
+            midRange: cityCars.filter(car => {
+              const price = car.numeric_price || parseFloat(car.price) || 0;
+              return price > 1000 && price <= 5000;
+            }).length,
+            premium: cityCars.filter(car => {
+              const price = car.numeric_price || parseFloat(car.price) || 0;
+              return price > 5000 && price <= 10000;
+            }).length,
+            luxury: cityCars.filter(car => {
+              const price = car.numeric_price || parseFloat(car.price) || 0;
+              return price > 10000;
+            }).length
+          };
+          
+          // Get top 3 cars from the city
+          const topCityCars = cityCars.slice(0, 3);
+          const carDetails = topCityCars.map(car => {
+            let details = `**${car.title || car.car_title || 'Car'}** - **$${car.formatted_price || car.price}**`;
+            
+            if (car.miles && car.miles > 0) {
+              details += `\n📏 **Miles:** ${car.miles.toLocaleString()}`;
+            }
+            
+            if (car.year) {
+              details += `\n📅 **Year:** ${car.year}`;
+            }
+            
+            if (car.seller_name) {
+              details += `\n💰 **Seller:** ${car.seller_name}`;
+            }
+            
+            return details;
+          }).join('\n\n');
+          
+          const response = `🏙️ **${cityMatch.charAt(0).toUpperCase() + cityMatch.slice(1)} City Cars Analysis:**
+
+📊 **City Overview:**
+• **Total cars available:** ${cityCars.length}
+• **Average price:** $${cityAvgPrice}
+• **Price range:** $${Math.min(...cityCars.map(car => car.numeric_price || parseFloat(car.price) || 0).filter(p => p > 0))} - $${Math.max(...cityCars.map(car => car.numeric_price || parseFloat(car.price) || 0).filter(p => p > 0))}
+
+🎯 **Price Breakdown in ${cityMatch.charAt(0).toUpperCase() + cityMatch.slice(1)}:**
+• **Budget (≤$1K):** ${cityPriceBreakdown.budget} cars
+• **Mid-range ($1K-$5K):** ${cityPriceBreakdown.midRange} cars
+• **Premium ($5K-$10K):** ${cityPriceBreakdown.premium} cars
+• **Luxury ($10K+):** ${cityPriceBreakdown.luxury} cars
+
+🏆 **Top ${cityMatch.charAt(0).toUpperCase() + cityMatch.slice(1)} Cars:**
+${carDetails}
+
+💡 **City-specific tips:**
+• **Local market:** ${cityMatch.charAt(0).toUpperCase() + cityMatch.slice(1)} has ${cityCars.length} cars available
+• **Price trend:** Average price is $${cityAvgPrice}
+• **Selection:** ${cityPriceBreakdown.premium + cityPriceBreakdown.luxury > 0 ? 'Premium options available!' : 'Focus on budget and mid-range'}
+
+🚀 **Ready to explore ${cityMatch.charAt(0).toUpperCase() + cityMatch.slice(1)} cars?** Browse the marketplace!`;
+          
+          return res.status(200).json({ message: response, success: true });
+        } else {
+          return res.status(200).json({ 
+            message: `🏙️ **${cityMatch.charAt(0).toUpperCase() + cityMatch.slice(1)} City Status:**
+
+❌ **Currently no cars available** in ${cityMatch.charAt(0).toUpperCase() + cityMatch.slice(1)}
+
+💡 **Suggestions:**
+• **Check nearby cities** for more options
+• **Expand your search** to include other locations
+• **Set up alerts** for when cars become available in ${cityMatch.charAt(0).toUpperCase() + cityMatch.slice(1)}
+
+🔍 **Try asking:**
+• "Market status" for overall availability
+• "Cars in [other city]" for alternatives
+• "Budget cars" for affordable options`,
+            success: true 
+          });
+        }
+      } else {
+        // Show all available cities
+        const cityStats = allCities.map(city => {
+          const cityCars = availableCars.filter(car => getCarCity(car) === city);
+          const avgPrice = Math.round(
+            cityCars.reduce((sum, car) => {
+              const price = car.numeric_price || parseFloat(car.price) || 0;
+              return sum + price;
+            }, 0) / cityCars.length
+          );
+          return { city, count: cityCars.length, avgPrice };
+        }).sort((a, b) => b.count - a.count);
+        
+        const response = `🏙️ **City-based Car Availability:**
+
+📊 **Available Cities:**
+${cityStats.map(stat => 
+  `• **${stat.city}:** ${stat.count} cars (avg: $${stat.avgPrice})`
+).join('\n')}
+
+💡 **How to use city filtering:**
+• **English:** "cars in Karachi", "cars in Lahore"
+• **Urdu:** "Karachi mein cars", "Lahore ke cars"
+• **Alternative:** "Karachi mein kya hai", "Rawalpindi ke options"
+
+🎯 **Popular cities:** ${cityStats.slice(0, 3).map(stat => stat.city).join(', ')} have the most cars
+
+🔍 **Try these examples:**
+• "cars in Islamabad" → Islamabad cars
+• "Rawalpindi mein cars" → Rawalpindi options
+• "Karachi ke cars" → Karachi availability
+• "Lahore mein kya hai" → Lahore overview`;
+        
+        return res.status(200).json({ message: response, success: true });
+      }
+    }
+    
+    // Premium cars ($5000+) specific queries
+    else if (lowerMessage.includes('5000') || lowerMessage.includes('5000+') || lowerMessage.includes('5k') || 
+             lowerMessage.includes('5k+') || lowerMessage.includes('premium cars') || lowerMessage.includes('premium segment')) {
+      
+      const premiumCars = availableCars.filter(car => {
+        const price = car.numeric_price || parseFloat(car.price) || 0;
+        return price >= 5000 && price > 0;
+      });
+      
+      if (premiumCars.length > 0) {
+        const premiumBreakdown = {
+          fiveTo7k: premiumCars.filter(car => {
+            const price = car.numeric_price || parseFloat(car.price) || 0;
+            return price >= 5000 && price <= 7000;
+          }).length,
+          sevenTo10k: premiumCars.filter(car => {
+            const price = car.numeric_price || parseFloat(car.price) || 0;
+            return price > 7000 && price <= 10000;
+          }).length,
+          tenTo15k: premiumCars.filter(car => {
+            const price = car.numeric_price || parseFloat(car.price) || 0;
+            return price > 10000 && price <= 15000;
+          }).length,
+          above15k: premiumCars.filter(car => {
+            const price = car.numeric_price || parseFloat(car.price) || 0;
+            return price > 15000;
+          }).length
+        };
+        
+        const avgPremiumPrice = Math.round(
+          premiumCars.reduce((sum, car) => {
+            const price = car.numeric_price || parseFloat(car.price) || 0;
+            return sum + price;
+          }, 0) / premiumCars.length
+        );
+        
+        const topPremiumCars = premiumCars.slice(0, 3);
+        const carDetails = topPremiumCars.map(car => {
+          let details = `**${car.title || car.car_title || 'Premium Car'}** - **$${car.formatted_price || car.price}**`;
+          
+          if (car.miles && car.miles > 0) {
+            details += `\n📏 **Miles:** ${car.miles.toLocaleString()}`;
+          }
+          
+          if (car.year) {
+            details += `\n📅 **Year:** ${car.year}`;
+          }
+          
+          if (car.reg_district) {
+            details += `\n📍 **City:** ${car.reg_district}`;
+          }
+          
+          if (car.seller_name) {
+            details += `\n💰 **Seller:** ${car.seller_name}`;
+          }
+          
+          return details;
+        }).join('\n\n');
+        
+        const response = `💎 **Premium Cars Analysis ($5000+):**
+
+📊 **Premium Market Overview:**
+• **Total premium cars:** ${premiumCars.length} available
+• **Average premium price:** $${avgPremiumPrice}
+• **Price range:** $5000 - $${Math.max(...premiumCars.map(car => car.numeric_price || parseFloat(car.price) || 0))}
+
+🎯 **Detailed Premium Breakdown:**
+• **$5K-$7K:** ${premiumBreakdown.fiveTo7k} cars (Entry premium)
+• **$7K-$10K:** ${premiumBreakdown.sevenTo10k} cars (Mid premium)
+• **$10K-$15K:** ${premiumBreakdown.tenTo15k} cars (High premium)
+• **$15K+:** ${premiumBreakdown.above15k} cars (Luxury premium)
+
+🏆 **Top Premium Options:**
+${carDetails}
+
+💡 **Premium Market Insights:**
+• **Investment value:** Premium cars hold value better over time
+• **Quality assurance:** Higher price = better condition and features
+• **Technology:** Advanced features and modern amenities
+• **Resale potential:** Good for long-term ownership
+
+🎯 **Best for:** Serious buyers, long-term investment, premium experience seekers
+
+🚀 **Ready to explore premium options?** Browse the marketplace for detailed listings!`;
+        
+        return res.status(200).json({ message: response, success: true });
+      } else {
+        return res.status(200).json({ 
+          message: `💎 **Premium Cars ($5000+) Status:**
+
+❌ **Currently no premium cars available** in the $5000+ range
+
+💡 **Market Analysis:**
+• **Premium demand:** High - premium cars sell quickly
+• **Market trend:** Currently favoring budget and mid-range options
+• **Opportunity:** Consider listing premium cars for better profits
+
+🎯 **Alternative Options:**
+• **Mid-range cars:** $1000-$5000 range available
+• **Budget cars:** Under $1000 options
+• **Market status:** Check overall availability
+
+🔍 **Try asking:**
+• "Market status" for complete overview
+• "Budget cars" for affordable options
+• "Mid-range cars" for $1000-$5000 range`,
+          success: true 
+        });
+      }
+    }
+    
+    // Test query for debugging
+    else if (lowerMessage.includes('test city') || lowerMessage.includes('city test')) {
+      const allCities = [...new Set(availableCars.map(car => car.reg_district).filter(city => city && city !== 'Other' && city !== 'Unknown'))];
+      const cityStats = allCities.map(city => {
+        const cityCars = availableCars.filter(car => car.reg_district === city);
+        return { city, count: cityCars.length };
+      }).sort((a, b) => b.count - a.count);
+      
+      const response = `🧪 **City Filtering Test Results:**
+
+📊 **Available Cities in Database:**
+${cityStats.map(stat => 
+  `• **${stat.city}:** ${stat.count} cars`
+).join('\n')}
+
+🔍 **Total Cities Found:** ${cityStats.length}
+📈 **Total Cars with City Data:** ${cityStats.reduce((sum, stat) => sum + stat.count, 0)}
+
+💡 **Test City Queries:**
+• "cars in Karachi" → Should show Karachi cars
+• "Rawalpindi mein cars" → Should show Rawalpindi cars
+• "Lahore ke cars" → Should show Lahore cars
+• "cars in Islamabad" → Should show Islamabad cars
+
+🎯 **Debug Info:** Check console for detailed city detection logs`;
+      
+      return res.status(200).json({ message: response, success: true });
     }
     
     else {

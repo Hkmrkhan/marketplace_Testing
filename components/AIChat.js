@@ -14,7 +14,9 @@ export default function AIChat({ context = 'general', isFloating = false, onClos
 
 ${!userId ? '🔓 **Guest Mode:** Login/Signup guidance available!' : ''}
 
-**🚗 Ready to explore?** Just ask!`,
+**🚗 Ready to explore?** Just ask!
+
+${context === 'global' ? '🌐 **Global Mode:** Available on all pages!' : ''}`,
       isAI: true,
       timestamp: new Date()
     }
@@ -24,21 +26,28 @@ ${!userId ? '🔓 **Guest Mode:** Login/Signup guidance available!' : ''}
   const [isOpen, setIsOpen] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [error, setError] = useState(null);
   const messagesEndRef = useRef(null);
 
-  // Common search terms and suggestions
+  // Enhanced search suggestions with better categorization
   const searchSuggestions = {
     buyer: [
       "Budget $500 mein kya milega?",
       "Cheapest car recommend karo",
       "Mid-range cars dikhao",
-      "Premium cars available?",
-      "Toyota cars available?",
-      "Honda cars list karo",
+      "Premium cars $5000+",
+      "Luxury cars $10000+",
+      "Cars in Karachi",
+      "Cars in Lahore",
+      "Cars in Islamabad",
+      "Rawalpindi mein cars",
+      "Karachi ke cars",
       "Market status check karo",
       "Buying tips",
       "200 dollar wali car",
-      "Best value cars"
+      "Best value cars",
+      "Car history check",
+      "Test drive options"
     ],
     seller: [
       "Selling tips provide karo",
@@ -48,22 +57,31 @@ ${!userId ? '🔓 **Guest Mode:** Login/Signup guidance available!' : ''}
       "Market competition check",
       "Quick sale ke liye advice",
       "Pricing guidance do",
-      "Seller success tips"
+      "Seller success tips",
+      "Photo upload tips",
+      "Listing optimization"
     ],
     general: [
       "Market status check karo",
       "Total kitni cars hain?",
       "Price range kya hai?",
       "Cheapest car kya hai?",
-      "Premium cars available?",
+      "Premium cars $5000+",
+      "Luxury cars $10000+",
+      "Cars in Rawalpindi",
+      "Cars in Peshawar",
+      "Karachi mein cars",
+      "Lahore ke cars",
       "Seller registration",
       "Buyer signup",
       "Tips and guide",
-      "Help me"
+      "Help me",
+      "Car categories",
+      "Market trends"
     ]
   };
 
-  // Autocorrect dictionary
+  // Enhanced autocorrect dictionary
   const autocorrect = {
     'sellig': 'selling',
     'sellng': 'selling', 
@@ -90,7 +108,13 @@ ${!userId ? '🔓 **Guest Mode:** Login/Signup guidance available!' : ''}
     'cars': 'car',
     'car': 'cars',
     'tips': 'tip',
-    'tip': 'tips'
+    'tip': 'tips',
+    'dolar': 'dollar',
+    'doller': 'dollar',
+    'recomendation': 'recommendation',
+    'sugest': 'suggest',
+    'advice': 'advice',
+    'advise': 'advice'
   };
 
   const scrollToBottom = () => {
@@ -101,9 +125,10 @@ ${!userId ? '🔓 **Guest Mode:** Login/Signup guidance available!' : ''}
     scrollToBottom();
   }, [messages]);
 
-  // Auto-suggestions based on input
+  // Enhanced auto-suggestions based on input
   const handleInputChange = (value) => {
     setInputMessage(value);
+    setError(null); // Clear any previous errors
     
     if (value.length > 1) {
       const contextSuggestions = userId ? searchSuggestions.buyer : searchSuggestions.general;
@@ -121,7 +146,7 @@ ${!userId ? '🔓 **Guest Mode:** Login/Signup guidance available!' : ''}
     }
   };
 
-  // Apply autocorrect
+  // Enhanced autocorrect with better word boundary detection
   const applyAutocorrect = (text) => {
     let correctedText = text;
     Object.keys(autocorrect).forEach(typo => {
@@ -135,6 +160,7 @@ ${!userId ? '🔓 **Guest Mode:** Login/Signup guidance available!' : ''}
   const handleQuickQuery = (query) => {
     setInputMessage(query);
     setShowSuggestions(false);
+    setError(null);
     // Auto-send the query
     setTimeout(() => {
       if (!isLoading) {
@@ -143,7 +169,7 @@ ${!userId ? '🔓 **Guest Mode:** Login/Signup guidance available!' : ''}
     }, 100);
   };
 
-  // Separate function for sending messages
+  // Enhanced message sending with better error handling
   const handleSendMessage = async (message = inputMessage) => {
     if (!message.trim() || isLoading) return;
 
@@ -160,6 +186,7 @@ ${!userId ? '🔓 **Guest Mode:** Login/Signup guidance available!' : ''}
     setMessages(prev => [...prev, userMessage]);
     setInputMessage('');
     setShowSuggestions(false);
+    setError(null);
     setIsLoading(true);
 
     try {
@@ -176,7 +203,15 @@ ${!userId ? '🔓 **Guest Mode:** Login/Signup guidance available!' : ''}
         }),
       });
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
+
+      if (!data.success && data.error) {
+        throw new Error(data.error);
+      }
 
       const aiMessage = {
         id: Date.now() + 1,
@@ -190,11 +225,12 @@ ${!userId ? '🔓 **Guest Mode:** Login/Signup guidance available!' : ''}
       console.error('Chat error:', error);
       const errorMessage = {
         id: Date.now() + 1,
-        text: 'Connection problem hai. Internet check kar ke dobara try kariye.',
+        text: `❌ **Error:** ${error.message || 'Connection problem hai. Internet check kar ke dobara try kariye.'}`,
         isAI: true,
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);
+      setError(error.message || 'Connection issue');
     } finally {
       setIsLoading(false);
     }
@@ -210,14 +246,24 @@ ${!userId ? '🔓 **Guest Mode:** Login/Signup guidance available!' : ''}
     }
   };
 
+  // Enhanced floating button with notification
   if (isFloating && !isOpen) {
+    console.log('Rendering floating button:', { isFloating, isOpen, error });
     return (
       <button
         className={styles.floatingButton}
         onClick={() => setIsOpen(true)}
         title="AI Assistant se help lein"
+        style={{
+          position: 'fixed',
+          bottom: '20px',
+          right: '20px',
+          zIndex: 9999,
+          display: 'flex'
+        }}
       >
         🤖
+        {error && <span className={styles.errorBadge}>!</span>}
       </button>
     );
   }
@@ -271,11 +317,26 @@ ${!userId ? '🔓 **Guest Mode:** Login/Signup guidance available!' : ''}
                 <span></span>
                 <span></span>
               </div>
+              <div className={styles.typingText}>AI thinking...</div>
             </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
+
+      {/* Error display */}
+      {error && (
+        <div className={styles.errorContainer}>
+          <span className={styles.errorIcon}>⚠️</span>
+          <span className={styles.errorText}>{error}</span>
+          <button 
+            className={styles.errorClose}
+            onClick={() => setError(null)}
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       <div className={styles.inputContainer}>
         <textarea
@@ -307,36 +368,41 @@ ${!userId ? '🔓 **Guest Mode:** Login/Signup guidance available!' : ''}
           onClick={sendMessage}
           disabled={!inputMessage.trim() || isLoading}
           className={styles.sendButton}
+          title={isLoading ? 'Processing...' : 'Send message'}
         >
           {isLoading ? '⏳' : '➤'}
         </button>
       </div>
       
-      {/* Quick Access Buttons */}
+      {/* Enhanced Quick Access Buttons */}
       {!isLoading && (
         <div className={styles.quickButtonsContainer}>
           <div className={styles.quickButtons}>
             <button 
               onClick={() => handleQuickQuery("Cheapest car kya hai?")}
               className={styles.quickButton}
+              title="Find the cheapest car"
             >
               💰 Cheapest Car
             </button>
             <button 
               onClick={() => handleQuickQuery("Market status check karo")}
               className={styles.quickButton}
+              title="Check current market status"
             >
               📊 Market Status
             </button>
             <button 
               onClick={() => handleQuickQuery("Selling tips")}
               className={styles.quickButton}
+              title="Get selling advice"
             >
               🏪 Selling Tips
             </button>
             <button 
               onClick={() => handleQuickQuery("Buying tips")}
               className={styles.quickButton}
+              title="Get buying advice"
             >
               🛒 Buying Tips
             </button>

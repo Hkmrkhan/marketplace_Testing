@@ -11,6 +11,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [forgotPasswordMode, setForgotPasswordMode] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
+  const [showContactPopup, setShowContactPopup] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -184,6 +185,17 @@ export default function LoginPage() {
 
       console.log('Profile loaded:', profile.user_type);
 
+      // Check if account is revoked
+      if (profile.account_status === 'revoked') {
+        console.log('Account is revoked, showing notification');
+        setMessage('❌ Your account has been revoked. Please contact support for assistance.');
+        setLoading(false);
+        
+        // Show contact popup
+        setShowContactPopup(true);
+        return;
+      }
+
       // Redirect based on user_type
       if (profile.user_type === 'seller') {
         console.log('Redirecting to seller dashboard');
@@ -321,6 +333,50 @@ export default function LoginPage() {
               {message}
             </div>
           )}
+
+          {/* Contact Popup for Revoked Accounts */}
+          {showContactPopup && (
+            <div className={styles.contactPopup}>
+              <div className={styles.contactPopupContent}>
+                <div className={styles.contactPopupHeader}>
+                  <h3>🚫 Account Revoked</h3>
+                  <button 
+                    onClick={() => setShowContactPopup(false)}
+                    className={styles.closePopupBtn}
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className={styles.contactPopupBody}>
+                  <p>Your account has been suspended by our administrators.</p>
+                  <p><strong>To restore access, please contact support:</strong></p>
+                  <div className={styles.contactInfo}>
+                    <div className={styles.contactItem}>
+                      <span>📧 Email:</span>
+                      <span>hkmrkhan</span>
+                    </div>
+                    <div className={styles.contactItem}>
+                      <span>📱 WhatsApp:</span>
+                      <span>+92 300 1234567</span>
+                    </div>
+                    <div className={styles.contactItem}>
+                      <span>🌐 Website:</span>
+                      <span>www.carmarketplace.com/contact</span>
+                    </div>
+                  </div>
+                  <div className={styles.contactActions}>
+                    <button 
+                      onClick={() => setShowContactPopup(false)}
+                      className={styles.contactCloseBtn}
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className={styles.authFooter}>
             <p>Don't have an account? <a href="/auth/signup">Sign Up</a></p>
           </div>

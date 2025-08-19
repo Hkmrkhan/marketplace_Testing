@@ -3,6 +3,7 @@ import styles from '../styles/CarCard.module.css';
 
 export default function CarCard({ car }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
   // Combine primary image with additional images
   const allImages = [];
   if (car.image_url && car.image_url.trim() !== '') {
@@ -47,12 +48,14 @@ export default function CarCard({ car }) {
         {car.year && (
           <p className={styles.year}>📅 {car.year}</p>
         )}
-                    {car.reg_district && car.reg_district !== 'Other' && (
-              <p className={styles.city}>📍 {car.reg_district}</p>
-            )}
+        {car.reg_district && car.reg_district !== 'Other' && (
+          <p className={styles.city}>📍 {car.reg_district}</p>
+        )}
         <p className={car.status === 'sold' ? styles.sold : styles.available}>
           {car.status === 'sold' ? 'Sold' : 'Available'}
         </p>
+        
+        {/* Buy button removed - users should browse first, then purchase from buyer dashboard */}
       </div>
     </div>
   );

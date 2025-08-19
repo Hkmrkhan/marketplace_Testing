@@ -750,3 +750,177 @@
     font-size: 0.75rem;
   }
 } 
+
+/* Contact Popup for Revoked Accounts */
+.contactPopup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.3s ease;
+}
+
+.contactPopupContent {
+  background: white;
+  border-radius: 16px;
+  padding: 0;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+}
+
+.contactPopupHeader {
+  background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 16px 16px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.contactPopupHeader h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.closePopupBtn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.closePopupBtn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.contactPopupBody {
+  padding: 25px;
+}
+
+.contactPopupBody p {
+  margin: 0 0 15px 0;
+  color: #374151;
+  line-height: 1.6;
+}
+
+.contactPopupBody strong {
+  color: #dc3545;
+}
+
+.contactInfo {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+  border-left: 4px solid #dc3545;
+}
+
+.contactItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.contactItem:last-child {
+  border-bottom: none;
+}
+
+.contactItem span:first-child {
+  font-weight: 600;
+  color: #374151;
+}
+
+.contactItem span:last-child {
+  color: #6b7280;
+  font-family: monospace;
+}
+
+.contactActions {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.contactCloseBtn {
+  background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.contactCloseBtn:hover {
+  background: linear-gradient(135deg, #4b5563 0%, #6b7280 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .contactPopupContent {
+    width: 95%;
+    margin: 20px;
+  }
+  
+  .contactPopupHeader {
+    padding: 15px;
+  }
+  
+  .contactPopupHeader h3 {
+    font-size: 1.2rem;
+  }
+  
+  .contactPopupBody {
+    padding: 20px;
+  }
+  
+  .contactItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+} 

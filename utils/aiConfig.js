@@ -24,7 +24,7 @@ export const AI_CONFIG = {
       dynamic: true
     },
     fallback: {
-      endpoint: '/api/chat-hf', // Uses fallback responses
+      endpoint: '/api/chat', // Uses fallback responses
       name: 'Local Fallback',
       free: true,
       rateLimit: 'Unlimited'
@@ -42,21 +42,27 @@ export const AI_CONFIG = {
   }
 };
 
-// Test responses for offline/fallback mode
+// Enhanced fallback responses for offline/fallback mode
 export const FALLBACK_RESPONSES = {
   'buyer-dashboard': [
-    'Car buying ke liye tips: Budget set karo, financing options check karo, test drive zaroori hai!',
-    'Market research karo, car history check karo, aur negotiate karne se na sharmao!',
-    'Insurance, registration aur maintenance cost bhi calculate karo purchase se pehle!'
+    '🛒 **Car buying ke liye tips:** Budget set karo, financing options check karo, test drive zaroori hai! Market research karo aur negotiate karne se na sharmao!',
+    '📊 **Smart buying strategy:** Multiple cars compare karo, seller verification karo, car history check karo. Insurance aur maintenance cost bhi calculate karo purchase se pehle!',
+    '💡 **Buyer pro tips:** Best time to buy is end of month, cash payment mein discount mil sakta hai, aur always ask for maintenance records!',
+    '🎯 **Budget planning:** Set clear price limit, hidden costs consider karo (insurance, registration, repairs), aur emergency fund rakho!',
+    '🚗 **Car selection:** Mileage, year, condition check karo. Test drive zaroori hai aur mechanic se inspection karwao!'
   ],
   'seller-dashboard': [
-    'Car selling tips: Competitive price research karo, honest description likho!',
-    'Achay photos lagao, paperwork ready rakho, aur responsive raho buyers ke saath!',
-    'Market timing important hai - peak season mein better price milti hai!'
+    '💼 **Car selling tips:** Competitive price research karo, honest description likho! Quality photos lagao aur responsive raho buyers ke saath!',
+    '📈 **Market success:** Price competitively, market timing important hai - peak season mein better price milti hai! Professional presentation zaroori hai!',
+    '📸 **Listing optimization:** Multiple angles se photos lagao, detailed description likho, quick responses do buyers ko. WhatsApp contact provide karo!',
+    '💰 **Pricing strategy:** Market average ke near rakho, quick sale ke liye slightly below average price set karo. Premium listing ke liye extra photos add karo!',
+    '🎯 **Seller pro tips:** Keep listing updated, respond within 1 hour, build trust with accurate information, aur meet in safe locations!'
   ],
   'general': [
-    'Main aap ki car marketplace assistant hun! Car buying ya selling ke barey mein koi sawal ho?',
-    'Pakistan ki car market ke barey mein koi specific information chahiye?',
-    'Koi particular car model ke barey mein janna chahte hain?'
+    '🤖 **Main aap ki car marketplace assistant hun!** Car buying ya selling ke barey mein koi sawal ho? Kya specific help chahiye?',
+    '🏪 **Car marketplace mein welcome!** Kya aap car buy karna chahte hain ya sell karna chahte hain? Main guide kar sakta hun!',
+    '🚗 **Car marketplace assistant at your service!** Budget, tips, market analysis - kya chahiye? Simply ask kar sakte hain!',
+    '💬 **Car marketplace help desk!** Buying tips, selling strategies, market trends - koi bhi sawal puch sakte hain!',
+    '🎯 **Car marketplace expert hun!** Kya aap buyer hain ya seller? Main dono ke liye detailed guidance provide kar sakta hun!'
   ]
 }; 

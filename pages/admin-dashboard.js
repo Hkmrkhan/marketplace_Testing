@@ -319,6 +319,35 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleAccountStatusChange = async (userId, newStatus) => {
+    try {
+      setLoading(true);
+      
+      // Update user account status
+      const { error } = await supabase
+        .from('profiles')
+        .update({ account_status: newStatus })
+        .eq('id', userId);
+
+      if (error) {
+        console.error('Error updating account status:', error);
+        setMessage('❌ Error updating account status: ' + error.message);
+        return;
+      }
+
+      setMessage(`✅ User account ${newStatus === 'active' ? 'activated' : 'revoked'} successfully!`);
+
+      // Reload users to reflect changes
+      await loadAllUsers();
+
+    } catch (error) {
+      console.error('Error:', error);
+      setMessage('❌ Error: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleBackfillCommissions = async () => {
     setBackfillLoading(true);
     setBackfillMessage('');
@@ -753,6 +782,31 @@ export default function AdminDashboard() {
                         <p><strong>WhatsApp:</strong> {user.whatsapp_number}</p>
                       )}
                       <p><strong>Joined:</strong> {new Date(user.created_at).toLocaleDateString()}</p>
+                      <p><strong>Status:</strong> <span className={`${styles.accountStatus} ${styles[user.account_status || 'active']}`}>
+                        {user.account_status || 'active'}
+                      </span></p>
+                    </div>
+                    <div className={styles.userActions}>
+                      {user.account_status === 'revoked' ? (
+                        <button 
+                          onClick={() => handleAccountStatusChange(user.id, 'active')}
+                          className={styles.activateBtn}
+                          title="Activate user account"
+                        >
+                          ✅ Activate
+                        </button>
+                      ) : (
+                        // Don't show revoke button for admin accounts
+                        user.user_type !== 'admin' && (
+                          <button 
+                            onClick={() => handleAccountStatusChange(user.id, 'revoked')}
+                            className={styles.revokeBtn}
+                            title="Revoke user account"
+                          >
+                            ❌ Revoke
+                          </button>
+                        )
+                      )}
                     </div>
                   </div>
                 ))}

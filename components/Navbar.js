@@ -145,13 +145,6 @@ export default function Navbar({ logoText }) {
           )}
         </div>
       </nav>
-      
-      {/* Global AI Chat - floating button for all users */}
-      <AIChat 
-        context="general" 
-        isFloating={true}
-        userId={userProfile?.id}
-      />
     </>
   );
 }

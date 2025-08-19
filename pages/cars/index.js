@@ -333,6 +333,9 @@ export default function CarsPage() {
                   <span>⭐ Verified Sellers</span>
                   <span>💎 Best Prices</span>
                 </div>
+                <div className={styles.userGuidance}>
+                  <p>💡 <strong>How to buy:</strong> Browse cars here → Login as buyer → Purchase from dashboard</p>
+                </div>
               </div>
             </div>
           </div>

@@ -1,8 +1,8 @@
 /* Floating Chat Button */
 .floatingButton {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
+  position: fixed !important;
+  bottom: 20px !important;
+  right: 20px !important;
   width: 60px;
   height: 60px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -13,15 +13,86 @@
   cursor: pointer;
   box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
   transition: all 0.3s ease;
-  z-index: 1000;
-  display: flex;
+  z-index: 99999 !important;
+  display: flex !important;
   align-items: center;
   justify-content: center;
+  /* Ensure button is always on top */
+  pointer-events: auto !important;
+  /* Prevent any CSS conflicts */
+  all: unset;
+  /* Re-apply essential styles */
+  position: fixed !important;
+  bottom: 20px !important;
+  right: 20px !important;
+  width: 60px !important;
+  height: 60px !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  border: none !important;
+  border-radius: 50% !important;
+  font-size: 24px !important;
+  color: white !important;
+  cursor: pointer !important;
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4) !important;
+  transition: all 0.3s ease !important;
+  z-index: 99999 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .floatingButton:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+  transform: scale(1.1) !important;
+  box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6) !important;
+}
+
+/* Ensure button is always visible */
+.floatingButton:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3) !important;
+}
+
+/* Force visibility */
+.floatingButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: inherit;
+  border-radius: inherit;
+  z-index: -1;
+}
+
+/* Error Badge */
+.errorBadge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #ef4444;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* Chat Container */
@@ -191,6 +262,13 @@
 
 .typing span:nth-child(2) {
   animation-delay: -0.16s;
+}
+
+.typingText {
+  font-size: 12px;
+  color: #6b7280;
+  font-style: italic;
+  margin-top: 4px;
 }
 
 @keyframes typing {
@@ -423,6 +501,57 @@
   background: #ccc;
   cursor: not-allowed;
   transform: none;
+}
+
+/* Error Container */
+.errorContainer {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: slideIn 0.3s ease-out;
+}
+
+.errorIcon {
+  font-size: 16px;
+  color: #dc2626;
+}
+
+.errorText {
+  flex: 1;
+  color: #dc2626;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.errorClose {
+  background: none;
+  border: none;
+  color: #dc2626;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.errorClose:hover {
+  background: rgba(220, 38, 38, 0.1);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Responsive Design */
