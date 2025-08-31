@@ -602,6 +602,75 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleAdminAvatarChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setMessage('❌ Please select an image file (PNG, JPG, JPEG, GIF)');
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setMessage('❌ File size must be less than 5MB');
+        return;
+      }
+
+      try {
+        setMessage('📸 Uploading profile picture...');
+        
+        // Create unique filename
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+        const filePath = `${user.id}/${fileName}`;
+
+        // Upload to Supabase storage
+        const { data, error } = await supabase.storage
+          .from('user-avatars')
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: true
+          });
+
+        if (error) {
+          throw error;
+        }
+
+        // Get public URL manually (Supabase storage issue fix)
+        // Extract project ref from Supabase URL
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://fdddzfnawuykljrdrlrp.supabase.co';
+        const projectRef = supabaseUrl.split('//')[1]?.split('.')[0] || 'fdddzfnawuykljrdrlrp';
+        const publicUrl = `https://${projectRef}.supabase.co/storage/v1/object/public/user-avatars/${filePath}`;
+
+        // Update profile with new avatar URL
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ avatar_url: publicUrl })
+          .eq('id', user.id);
+
+        if (updateError) {
+          throw updateError;
+        }
+
+        // Update local state
+        setUserProfile(prev => ({
+          ...prev,
+          avatar_url: publicUrl
+        }));
+
+        setMessage('✅ Profile picture updated successfully!');
+        
+        // Clear the file input
+        e.target.value = '';
+
+      } catch (error) {
+        console.error('Error uploading avatar:', error);
+        setMessage('❌ Failed to upload profile picture: ' + error.message);
+      }
+    }
+  };
+
   if (loading) {
     return (
         <div className={styles.loadingContainer}>
@@ -628,7 +697,15 @@ export default function AdminDashboard() {
         <div className={styles.sidebar}>
           <div className={styles.userInfo}>
             <div className={styles.avatar}>
-              {userProfile?.full_name?.charAt(0) || 'A'}
+              {userProfile?.avatar_url ? (
+                <img 
+                  src={userProfile.avatar_url} 
+                  alt="Profile" 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+                />
+              ) : (
+                userProfile?.full_name?.charAt(0) || 'A'
+              )}
             </div>
             <h3>{userProfile?.full_name || 'Admin'}</h3>
             <p>Administrator</p>
@@ -665,6 +742,12 @@ export default function AdminDashboard() {
               onClick={() => setActiveTab('commission')}
             >
               💵 Commission ({commissionData.length})
+            </button>
+            <button 
+              className={`${styles.navItem} ${activeTab === 'profile' ? styles.active : ''}`}
+              onClick={() => setActiveTab('profile')}
+            >
+              👤 Profile
             </button>
           </nav>
         </div>
@@ -1132,6 +1215,140 @@ export default function AdminDashboard() {
                   </div>
                 </>
               )}
+            </div>
+          )}
+
+          {activeTab === 'profile' && (
+            <div className={styles.section}>
+              <h2>👤 Admin Profile</h2>
+              
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: '1fr 1fr', 
+                gap: '2rem',
+                marginTop: '1rem'
+              }}>
+                {/* Profile Information */}
+                <div style={{ 
+                  background: 'white', 
+                  padding: '1.5rem', 
+                  borderRadius: '12px',
+                  border: '1px solid #e5e7eb',
+                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)'
+                }}>
+                  <h3 style={{ marginTop: 0, color: '#374151', marginBottom: '1rem' }}>Profile Information</h3>
+                  
+                  <div style={{ marginBottom: '1rem' }}>
+                    <strong>User ID:</strong> {user?.id}
+                  </div>
+                  <div style={{ marginBottom: '1rem' }}>
+                    <strong>Email:</strong> {user?.email}
+                  </div>
+                  <div style={{ marginBottom: '1rem' }}>
+                    <strong>Full Name:</strong> {userProfile?.full_name || 'Not set'}
+                  </div>
+                  <div style={{ marginBottom: '1rem' }}>
+                    <strong>User Type:</strong> {userProfile?.user_type || 'Not set'}
+                  </div>
+                  <div style={{ marginBottom: '1rem' }}>
+                    <strong>Avatar URL:</strong> {userProfile?.avatar_url || 'No avatar uploaded'}
+                  </div>
+                </div>
+
+                {/* Avatar Management */}
+                <div style={{ 
+                  background: 'white', 
+                  padding: '1.5rem', 
+                  borderRadius: '12px',
+                  border: '1px solid #e5e7eb',
+                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)'
+                }}>
+                  <h3 style={{ marginTop: 0, color: '#374151', marginBottom: '1rem' }}>Profile Picture</h3>
+                  
+                  <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+                    {userProfile?.avatar_url ? (
+                      <div style={{ 
+                        width: '120px', 
+                        height: '120px', 
+                        margin: '0 auto',
+                        position: 'relative'
+                      }}>
+                        <img 
+                          src={userProfile.avatar_url} 
+                          alt="Admin Profile" 
+                          style={{ 
+                            width: '100%', 
+                            height: '100%', 
+                            objectFit: 'cover', 
+                            borderRadius: '50%',
+                            border: '3px solid #667eea'
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <div style={{
+                        width: '120px',
+                        height: '120px',
+                        margin: '0 auto',
+                        border: '2px dashed #d1d5db',
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: '#f9fafb',
+                        color: '#6b7280',
+                        fontSize: '3rem'
+                      }}>
+                        👤
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div style={{ textAlign: 'center' }}>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAdminAvatarChange}
+                      style={{ display: 'none' }}
+                      id="adminAvatarInput"
+                    />
+                    <label
+                      htmlFor="adminAvatarInput"
+                      style={{
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: '10px 20px',
+                        fontSize: '0.9rem',
+                        cursor: 'pointer',
+                        display: 'inline-block',
+                        transition: 'all 0.3s ease'
+                      }}
+                      onMouseOver={(e) => {
+                        e.target.style.transform = 'translateY(-2px)';
+                        e.target.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.4)';
+                      }}
+                      onMouseOut={(e) => {
+                        e.target.style.transform = 'translateY(0)';
+                        e.target.style.boxShadow = 'none';
+                      }}
+                    >
+                      📷 Change Profile Picture
+                    </label>
+                  </div>
+                  
+                  <p style={{ 
+                    marginTop: '1rem', 
+                    fontSize: '0.8rem', 
+                    color: '#6b7280', 
+                    textAlign: 'center',
+                    fontStyle: 'italic'
+                  }}>
+                    PNG, JPG, JPEG, GIF up to 5MB
+                  </p>
+                </div>
+              </div>
             </div>
           )}
               </div>

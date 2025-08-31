@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { supabase } from '../../utils/supabaseClient';
 import styles from '../../styles/Auth.module.css';
@@ -11,6 +11,10 @@ export default function SignupPage() {
   const [userType, setUserType] = useState('buyer');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -35,6 +39,105 @@ export default function SignupPage() {
     
     checkUser();
   }, [router]);
+
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setMessage('❌ Please select an image file (PNG, JPG, JPEG, GIF)');
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setMessage('❌ File size must be less than 5MB');
+        return;
+      }
+
+      setAvatarFile(file);
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setAvatarPreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+      
+      setMessage(''); // Clear any previous error messages
+    }
+  };
+
+  const uploadAvatar = async (userId) => {
+    if (!avatarFile) return null;
+
+    try {
+      setUploadingAvatar(true);
+      
+      // Create unique filename
+      const fileExt = avatarFile.name.split('.').pop();
+      const fileName = `${userId}-${Date.now()}.${fileExt}`;
+      const filePath = `${userId}/${fileName}`;
+
+      console.log('🔄 Starting avatar upload...', { filePath, fileSize: avatarFile.size });
+
+      // Check if storage bucket exists first
+      const { data: buckets, error: bucketError } = await supabase.storage.listBuckets();
+      if (bucketError) {
+        console.error('❌ Error checking buckets:', bucketError);
+        throw new Error('Storage service unavailable');
+      }
+
+      const userAvatarsBucket = buckets.find(bucket => bucket.id === 'user-avatars');
+      if (!userAvatarsBucket) {
+        console.error('❌ user-avatars bucket not found');
+        throw new Error('Avatar storage not configured. Please contact support.');
+      }
+
+      console.log('✅ Storage bucket found:', userAvatarsBucket);
+
+      // Upload to Supabase storage
+      const { data, error } = await supabase.storage
+        .from('user-avatars')
+        .upload(filePath, avatarFile, {
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (error) {
+        console.error('❌ Storage upload error:', error);
+        throw error;
+      }
+
+      console.log('✅ File uploaded successfully:', data);
+
+      // Get public URL manually (Supabase storage issue fix)
+      // Extract project ref from Supabase URL
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://fdddzfnawuykljrdrlrp.supabase.co';
+      const projectRef = supabaseUrl.split('//')[1]?.split('.')[0] || 'fdddzfnawuykljrdrlrp';
+      const publicUrl = `https://${projectRef}.supabase.co/storage/v1/object/public/user-avatars/${filePath}`;
+
+      console.log('✅ Public URL generated manually:', publicUrl);
+
+      return publicUrl;
+
+    } catch (error) {
+      console.error('❌ Error uploading avatar:', error);
+      
+      // Provide more specific error messages
+      if (error.message.includes('bucket')) {
+        throw new Error('Avatar storage not configured. Please contact support.');
+      } else if (error.message.includes('permission')) {
+        throw new Error('Permission denied. Please try again or contact support.');
+      } else if (error.message.includes('network')) {
+        throw new Error('Network error. Please check your connection and try again.');
+      } else {
+        throw new Error(`Upload failed: ${error.message}`);
+      }
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -84,15 +187,37 @@ export default function SignupPage() {
         console.log('User created successfully:', data.user.id);
         console.log('Creating profile with user type:', userType);
         
-        // Create profile
-        const { data: profileData, error: profileError } = await supabase
+        let avatarUrl = null;
+        
+        // Upload avatar if selected
+        if (avatarFile) {
+          try {
+            setMessage('📸 Uploading profile picture...');
+            avatarUrl = await uploadAvatar(data.user.id);
+            setMessage('✅ Profile picture uploaded! Creating account...');
+          } catch (avatarError) {
+            console.error('Avatar upload error:', avatarError);
+            // Continue with signup even if avatar fails
+            setMessage('⚠️ Account created but profile picture upload failed. You can add it later.');
+            avatarUrl = null; // Ensure avatarUrl is null if upload fails
+          }
+        }
+        
+        // Create profile with avatar URL
+        const profileData = {
+          id: data.user.id,
+          full_name: fullName,
+          email: email,
+          user_type: userType
+        };
+        
+        if (avatarUrl) {
+          profileData.avatar_url = avatarUrl;
+        }
+        
+        const { data: profileDataResult, error: profileError } = await supabase
           .from('profiles')
-          .insert([{
-            id: data.user.id,
-            full_name: fullName,
-            email: email,
-            user_type: userType
-          }])
+          .insert([profileData])
           .select();
           
         if (profileError) {
@@ -102,7 +227,7 @@ export default function SignupPage() {
           return;
         }
 
-        console.log('Profile created successfully:', profileData);
+        console.log('Profile created successfully:', profileDataResult);
 
         // Handle different user types
         if (userType === 'seller') {
@@ -174,6 +299,14 @@ export default function SignupPage() {
     }
   };
 
+  const removeAvatar = () => {
+    setAvatarFile(null);
+    setAvatarPreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   return (
     <main className={styles.authContainer}>
       <div className={styles.authCardWithGraphic}>
@@ -182,6 +315,42 @@ export default function SignupPage() {
             <h1>Join Car Marketplace</h1>
             <p>Create your account to start buying or selling cars</p>
           </div>
+          
+          {/* Profile Picture Uploader */}
+          <div className={styles.avatarSection}>
+            <label className={styles.avatarLabel}>Profile Picture (Optional)</label>
+            <div className={styles.avatarUploader}>
+              {avatarPreview ? (
+                <div className={styles.avatarPreview}>
+                  <img src={avatarPreview} alt="Profile Preview" />
+                  <button 
+                    type="button" 
+                    onClick={removeAvatar}
+                    className={styles.removeAvatarBtn}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ) : (
+                <div 
+                  className={styles.avatarPlaceholder}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <span>📷</span>
+                  <p>Click to add photo</p>
+                </div>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarChange}
+                style={{ display: 'none' }}
+              />
+            </div>
+            <p className={styles.avatarHelp}>PNG, JPG, JPEG, GIF up to 5MB</p>
+          </div>
+
           <form onSubmit={handleSignup} className={styles.authForm}>
             <div style={{ 
               backgroundColor: '#f8f9fa', 
@@ -270,9 +439,9 @@ export default function SignupPage() {
             <button 
               type="submit" 
               className={styles.submitBtn}
-              disabled={loading}
+              disabled={loading || uploadingAvatar}
             >
-              {loading ? 'Creating Account...' : 'Create Account'}
+              {loading ? 'Creating Account...' : uploadingAvatar ? 'Uploading...' : 'Create Account'}
             </button>
           </form>
           {message && (

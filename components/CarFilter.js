@@ -35,29 +35,45 @@ export default function CarFilter({ onFilterChange, filters }) {
       
       // Check if response is ok
       if (!response.ok) {
-        console.error('API response not ok:', response.status, response.statusText);
-        alert('Failed to load filters. Please try again.');
+        console.error('❌ API response not ok:', response.status, response.statusText);
+        
+        // Try to get error details from response
+        try {
+          const errorText = await response.text();
+          console.error('❌ Error response body:', errorText);
+          
+          // Show user-friendly error message
+          if (response.status === 500) {
+            alert('Server error loading filters. Please try again later.');
+          } else {
+            alert('Failed to load filters. Please try again.');
+          }
+        } catch (e) {
+          alert('Failed to load filters. Please try again.');
+        }
         return;
       }
       
       // Check if response is JSON
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
-        console.error('API returned non-JSON response:', contentType);
+        console.error('❌ API returned non-JSON response:', contentType);
         alert('Server error. Please try again.');
         return;
       }
       
       const result = await response.json();
+      console.log('✅ Filters API response:', result);
       
       if (result.success) {
-        setSavedFilters(result.data);
+        setSavedFilters(result.data || []);
+        console.log('✅ Saved filters loaded:', result.data?.length || 0, 'filters');
       } else {
-        console.error('Failed to load filters:', result.error);
+        console.error('❌ API returned error:', result.error);
         alert(`Error loading filters: ${result.error}`);
       }
     } catch (error) {
-      console.error('Error loading filters:', error);
+      console.error('❌ Network error loading filters:', error);
       alert('Network error loading filters. Please try again.');
     } finally {
       setLoading(false);

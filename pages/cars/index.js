@@ -218,16 +218,6 @@ export default function CarsPage() {
 
   // Apply filters to cars
   const filteredCars = cars.filter(car => {
-    console.log('Filtering car:', {
-      id: car.id,
-      title: car.title,
-      price: car.price,
-      miles: car.miles,
-      reg_district: car.reg_district,
-      year: car.year,
-      status: car.status
-    });
-    
     if (car.status === 'available') {
       // Search term filter
       if (searchTerm.trim()) {
@@ -238,17 +228,14 @@ export default function CarsPage() {
       
       // Title filter
       if (filters.title && !car.title?.toLowerCase().includes(filters.title.toLowerCase())) {
-        console.log('Filtered out by title:', car.title);
         return false;
       }
       
       // Price range filter
       if (filters.minPrice && car.price < parseFloat(filters.minPrice)) {
-        console.log('Filtered out by min price:', car.price, '<', filters.minPrice);
         return false;
       }
       if (filters.maxPrice && car.price > parseFloat(filters.maxPrice)) {
-        console.log('Filtered out by max price:', car.price, '>', filters.maxPrice);
         return false;
       }
       
@@ -275,37 +262,31 @@ export default function CarsPage() {
       if (filters.miles_min && filters.miles_min.trim() !== '') {
         const filterMilesMin = parseFloat(filters.miles_min);
         if (car.miles && car.miles < filterMilesMin) {
-          console.log('Filtered out by min miles:', car.miles, '<', filterMilesMin);
           return false;
         }
       }
       if (filters.miles_max && filters.miles_max.trim() !== '') {
         const filterMilesMax = parseFloat(filters.miles_max);
         if (car.miles && car.miles > filterMilesMax) {
-          console.log('Filtered out by max miles:', car.miles, '>', filterMilesMax);
           return false;
         }
       }
       
-              // City filter
-        if (filters.reg_district && filters.reg_district.trim() !== '') {
-          if (!car.reg_district || car.reg_district !== filters.reg_district) {
-            console.log('Filtered out by city:', car.reg_district, '!=', filters.reg_district);
+      // City filter
+      if (filters.reg_district && filters.reg_district.trim() !== '') {
+        if (!car.reg_district || car.reg_district !== filters.reg_district) {
           return false;
         }
       }
       
       // Year range filter
       if (filters.year_min && car.year && car.year < parseInt(filters.year_min)) {
-        console.log('Filtered out by min year:', car.year, '<', filters.year_min);
         return false;
       }
       if (filters.year_max && car.year && car.year > parseInt(filters.year_max)) {
-        console.log('Filtered out by max year:', car.year, '>', filters.year_max);
         return false;
       }
       
-      console.log('Car passed all filters:', car.title);
       return true;
     }
     if (userProfile?.user_type === 'buyer' && car.status === 'sold' && car.buyer_id === userProfile.id) {

@@ -34,146 +34,17 @@ const formatWhatsAppNumber = (number) => {
   return cleaned;
 };
 
-function CarChat({ carId, sellerId, buyerId, currentUserId, onOpenChat, unreadCount, onMarkAsRead }) {
-  const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState('');
-  const [sending, setSending] = useState(false);
-  const [loadingMessages, setLoadingMessages] = useState(true);
-  const messagesEndRef = useRef(null);
 
-  const fetchMessages = async () => {
-    try {
-      setLoadingMessages(true);
-      const { data, error } = await supabase
-        .from('messages_with_names')
-        .select('*')
-        .eq('car_id', carId)
-        .or(`and(sender_id.eq.${currentUserId},receiver_id.eq.${sellerId}),and(sender_id.eq.${sellerId},receiver_id.eq.${currentUserId})`)
-        .order('created_at', { ascending: true });
 
-      if (error) {
-        console.error('Error fetching messages:', error);
-        return;
-      }
 
-      // Use the names directly from the view
-      const formattedMessages = data?.map(msg => ({
-        ...msg,
-        sender_name: msg.sender_name || (msg.sender_id === currentUserId ? 'You' : 'Seller'),
-        receiver_name: msg.receiver_name || (msg.receiver_id === currentUserId ? 'You' : 'Seller')
-      })) || [];
 
-      setMessages(formattedMessages);
-    } catch (error) {
-      console.error('Error fetching messages:', error);
-    } finally {
-      setLoadingMessages(false);
-    }
-  };
 
-  const sendMessage = async () => {
-    if (!newMessage.trim() || sending) return;
 
-    try {
-      setSending(true);
-      const { error } = await supabase
-        .from('messages')
-        .insert([{
-          car_id: carId,
-          sender_id: currentUserId,
-          receiver_id: sellerId,
-          message: newMessage.trim()
-        }]);
 
-      if (error) {
-        console.error('Error sending message:', error);
-        return;
-      }
 
-      setNewMessage('');
-      await fetchMessages();
-    } catch (error) {
-      console.error('Error sending message:', error);
-    } finally {
-      setSending(false);
-    }
-  };
 
-  useEffect(() => {
-    if (carId && currentUserId && sellerId) {
-      fetchMessages();
-    }
-  }, [carId, currentUserId, sellerId]);
 
-  useEffect(() => {
-    if (messagesEndRef.current && messages.length > 0) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'auto' });
-    }
-  }, [messages.length]);
 
-  if (loadingMessages) return <div style={{ padding: '10px', textAlign: 'center', color: '#666' }}>Loading messages...</div>;
-
-  return (
-      <div className="chat-icon-wrapper" style={{ position: 'relative', display: 'inline-block' }}>
-        <button
-        onClick={() => onOpenChat(carId, sellerId, messages, setMessages, newMessage, setNewMessage, sending, sendMessage)}
-        style={{
-          background: '#007bff',
-          color: 'white',
-          border: 'none',
-          borderRadius: '50%',
-          width: '50px',
-          height: '50px',
-      display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-          fontSize: '20px',
-          boxShadow: '0 2px 8px rgba(0,123,255,0.3)',
-          transition: 'all 0.3s ease'
-        }}
-        onMouseOver={(e) => {
-          e.target.style.transform = 'scale(1.1)';
-          e.target.style.boxShadow = '0 4px 12px rgba(0,123,255,0.4)';
-        }}
-        onMouseOut={(e) => {
-          e.target.style.transform = 'scale(1)';
-          e.target.style.boxShadow = '0 2px 8px rgba(0,123,255,0.3)';
-        }}
-        title="Chat with seller"
-      >
-        💬
-      </button>
-      
-      {/* Message Count Badge */}
-      {unreadCount > 0 && (
-        <span 
-          className="badge" 
-          style={{
-            position: 'absolute',
-            top: '-5px',
-            right: '-5px',
-            background: 'red',
-            color: 'white',
-            borderRadius: '50%',
-            padding: '3px 6px',
-                fontSize: '12px',
-                  fontWeight: 'bold',
-            minWidth: '20px',
-            height: '20px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            border: '2px solid white',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-          }}
-        >
-          {unreadCount}
-        </span>
-      )}
-    </div>
-  );
-}
 
 export default function BuyerDashboard() {
   const [user, setUser] = useState(null);
@@ -193,6 +64,7 @@ export default function BuyerDashboard() {
   const [showChat, setShowChat] = useState(false);
   const [chatCarId, setChatCarId] = useState(null);
   const [chatSellerId, setChatSellerId] = useState(null);
+  const [chatSellerInfo, setChatSellerInfo] = useState(null); // Store seller info
   const [chatData, setChatData] = useState(null);
   const [buyerId, setBuyerId] = useState(null);
   const [unreadCounts, setUnreadCounts] = useState({}); // Track unread counts per car
@@ -203,14 +75,112 @@ export default function BuyerDashboard() {
   const [localMessages, setLocalMessages] = useState([]); // Local messages for modal
   const [imageIndexes, setImageIndexes] = useState({}); // carId: index
 
+
+
+  // Fetch existing messages for buyer dashboard
+  const fetchExistingMessages = async (carId, sellerId, buyerId) => {
+    try {
+      console.log('🔍 Buyer Dashboard: Fetching existing messages for car:', carId, 'seller:', sellerId, 'buyer:', buyerId);
+      
+      // Try messages_with_names first - get messages for this specific car AND between this buyer and seller
+      let { data, error } = await supabase
+        .from('messages_with_names')
+        .select('*')
+        .eq('car_id', carId)
+        .or(`and(sender_id.eq.${buyerId},receiver_id.eq.${sellerId}),and(sender_id.eq.${sellerId},receiver_id.eq.${buyerId})`)
+        .order('created_at', { ascending: true });
+
+      // If messages_with_names fails, try basic messages table
+      if (error || !data) {
+        console.log('⚠️ Buyer Dashboard: messages_with_names failed, trying basic messages table...');
+        const result = await supabase
+          .from('messages')
+          .select('*')
+          .eq('car_id', carId)
+          .or(`and(sender_id.eq.${buyerId},receiver_id.eq.${sellerId}),and(sender_id.eq.${sellerId},receiver_id.eq.${buyerId})`)
+          .order('created_at', { ascending: true });
+        
+        data = result.data;
+        error = result.error;
+      }
+
+      if (error) {
+        console.error('❌ Buyer Dashboard: Error fetching messages:', error);
+        return [];
+      }
+
+      console.log('✅ Buyer Dashboard: Messages fetched successfully:', data?.length || 0, 'messages');
+      if (data && data.length > 0) {
+        console.log('📝 Buyer Dashboard: Sample message:', data[0]);
+        console.log('📝 Buyer Dashboard: All messages:', data);
+        console.log('🔍 Buyer Dashboard: Checking message details...');
+        data.forEach((msg, index) => {
+          console.log(`📝 Message ${index + 1}:`, {
+            id: msg.id,
+            sender_id: msg.sender_id,
+            receiver_id: msg.receiver_id,
+            sender_name: msg.sender_name,
+            message: msg.message,
+            created_at: msg.created_at
+          });
+        });
+      } else {
+        console.log('⚠️ Buyer Dashboard: No messages found for this car');
+      }
+
+      // Format messages with proper names
+      const formattedMessages = data?.map(msg => ({
+        ...msg,
+        sender_name: msg.sender_name || (msg.sender_id === buyerId ? 'You' : 'Seller'),
+        receiver_name: msg.receiver_name || (msg.receiver_id === buyerId ? 'You' : 'Seller')
+      })) || [];
+
+      return formattedMessages;
+    } catch (error) {
+      console.error('❌ Buyer Dashboard: Error in fetchExistingMessages:', error);
+      return [];
+    }
+  };
+
   // Chat functions
-  const onOpenChat = (carId, sellerId, messages, setMessages, newMessage, setNewMessage, sending, sendMessage) => {
+  const onOpenChat = async (carId, sellerId, messages, setMessages, newMessage, setNewMessage, sending, sendMessage) => {
+    console.log('🚀 onOpenChat function called!');
+    console.log('📊 Parameters received:', { carId, sellerId, messages, setMessages, newMessage, setNewMessage, sending, sendMessage });
+    console.log('📱 Current showChat state:', showChat);
+    console.log('🎯 Current chatCarId:', chatCarId);
+    console.log('👤 Current chatSellerId:', chatSellerId);
+    
     setChatCarId(carId);
     setChatSellerId(sellerId);
     setShowChat(true);
     
-    // Copy existing messages to local state
+    console.log('✅ State updated:');
+    console.log('✅ State updated:');
+    console.log('   - chatCarId set to:', carId);
+    console.log('   - chatSellerId set to:', sellerId);
+    console.log('   - showChat set to:', true);
+    
+    // Store seller information for persistence
+    if (sellerId) {
+      // Find seller info from available cars
+      const carWithSeller = availableCars.find(car => car.id === carId);
+      if (carWithSeller && carWithSeller.seller) {
+        setChatSellerInfo(carWithSeller.seller);
+        console.log('👤 Seller info stored:', carWithSeller.seller);
+      }
+    }
+    
+    // Fetch existing messages from database
+    if (carId && sellerId && user?.id) {
+      console.log('📡 Fetching existing messages...');
+      const existingMessages = await fetchExistingMessages(carId, sellerId, user.id);
+      setLocalMessages(existingMessages);
+      console.log('✅ Existing messages loaded:', existingMessages.length);
+    } else {
+      // Fallback to passed messages if available
     setLocalMessages(messages || []);
+      console.log('⚠️ Using fallback messages:', messages?.length || 0);
+    }
     
     // Store chat data for modal
     setChatData({ 
@@ -226,6 +196,9 @@ export default function BuyerDashboard() {
     if (carId && user?.id) {
       markMessagesAsRead(carId, user.id);
     }
+    
+    console.log('🎯 Chat modal should now be visible');
+    console.log('🔍 Final state check - chatCarId:', chatCarId, 'chatSellerId:', chatSellerId);
   };
 
   // Fetch unread message counts for all cars
@@ -269,9 +242,26 @@ export default function BuyerDashboard() {
 
   // Handle sending message from modal
   const handleSendMessage = async () => {
-    if (!localMessage.trim() || !chatCarId || !chatSellerId || !user?.id) return;
+    console.log('🚀 handleSendMessage called!');
+    console.log('📊 Message data:', { 
+      localMessage: localMessage?.trim(), 
+      chatCarId, 
+      chatSellerId, 
+      userId: user?.id 
+    });
+    
+    if (!localMessage.trim() || !chatCarId || !chatSellerId || !user?.id) {
+      console.log('❌ Validation failed:', { 
+        hasMessage: !!localMessage?.trim(), 
+        hasCarId: !!chatCarId, 
+        hasSellerId: !!chatSellerId, 
+        hasUserId: !!user?.id 
+      });
+      return;
+    }
     
     try {
+      console.log('✅ Starting to send message...');
       setSending(true);
       
       // Create new message object
@@ -286,10 +276,14 @@ export default function BuyerDashboard() {
         created_at: new Date().toISOString()
       };
       
+      console.log('📝 New message object:', newMessageObj);
+      
       // Add message to local messages immediately (optimistic update)
       setLocalMessages(prev => [...prev, newMessageObj]);
+      console.log('✅ Message added to local state');
       
       // Send message to database
+      console.log('📡 Sending to database...');
       const { error } = await supabase
         .from('messages')
         .insert([{
@@ -300,35 +294,42 @@ export default function BuyerDashboard() {
         }]);
       
       if (error) {
-        console.error('Error sending message:', error);
+        console.error('❌ Database error:', error);
         // Remove message from local state if database save failed
         setLocalMessages(prev => prev.filter(msg => msg.id !== newMessageObj.id));
         return;
       }
       
+      console.log('✅ Message saved to database successfully!');
+      
       // Clear input
       setLocalMessage('');
+      console.log('✅ Input cleared');
       
       // Refresh messages in CarChat component
       if (chatData?.setMessages) {
         chatData.setMessages(prev => [...prev, newMessageObj]);
+        console.log('✅ CarChat messages updated');
       }
       
     } catch (error) {
-      console.error('Error in handleSendMessage:', error);
+      console.error('❌ Error in handleSendMessage:', error);
     } finally {
       setSending(false);
+      console.log('✅ Sending state reset');
     }
   };
 
   const closeChat = () => {
+    console.log('🔒 Closing chat...');
     setShowChat(false);
     setChatCarId(null);
     setChatSellerId(null);
     setChatData(null);
-    // Reset local chat state
+    // Don't reset local messages and seller info - keep them for persistence
     setLocalMessage('');
     setSending(false);
+    console.log('✅ Chat closed, messages and seller info preserved');
   };
 
   const markMessagesAsRead = async (carId, buyerId) => {
@@ -569,6 +570,14 @@ export default function BuyerDashboard() {
           ...prev,
           [payload.new.car_id]: (prev[payload.new.car_id] || 0) + 1
         }));
+        
+        // If chat is open for this car, refresh messages
+        if (showChat && chatCarId === payload.new.car_id) {
+          console.log('🔄 Buyer: Chat is open for this car, refreshing messages...');
+          fetchExistingMessages(payload.new.car_id, chatSellerId, user.id).then(newMessages => {
+            setLocalMessages(newMessages);
+          });
+        }
       })
       .on('postgres_changes', {
         event: 'UPDATE',
@@ -815,6 +824,103 @@ export default function BuyerDashboard() {
     setProfileMsg('');
   };
 
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setProfileMsg('❌ Please select an image file (PNG, JPG, JPEG, GIF)');
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setProfileMsg('❌ File size must be less than 5MB');
+        return;
+      }
+
+      try {
+        setProfileMsg('📸 Uploading profile picture...');
+        
+        // Create unique filename
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+        const filePath = `${user.id}/${fileName}`;
+
+        // Upload to Supabase storage
+        const { data, error } = await supabase.storage
+          .from('user-avatars')
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: true
+          });
+
+        if (error) {
+          throw error;
+        }
+
+        // Get public URL manually (Supabase storage issue fix)
+        // Extract project ref from Supabase URL
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://fdddzfnawuykljrdrlrp.supabase.co';
+        const projectRef = supabaseUrl.split('//')[1]?.split('.')[0] || 'fdddzfnawuykljrdrlrp';
+        const publicUrl = `https://${projectRef}.supabase.co/storage/v1/object/public/user-avatars/${filePath}`;
+
+        // Update profile with new avatar URL
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ avatar_url: publicUrl })
+          .eq('id', user.id);
+
+        if (updateError) {
+          throw updateError;
+        }
+
+        // Update local state
+        setUserProfile(prev => ({
+          ...prev,
+          avatar_url: publicUrl
+        }));
+
+        setProfileMsg('✅ Profile picture updated successfully!');
+        
+        // Clear the file input
+        e.target.value = '';
+
+      } catch (error) {
+        console.error('Error uploading avatar:', error);
+        setProfileMsg('❌ Failed to upload profile picture: ' + error.message);
+      }
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    try {
+      setProfileMsg('🗑️ Removing profile picture...');
+      
+      // Remove avatar_url from profile
+      const { error } = await supabase
+        .from('profiles')
+        .update({ avatar_url: null })
+        .eq('id', user.id);
+
+      if (error) {
+        throw error;
+      }
+
+      // Update local state
+      setUserProfile(prev => ({
+        ...prev,
+        avatar_url: null
+      }));
+
+      setProfileMsg('✅ Profile picture removed successfully!');
+
+    } catch (error) {
+      console.error('Error removing avatar:', error);
+      setProfileMsg('❌ Failed to remove profile picture: ' + error.message);
+    }
+  };
+
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
     setProfileMsg('');
@@ -835,8 +941,8 @@ export default function BuyerDashboard() {
     }
     // Update email in auth
     const { error: emailError } = await supabase.auth.updateUser({ email: editEmail });
-    if (emailError) {
-      setProfileMsg('❌ ' + emailError.message);
+    if (profileError) {
+      setProfileMsg('❌ ' + profileError.message);
       return;
     }
     setProfileMsg('✅ Profile updated successfully!');
@@ -950,10 +1056,19 @@ export default function BuyerDashboard() {
         <div className={styles.sidebar}>
           <div className={styles.userInfo}>
             <div className={styles.avatar}>
-              {userProfile?.full_name?.charAt(0) || 'B'}
+              {userProfile?.avatar_url ? (
+                <img 
+                  src={userProfile.avatar_url} 
+                  alt="Profile" 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+                />
+              ) : (
+                userProfile?.full_name?.charAt(0) || 'B'
+              )}
             </div>
             <h3>{userProfile?.full_name || 'Buyer'}</h3>
             <p>Car Buyer</p>
+
           </div>
           
 
@@ -972,7 +1087,7 @@ export default function BuyerDashboard() {
             </button>
             <button 
               className={`${styles.navItem} ${activeTab === 'profile' ? styles.active : ''}`}
-              onClick={() => setActiveTab('profile')}
+              onClick={() => setShowEditProfileModal(true)}
             >
               Profile
             </button>
@@ -1030,7 +1145,10 @@ export default function BuyerDashboard() {
                     
                     return (
                       <div key={car.id} className={styles.carCard}>
-                        <h3 className={styles.carTitle}>{car.title}</h3>
+                        {/* Car Title - Clear and Professional */}
+                        <h3 className={styles.carTitle}>
+                          {car.title || `${car.make || 'Car'} ${car.model || ''} ${car.year || ''}`}
+                        </h3>
                         
                         {/* Gallery block - improved version */}
                         <div className={styles.carImageContainer}>
@@ -1072,17 +1190,49 @@ export default function BuyerDashboard() {
                         )}
                         
                         <div className={styles.carDetails}>
+                          {/* Car Description */}
                           <p className={styles.carDescription}>{car.description}</p>
-                          <p className={styles.price}>${car.price}</p>
-                        <p className={car.status === 'sold' ? styles.sold : styles.available}>
-                          {car.status === 'sold' ? 'Sold' : 'Available'}
-                        </p>
                           
-                          <div className={styles.sellerInfo}>
-                            <span>Seller: <b>{car.seller?.full_name || 'N/A'}</b></span>
-                            {car.seller?.email && <span style={{ marginLeft: 8, color: '#888' }}>({car.seller.email})</span>}
+                          {/* Price - Professional Badge Style */}
+                          <div className={styles.priceContainer}>
+                            <span className={styles.priceLabel}>Price:</span>
+                            <span className={styles.price}>${car.price?.toLocaleString() || '0'}</span>
                           </div>
                           
+                          {/* Status Badge - Professional Style */}
+                          <div className={styles.statusContainer}>
+                            <span className={car.status === 'sold' ? styles.soldBadge : styles.availableBadge}>
+                          {car.status === 'sold' ? 'Sold' : 'Available'}
+                            </span>
+                          </div>
+                          
+                          {/* Seller Info - Enhanced with Avatar */}
+                          <div className={styles.sellerInfo}>
+                            <div className={styles.sellerAvatar}>
+                              {car.seller?.avatar_url ? (
+                                <img 
+                                  src={car.seller.avatar_url} 
+                                  alt="Seller Avatar" 
+                                  className={styles.avatarImage}
+                                />
+                              ) : (
+                                <div className={styles.avatarPlaceholder}>
+                                  {car.seller?.full_name?.charAt(0)?.toUpperCase() || 'S'}
+                                </div>
+                              )}
+                            </div>
+                            <div className={styles.sellerDetails}>
+                              <span className={styles.sellerName}>
+                                <strong>Seller:</strong> {car.seller?.full_name || 'N/A'}
+                              </span>
+                              {car.seller?.email && (
+                                <span className={styles.sellerEmail}>{car.seller.email}</span>
+                              )}
+                            </div>
+                          </div>
+                          
+                          {/* Action Buttons - Professional Layout */}
+                          <div className={styles.actionButtons}>
                           {car.status === 'available' ? (
                             <button 
                               className={styles.buyBtn}
@@ -1096,18 +1246,64 @@ export default function BuyerDashboard() {
                           </div>
                         )}
                           
-                          {/* Chat button for each car */}
-                          <div style={{ marginTop: 12 }}>
-                            <CarChat 
-                              carId={car.id} 
-                              sellerId={car.seller_id} 
-                              buyerId={buyerId} 
-                              currentUserId={user?.id} 
-                              onOpenChat={onOpenChat}
-                              unreadCount={unreadCounts[car.id] || 0}
-                              onMarkAsRead={() => setUnreadCounts(prev => ({ ...prev, [car.id]: 0 }))}
-                            />
-                            </div>
+                            {/* Message Button - Integrated */}
+                            <button 
+                              className={styles.messageBtn}
+                              onClick={() => {
+                                console.log('🎯 Message button clicked!');
+                                console.log('📊 Full Car Object:', car);
+                                console.log('📊 Car data breakdown:', { 
+                                  carId: car.id, 
+                                  sellerId: car.seller_id,
+                                  seller: car.seller,
+                                  seller_id: car.seller_id,
+                                  'car.seller?.id': car.seller?.id,
+                                  'car.seller_id': car.seller_id
+                                });
+                                
+                                // Try to get seller ID from multiple possible sources
+                                const sellerId = car.seller_id || car.seller?.id || car.seller_id;
+                                console.log('🎯 Final sellerId to use:', sellerId);
+                                
+                                if (!sellerId) {
+                                  console.error('❌ No seller ID found! Cannot open chat.');
+                                  alert('Error: Seller information not available for this car.');
+                                  return;
+                                }
+                                
+                                onOpenChat(car.id, sellerId, [], null, '', null, false, null);
+                              }}
+                              style={{ position: 'relative' }}
+                            >
+                              💬 Message
+                              {/* Unread Count Badge */}
+                              {unreadCounts[car.id] > 0 && (
+                                <span 
+                                  style={{
+                                    position: 'absolute',
+                                    top: '-8px',
+                                    right: '-8px',
+                                    background: 'red',
+                                    color: 'white',
+                                    borderRadius: '50%',
+                                    padding: '4px 8px',
+                                    fontSize: '12px',
+                                    fontWeight: 'bold',
+                                    minWidth: '20px',
+                                    height: '20px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    border: '2px solid white',
+                                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                                    zIndex: 10
+                                  }}
+                                >
+                                  {unreadCounts[car.id]}
+                                </span>
+                              )}
+                            </button>
+                          </div>
                         </div>
                       </div>
                     );
@@ -1194,25 +1390,7 @@ export default function BuyerDashboard() {
               )}
             </div>
           )}
-          {activeTab === 'profile' && (
-            <div className={styles.profile}>
-              <h1>Profile</h1>
-              <div className={styles.profileCard}>
-                <div className={styles.profileInfo}>
-                  <div className={styles.avatar}>
-                    {userProfile?.full_name?.charAt(0) || 'B'}
-                  </div>
-                  <div>
-                    <h3>{userProfile?.full_name || 'Buyer'}</h3>
-                    <p>{user?.email}</p>
-                    <p>Car Buyer</p>
-                  </div>
-                </div>
-                <button className={styles.editProfileBtn} onClick={handleEditProfile}>Edit Profile</button>
-              </div>
 
-            </div>
-          )}
           {activeTab === 'aihelp' && (
             <div className={styles.aiAssistant}>
               <div className={styles.sectionHeader}>
@@ -1231,6 +1409,7 @@ export default function BuyerDashboard() {
         </div>
       </div>
       {/* Chat Modal */}
+      {console.log('🔍 Rendering chat modal. showChat:', showChat)}
       {showChat && (
         <div style={{
           position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
@@ -1257,7 +1436,24 @@ export default function BuyerDashboard() {
               background: '#007bff',
               color: 'white'
             }}>
+              <div style={{ flex: 1 }}>
               <h2 style={{ margin: 0, color: 'white', fontSize: '18px', fontWeight: '600' }}>💬 Chat with Seller</h2>
+                {chatSellerInfo && (
+                  <div style={{ 
+                    fontSize: '12px', 
+                    opacity: 0.9, 
+                    marginTop: '4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}>
+                    <span>👤 {chatSellerInfo.full_name || 'Seller'}</span>
+                    {chatSellerInfo.email && (
+                      <span style={{ opacity: 0.8 }}>• {chatSellerInfo.email}</span>
+                    )}
+                  </div>
+                )}
+              </div>
               <button 
                 onClick={closeChat}
                 style={{
@@ -1296,19 +1492,6 @@ export default function BuyerDashboard() {
               minHeight: '250px'
             }}>
               {localMessages.length > 0 ? (
-                <>
-                  {localMessages.length === 0 ? (
-                    <div style={{ 
-                      textAlign: 'center', 
-                      color: '#888', 
-                      marginTop: '80px',
-                      fontSize: '14px'
-                    }}>
-                      <div style={{ fontSize: '32px', marginBottom: '12px' }}>💬</div>
-                      No messages yet.<br/>
-                      <small style={{ fontSize: '12px', opacity: 0.7 }}>Start the conversation!</small>
-                    </div>
-                  ) : (
                     localMessages.map((msg, index) => (
                       <div key={index} style={{
                         display: 'flex',
@@ -1340,8 +1523,6 @@ export default function BuyerDashboard() {
                         </div>
                       </div>
                     ))
-                  )}
-                </>
               ) : (
                 <div style={{ 
                   textAlign: 'center', 
@@ -1349,8 +1530,9 @@ export default function BuyerDashboard() {
                   marginTop: '80px',
                   fontSize: '14px'
                 }}>
-                  <div style={{ fontSize: '32px', marginBottom: '12px' }}>⏳</div>
-                  Loading chat...
+                  <div style={{ fontSize: '32px', marginBottom: '12px' }}>💬</div>
+                  No messages yet.<br/>
+                  <small style={{ fontSize: '12px', opacity: 0.7 }}>Start the conversation!</small>
                 </div>
               )}
             </div>
@@ -1402,7 +1584,12 @@ export default function BuyerDashboard() {
                 disabled={sending}
               />
               <button
-                onClick={handleSendMessage}
+                onClick={() => {
+                  console.log('🎯 Send button clicked!');
+                  console.log('📝 Current message:', localMessage);
+                  console.log('🔒 Button disabled:', !localMessage.trim() || sending);
+                  handleSendMessage();
+                }}
                 disabled={!localMessage.trim() || sending}
                 style={{
                   background: localMessage.trim() && !sending ? '#007bff' : '#ccc',
@@ -1523,11 +1710,99 @@ export default function BuyerDashboard() {
             {/* Modal Body */}
             <div style={{ padding: '32px', overflowY: 'auto' }}>
               <form onSubmit={handleProfileUpdate} className={authStyles.authForm} style={{ margin: 0 }}>
+                {/* Profile Picture Upload - Professional Style */}
+                <div style={{ 
+                  textAlign: 'center', 
+                  marginBottom: '24px',
+                  padding: '20px',
+                  background: '#f8f9fa',
+                  borderRadius: '12px',
+                  border: '1px solid #e9ecef'
+                }}>
+                  <div style={{ 
+                    width: '120px', 
+                    height: '120px', 
+                    margin: '0 auto 16px',
+                    position: 'relative'
+                  }}>
+                    {userProfile?.avatar_url ? (
+                      <img 
+                        src={userProfile.avatar_url} 
+                        alt="Buyer Profile" 
+                        style={{ 
+                          width: '100%', 
+                          height: '100%', 
+                          objectFit: 'cover', 
+                          borderRadius: '50%',
+                          border: '3px solid #667eea'
+                        }}
+                      />
+                    ) : (
+                      <div style={{
+                        width: '100%',
+                        height: '100%',
+                        border: '2px dashed #d1d5db',
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: '#f9fafb',
+                        color: '#6b7280',
+                        fontSize: '3rem',
+                        fontWeight: 'bold'
+                      }}>
+                        {userProfile?.full_name?.charAt(0) || 'B'}
+                      </div>
+                    )}
+                  </div>
+                  
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarChange}
+                    style={{ display: 'none' }}
+                    id="buyerModalAvatarInput"
+                  />
+                  <label
+                    htmlFor="buyerModalAvatarInput"
+                    style={{
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      padding: '12px 24px',
+                      fontSize: '0.9rem',
+                      cursor: 'pointer',
+                      display: 'inline-block',
+                      transition: 'all 0.3s ease',
+                      marginBottom: '8px'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.transform = 'translateY(-2px)';
+                      e.target.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.4)';
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.transform = 'translateY(0)';
+                      e.target.style.boxShadow = 'none';
+                    }}
+                  >
+                    📷 Change Profile Picture
+                  </label>
+                  <p style={{ 
+                    fontSize: '0.8rem', 
+                    color: '#6b7280', 
+                    margin: '8px 0 0 0',
+                    fontStyle: 'italic'
+                  }}>
+                    PNG, JPG, JPEG, GIF up to 5MB
+                  </p>
+                </div>
+
                 <div className={authStyles.formGroup}>
                   <label>Full Name <span style={{ color: 'red' }}>*</span></label>
                   <input
                     type="text"
-                    value={editName}
+                    value={editName || userProfile?.full_name || ''}
                     onChange={e => setEditName(e.target.value)}
                     className={authStyles.input}
                     placeholder="Enter your full name"
@@ -1538,7 +1813,7 @@ export default function BuyerDashboard() {
                   <label>Email <span style={{ color: 'red' }}>*</span></label>
                   <input
                     type="email"
-                    value={editEmail}
+                    value={editEmail || user?.email || ''}
                     onChange={e => setEditEmail(e.target.value)}
                     className={authStyles.input}
                     placeholder="Enter your email address"
@@ -1564,11 +1839,25 @@ export default function BuyerDashboard() {
                     type="button" 
                     className={authStyles.submitBtn} 
                     style={{ 
-                      background: '#ccc', 
-                      color: '#333',
-                      flex: 1
+                      background: '#dc3545', 
+                      color: 'white',
+                      flex: 1,
+                      border: 'none',
+                      borderRadius: '8px',
+                      padding: '12px 24px',
+                      fontSize: '0.9rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease'
                     }} 
                     onClick={() => setShowEditProfileModal(false)}
+                    onMouseOver={(e) => {
+                      e.target.style.background = '#c82333';
+                      e.target.style.transform = 'translateY(-1px)';
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.background = '#dc3545';
+                      e.target.style.transform = 'translateY(0)';
+                    }}
                   >
                     Cancel
                   </button>
