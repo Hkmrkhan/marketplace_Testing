@@ -26,32 +26,50 @@ export default function CarsPage() {
 
   const fetchCars = async () => {
     setLoading(true);
-    // Fetch from Supabase view 'cars_with_seller_enhanced' - only approved cars
+    
+    // Direct query to cars table with proper join to get approval status
     const { data, error } = await supabase
-      .from('cars_with_seller_enhanced')
-      .select('*')
+      .from('cars')
+      .select(`
+        *,
+        profiles!inner(
+          full_name,
+          email,
+          whatsapp_number
+        ),
+        admin_approvals(
+          approval_status,
+          approved_at
+        )
+      `)
       .eq('status', 'available')
       .order('created_at', { ascending: false });
     
-    // Filter approved cars on frontend
+    if (error) {
+      console.error('Error fetching cars:', error);
+      setCars([]);
+      setLoading(false);
+      return;
+    }
+    
+    // Filter approved cars properly
     if (data) {
       const approvedCars = data.filter(car => {
-        // If car has approval_status, check it's approved
-        if (car.approval_status) {
-          return car.approval_status === 'approved';
-        }
-        // If no approval_status, show it (existing cars)
-        return true;
+        // Check if car has admin approval
+        const hasApproval = car.admin_approvals && car.admin_approvals.length > 0;
+        const isApproved = hasApproval && car.admin_approvals.some(approval => 
+          approval.approval_status === 'approved'
+        );
+        
+        // Only show cars that are approved
+        return isApproved;
       });
-      setCars(approvedCars);
-    } else {
-      setCars([]);
-    }
-    if (error) {
-      setCars([]);
-    } else {
-      // Clean descriptions for all cars
-      const cleanedCars = (data || []).map(car => {
+      
+      console.log('Total cars fetched:', data.length);
+      console.log('Approved cars:', approvedCars.length);
+      
+      // Clean descriptions for approved cars only
+      const cleanedCars = approvedCars.map(car => {
         if (car.description) {
           console.log('Original car description:', car.description);
           
@@ -87,6 +105,8 @@ export default function CarsPage() {
         return car;
       });
       setCars(cleanedCars);
+    } else {
+      setCars([]);
     }
     setLoading(false);
   };
@@ -103,6 +123,9 @@ export default function CarsPage() {
     };
     fetchUser();
     fetchCars();
+    
+    // Clear comparison when landing on cars page
+    localStorage.removeItem('comparisonCars');
   }, []);
 
   // Enhanced search function for better voice search support
@@ -358,11 +381,7 @@ export default function CarsPage() {
             <div className={styles.carsGrid}>
               {filteredCars.map(car => (
                 <div key={car.car_id || car.id}>
-                  <CarCard car={car} />
-                  <div className={styles.sellerInfo}>
-                    <span>Seller: <b>{car.seller_name || 'Unknown'}</b></span>
-                    {car.seller_email && <span style={{ marginLeft: 8, color: '#888' }}>({car.seller_email})</span>}
-                  </div>
+                  <CarCard car={car} userProfile={userProfile} />
                 </div>
               ))}
             </div>

@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import styles from '../styles/Navbar.module.css';
 import { supabase } from '../utils/supabaseClient';
+import { useComparison } from '../utils/ComparisonContext';
 import AIChat from './AIChat';
 
 export default function Navbar({ logoText }) {
@@ -10,6 +11,7 @@ export default function Navbar({ logoText }) {
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const router = useRouter();
+  const { comparisonCars } = useComparison();
 
   const checkUser = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -63,6 +65,7 @@ export default function Navbar({ logoText }) {
               {/* Desktop Navigation */}
               <ul className={styles.navLinks}>
                 <li><Link href="/" className={`${styles.navLink} ${router.pathname === '/' ? styles.active : ''}`} onClick={closeMobileMenu}>Home</Link></li>
+
                 {userProfile && (
                   <li><Link href="/forum" className={`${styles.navLink} ${router.pathname === '/forum' ? styles.active : ''}`} onClick={closeMobileMenu}>Forum</Link></li>
                 )}

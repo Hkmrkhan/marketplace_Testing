@@ -1,0 +1,362 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 80vh;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 20px 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 12px;
+}
+
+.header h1 {
+  margin: 0 0 10px 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.header p {
+  margin: 0;
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.comparisonTable {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-bottom: 30px;
+}
+
+.tableHeader {
+  display: grid;
+  grid-template-columns: 200px repeat(auto-fit, minmax(250px, 1fr));
+  background: #f8fafc;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.featureColumn {
+  padding: 20px;
+  font-weight: 600;
+  color: #1f2937;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.carColumn {
+  padding: 20px;
+  text-align: center;
+  border-left: 1px solid #e2e8f0;
+}
+
+.carImage {
+  width: 120px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  border: 2px solid #e2e8f0;
+}
+
+.carTitle {
+  margin: 0 0 8px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1f2937;
+  line-height: 1.3;
+}
+
+.carPrice {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #059669;
+}
+
+.tableBody {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 200px repeat(auto-fit, minmax(250px, 1fr));
+  border-bottom: 1px solid #e2e8f0;
+  transition: background-color 0.2s;
+}
+
+.row:hover {
+  background: #f8fafc;
+}
+
+.row .featureColumn {
+  background: #f8fafc;
+  font-weight: 600;
+  color: #374151;
+  border-right: 1px solid #e2e8f0;
+}
+
+.row .carColumn {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  color: #4b5563;
+  line-height: 1.4;
+}
+
+.actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.backBtn, .clearBtn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1rem;
+}
+
+.backBtn {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+}
+
+.backBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.clearBtn {
+  background: #6b7280;
+  color: white;
+}
+
+.clearBtn:hover {
+  background: #4b5563;
+  transform: translateY(-1px);
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e2e8f0;
+  border-top: 4px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error {
+  text-align: center;
+  padding: 60px 20px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.error h2 {
+  color: #dc2626;
+  margin-bottom: 16px;
+}
+
+.error p {
+  color: #6b7280;
+  margin-bottom: 24px;
+}
+
+/* Recommendations Section */
+.recommendations {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-radius: 12px;
+  padding: 24px;
+  margin: 30px 0;
+  border: 1px solid #bae6fd;
+}
+
+.recommendations h2 {
+  margin: 0 0 20px 0;
+  color: #0369a1;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.recommendationList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.recommendationItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #e0f2fe;
+  transition: all 0.2s;
+}
+
+.recommendationItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(3, 105, 161, 0.1);
+}
+
+.recommendationMessage {
+  font-weight: 600;
+  color: #0c4a6e;
+  font-size: 1rem;
+}
+
+.viewCarBtn {
+  background: linear-gradient(135deg, #0369a1 0%, #0284c7 100%);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+
+.viewCarBtn:hover {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(3, 105, 161, 0.3);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+  
+  .header h1 {
+    font-size: 2rem;
+  }
+  
+  .tableHeader,
+  .row {
+    grid-template-columns: 120px repeat(auto-fit, minmax(200px, 1fr));
+  }
+  
+  .featureColumn {
+    padding: 12px 8px;
+    font-size: 0.9rem;
+  }
+  
+  .carColumn {
+    padding: 12px 8px;
+  }
+  
+  .carImage {
+    width: 80px;
+    height: 60px;
+  }
+  
+  .carTitle {
+    font-size: 0.9rem;
+  }
+  
+  .carPrice {
+    font-size: 1rem;
+  }
+  
+  .row .carColumn {
+    padding: 10px 8px;
+    font-size: 0.85rem;
+  }
+  
+  .actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .backBtn, .clearBtn {
+    width: 200px;
+  }
+  
+  .recommendations {
+    padding: 16px;
+    margin: 20px 0;
+  }
+  
+  .recommendations h2 {
+    font-size: 1.3rem;
+  }
+  
+  .recommendationItem {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+  
+  .recommendationMessage {
+    font-size: 0.9rem;
+  }
+  
+  .viewCarBtn {
+    width: 100%;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tableHeader,
+  .row {
+    grid-template-columns: 100px repeat(auto-fit, minmax(150px, 1fr));
+  }
+  
+  .featureColumn {
+    padding: 8px 4px;
+    font-size: 0.8rem;
+  }
+  
+  .carColumn {
+    padding: 8px 4px;
+  }
+  
+  .carImage {
+    width: 60px;
+    height: 45px;
+  }
+  
+  .carTitle {
+    font-size: 0.8rem;
+  }
+  
+  .carPrice {
+    font-size: 0.9rem;
+  }
+}

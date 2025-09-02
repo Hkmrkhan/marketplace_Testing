@@ -1,6 +1,8 @@
 import '../styles/globals.css';
 import ErrorBoundary from '../components/ErrorBoundary';
 import AIChat from '../components/AIChat';
+import ComparisonSidebar from '../components/ComparisonSidebar';
+import { ComparisonProvider } from '../utils/ComparisonContext';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { checkEnvironment } from '../utils/checkEnvironment';
@@ -72,16 +74,21 @@ export default function App({ Component, pageProps }) {
 
   return (
     <ErrorBoundary>
-      <Component {...pageProps} />
-      
-      {/* Global AI Chat Assistant - Hidden on auth pages */}
-      {!loading && !isAuthPage && (
-        <AIChat 
-          context="global" 
-          isFloating={true}
-          userId={userProfile?.id}
-        />
-      )}
+      <ComparisonProvider>
+        <Component {...pageProps} />
+        
+        {/* Global AI Chat Assistant - Hidden on auth pages */}
+        {!loading && !isAuthPage && (
+          <AIChat 
+            context="global" 
+            isFloating={true}
+            userId={userProfile?.id}
+          />
+        )}
+        
+        {/* Global Comparison Sidebar */}
+        <ComparisonSidebar />
+      </ComparisonProvider>
     </ErrorBoundary>
   );
 } 

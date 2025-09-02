@@ -147,6 +147,62 @@ export default function CarDetails() {
     setBuyMessage('');
   };
 
+  // Handle purchase after successful payment (same as buyer dashboard)
+  const handlePurchase = async (car) => {
+    try {
+      console.log('carToPurchase:', car);
+      console.log('seller_id being sent:', car?.seller_id);
+      if (!car) {
+        alert('Car not found!');
+        return;
+      }
+      
+      // Insert purchase record with all required fields
+      const purchaseData = {
+        car_id: car.id,
+        buyer_id: buyerId,
+        seller_id: car.seller_id, // Always use car.seller_id
+        amount: car.price,
+        purchase_date: new Date().toISOString()
+      };
+      
+      const { data: purchaseResult, error: purchaseError } = await supabase
+        .from('purchases')
+        .insert([purchaseData])
+        .select();
+        
+      if (purchaseError) {
+        console.error('Purchase error:', purchaseError);
+        alert('Error making purchase: ' + purchaseError.message);
+        return;
+      }
+      
+      // Update car status to sold
+      const { data: updateResult, error: carError } = await supabase
+        .from('cars')
+        .update({ status: 'sold' })
+        .eq('id', car.id)
+        .select();
+        
+      if (carError) {
+        console.error('Car update error:', carError);
+        alert('Warning: Purchase successful but car status update failed.');
+      }
+      
+      alert('✅ Car purchased successfully!');
+      setBuyMessage('✅ Car purchased successfully! Car status updated to sold.');
+      
+      // Refresh car data to show updated status
+      setTimeout(() => {
+        fetchCar();
+      }, 1000);
+      
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error making purchase: ' + error.message);
+    }
+  };
+
   // Combine all images for the car
   const getAllImages = () => {
     const images = [];
@@ -511,7 +567,7 @@ export default function CarDetails() {
             marginBottom: '2rem',
             flexWrap: 'wrap'
           }}>
-                {car.status === 'available' && (
+                {car.status === 'available' && currentUser?.user_type === 'buyer' && (
                   <button 
                     onClick={handleBuy}
                     style={{
@@ -604,7 +660,9 @@ export default function CarDetails() {
         display: 'flex', 
         justifyContent: 'center', 
         marginTop: '2rem',
-        marginBottom: '1rem'
+        marginBottom: '1rem',
+        gap: '1rem',
+        flexWrap: 'wrap'
       }}>
         <button 
           onClick={() => router.push(`/forum/create?car_id=${car.id}&car_title=${encodeURIComponent(car.title)}`)}
@@ -623,6 +681,28 @@ export default function CarDetails() {
           }}
         >
           💬 Discuss This Car in Forum
+        </button>
+        
+        <button 
+          onClick={() => router.push('/cars')}
+          style={{
+            padding: '1rem 2rem',
+            backgroundColor: '#3b82f6',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontSize: '1.1rem',
+            fontWeight: 'bold',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            transition: 'all 0.2s'
+          }}
+          onMouseEnter={(e) => e.target.style.backgroundColor = '#2563eb'}
+          onMouseLeave={(e) => e.target.style.backgroundColor = '#3b82f6'}
+        >
+          ← Back to Cars
         </button>
       </div>
 
@@ -683,7 +763,11 @@ export default function CarDetails() {
             <StripeCheckout 
               car={car} 
               userId={buyerId} 
-              onSuccess={handlePaymentSuccess}
+              onSuccess={async (paymentIntent) => {
+                await handlePurchase(car); // Insert purchase from frontend (same as buyer dashboard)
+                setShowPaymentModal(false);
+                alert('Payment successful! Car marked as sold.');
+              }}
             />
           </div>
         </div>

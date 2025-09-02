@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
+import { useComparison } from '../utils/ComparisonContext';
 import styles from '../styles/CarCard.module.css';
 
-export default function CarCard({ car }) {
+export default function CarCard({ car, userProfile }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const router = useRouter();
+  const { addToComparison, isInComparison, comparisonCars } = useComparison();
   
   // Combine primary image with additional images
   const allImages = [];
@@ -75,30 +77,64 @@ export default function CarCard({ car }) {
         
         {/* Buy button removed - users should browse first, then purchase from buyer dashboard */}
         
-        {/* Discuss in Forum Button */}
-        <div style={{ marginTop: 8 }}>
+        {/* Action Buttons */}
+        <div style={{ marginTop: 8, display: 'flex', gap: '8px' }}>
+          {/* Compare Button - Hide for admin */}
+          {userProfile?.user_type !== 'admin' && (
+            <button 
+              style={{
+                flex: 1,
+                padding: '8px 12px',
+                backgroundColor: (isInComparison(car.id) && comparisonCars.length > 0) ? '#059669' : '#3b82f6',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '0.85rem',
+                fontWeight: '500',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '4px',
+                transition: 'background-color 0.2s'
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                addToComparison(car);
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = (isInComparison(car.id) && comparisonCars.length > 0) ? '#047857' : '#2563eb'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = (isInComparison(car.id) && comparisonCars.length > 0) ? '#059669' : '#3b82f6'}
+            >
+              {(isInComparison(car.id) && comparisonCars.length > 0) ? '✓ Added' : '⚖️ Compare'}
+            </button>
+          )}
+          
+          {/* Discuss in Forum Button */}
           <button 
             style={{
-              width: '100%',
-              padding: '8px 16px',
+              flex: 1,
+              padding: '8px 12px',
               backgroundColor: 'rgb(5, 150, 105)',
               color: 'white',
               border: 'none',
               borderRadius: '6px',
               cursor: 'pointer',
-              fontSize: '0.9rem',
+              fontSize: '0.85rem',
               fontWeight: '500',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '6px',
+              gap: '4px',
               transition: 'background-color 0.2s'
             }}
-            onClick={handleDiscussInForum}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDiscussInForum();
+            }}
             onMouseEnter={(e) => e.target.style.backgroundColor = 'rgb(4, 120, 84)'}
             onMouseLeave={(e) => e.target.style.backgroundColor = 'rgb(5, 150, 105)'}
           >
-            💬 Discuss in Forum
+            💬 Forum
           </button>
         </div>
       </div>
