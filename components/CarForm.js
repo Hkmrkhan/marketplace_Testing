@@ -9,12 +9,14 @@ export default function CarForm({ onSubmit, onCancel }) {
   const [reg_district, setRegDistrict] = useState('');
   const [year, setYear] = useState('');
   const [images, setImages] = useState(['', '', '', '']); // 4 additional images
+  const [videoFile, setVideoFile] = useState(null); // Video file
+  const [videoPreview, setVideoPreview] = useState(''); // Video preview URL
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   // Check if form has any data
   const hasFormData = () => {
     return title.trim() || description.trim() || price.trim() || miles.trim() || 
-           reg_district.trim() || year.trim() || images.some(img => img.trim() !== '');
+           reg_district.trim() || year.trim() || images.some(img => img.trim() !== '') || videoFile;
   };
 
   const resetForm = () => {
@@ -25,12 +27,37 @@ export default function CarForm({ onSubmit, onCancel }) {
     setRegDistrict('');
     setYear('');
     setImages(['', '', '', '']);
+    setVideoFile(null);
+    setVideoPreview('');
   };
 
   const handleImageChange = (index, value) => {
     const newImages = [...images];
     newImages[index] = value;
     setImages(newImages);
+  };
+
+  const handleVideoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('video/')) {
+        alert('Please select a video file (MP4, AVI, MOV, etc.)');
+        return;
+      }
+      
+      // Validate file size (max 50MB)
+      if (file.size > 50 * 1024 * 1024) {
+        alert('Video file size must be less than 50MB');
+        return;
+      }
+      
+      setVideoFile(file);
+      
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setVideoPreview(previewUrl);
+    }
   };
 
   const handleCancel = () => {
@@ -50,7 +77,7 @@ export default function CarForm({ onSubmit, onCancel }) {
       alert('Please add at least one image for your car.');
       return;
     }
-    onSubmit({ title, description, price, miles, reg_district, year, images: validImages }, resetForm);
+    onSubmit({ title, description, price, miles, reg_district, year, images: validImages, videoFile }, resetForm);
   };
 
   return (
@@ -229,7 +256,36 @@ export default function CarForm({ onSubmit, onCancel }) {
               <option value="Other">Other</option>
             </select>
           </div>
-        </div>
+                  </div>
+
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Car Video (Optional)</label>
+            <p className={styles.helperText}>Upload a video file to showcase your car (MP4, AVI, MOV - Max 50MB)</p>
+            <input
+              type="file"
+              accept="video/*"
+              onChange={handleVideoChange}
+              className={styles.input}
+            />
+            {videoPreview && (
+              <div style={{ marginTop: '1rem' }}>
+                <video
+                  src={videoPreview}
+                  controls
+                  style={{
+                    width: '100%',
+                    maxWidth: '400px',
+                    height: '200px',
+                    borderRadius: '8px',
+                    border: '1px solid #e2e8f0'
+                  }}
+                />
+                <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '0.5rem' }}>
+                  Video Preview
+                </p>
+              </div>
+            )}
+          </div>
 
           <div className={styles.formGroup}>
             <label className={styles.label}>Car Images (Up to 5) <span className={styles.required}>*</span></label>

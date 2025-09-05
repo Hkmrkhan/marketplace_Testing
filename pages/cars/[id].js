@@ -25,40 +25,48 @@ export default function CarDetails() {
   const fetchCar = async () => {
     if (!id) return;
     setLoading(true);
-    // Fetch from Supabase view 'cars_with_seller_enhanced' - same as cars listing page
-    let { data, error } = await supabase.from('cars_with_seller_enhanced').select('*').eq('id', id).single();
+    
+    // Direct query to cars table with seller info to get video_url
+    const { data, error } = await supabase
+      .from('cars')
+      .select(`
+        *,
+        profiles!inner(
+          full_name,
+          email,
+          whatsapp_number
+        )
+      `)
+      .eq('id', id)
+      .single();
+    
     if (error) {
-      console.log('First query error:', error);
-      // Try alternative field names
-      const { data: data2, error: error2 } = await supabase.from('cars_with_seller_enhanced').select('*').eq('car_id', id).single();
-      if (error2) {
-        console.log('Second query error:', error2);
-        setError('Car not found');
-        setLoading(false);
-        return;
-      }
-      console.log('Found car with car_id:', data2);
-      data = data2;
+      console.log('Car fetch error:', error);
+      setError('Car not found');
+      setLoading(false);
+      return;
     }
+    
     if (!data) {
       setError('Car not found');
       setLoading(false);
       return;
     }
+    
+    // Add seller info to match the expected format
+    const carData = {
+      ...data,
+      seller_name: data.profiles?.full_name,
+      seller_email: data.profiles?.email,
+      seller_whatsapp: data.profiles?.whatsapp_number
+    };
+    
     console.log('=== CAR DATA DEBUG ===');
-    console.log('Complete car object:', data);
-    console.log('Car title:', data.title);
-    console.log('Car year:', data.year);
-    console.log('Car miles:', data.miles);
-    console.log('Car mileage:', data.mileage);
-    console.log('Car district:', data.district);
-    console.log('Car reg_district:', data.reg_district);
-    console.log('Car status:', data.status);
-    console.log('Seller name:', data.seller_name);
-    console.log('Seller email:', data.seller_email);
-    console.log('All available keys:', Object.keys(data));
+    console.log('Complete car object:', carData);
+    console.log('Video URL:', carData.video_url);
     console.log('=== END CAR DATA DEBUG ===');
-    setCar(data);
+    
+    setCar(carData);
     setLoading(false);
   };
 
@@ -462,6 +470,48 @@ export default function CarDetails() {
               </div>
             )}
           </div>
+
+          {/* Car Video Section */}
+          {car.video_url && (
+            <div style={{ 
+              background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)', 
+              padding: '2rem', 
+              borderRadius: '16px',
+              border: '1px solid #e2e8f0',
+              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+              marginBottom: '2.5rem'
+            }}>
+              <h2 style={{ 
+                margin: '0 0 1.5rem 0', 
+                color: '#1e293b', 
+                fontSize: '1.8rem', 
+                fontWeight: '700',
+                textAlign: 'center'
+              }}>
+                🎥 Car Video
+              </h2>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
+                <video
+                  src={car.video_url}
+                  controls
+                  width="100%"
+                  height="400"
+                  style={{
+                    maxWidth: '800px',
+                    borderRadius: '12px',
+                    border: 'none'
+                  }}
+                  title="Car Video"
+                >
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            </div>
+          )}
 
           {/* Car Information - EXACT SAME LOGIC AS CARSCARD */}
           <div style={{ 

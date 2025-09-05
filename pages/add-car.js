@@ -55,9 +55,42 @@ export default function AddCarPage() {
         title: car.title,
         description: car.description,
         price: parseFloat(car.price),
-        images: car.images, // Now handling multiple images
+        images: car.images,
+        videoFile: car.videoFile,
         status: 'available'
       });
+
+      let videoUrl = null;
+      
+      // Upload video file if provided
+      if (car.videoFile) {
+        setMessage('📹 Uploading video...');
+        
+        // Create unique filename
+        const fileExt = car.videoFile.name.split('.').pop();
+        const fileName = `video-${user.id}-${Date.now()}.${fileExt}`;
+        const filePath = `videos/${user.id}/${fileName}`;
+
+        // Upload to Supabase storage
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('car_videos')
+          .upload(filePath, car.videoFile);
+
+        if (uploadError) {
+          console.error('Video upload error:', uploadError);
+          setMessage('❌ Error uploading video: ' + uploadError.message);
+          setLoading(false);
+          return;
+        }
+
+        // Get public URL
+        const { data: urlData } = supabase.storage
+          .from('car_videos')
+          .getPublicUrl(filePath);
+        
+        videoUrl = urlData.publicUrl;
+        console.log('Video uploaded successfully:', videoUrl);
+      }
 
       // Add car to Supabase with seller_id and multiple images
       const { data, error } = await supabase
@@ -74,6 +107,7 @@ export default function AddCarPage() {
             year: car.year ? parseInt(car.year) : 2020,
             image_url: car.images[0], // Primary image (first one)
             additional_images: car.images.slice(1), // Additional images as array
+            video_url: videoUrl, // Video file URL
             status: 'available'
           }
         ])

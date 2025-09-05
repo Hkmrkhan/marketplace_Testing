@@ -17,6 +17,10 @@ SELECT
     c.image_url,
     c.additional_images,
     c.seller_id,
+    c.miles,
+    c.year,
+    c.reg_district,
+    c.district,
     
     -- Seller information from profiles
     p.full_name as seller_name,
@@ -95,7 +99,14 @@ SELECT
         WHEN c.additional_images IS NOT NULL THEN 
             array_length(c.additional_images, 1)
         ELSE 0
-    END as additional_images_count
+    END as additional_images_count,
+    
+    -- City information (combine both district fields)
+    COALESCE(
+        NULLIF(c.reg_district, ''),
+        NULLIF(c.district, ''),
+        'Unknown'
+    ) as city
 
 FROM cars c
 LEFT JOIN profiles p ON c.seller_id = p.id

@@ -345,16 +345,31 @@ export default async function handler(req, res) {
     // Dynamic responses based on real data
     if (lowerMessage.includes('budget') || lowerMessage.includes('price range') || lowerMessage.includes('afford') ||
         lowerMessage.includes('dolar') || lowerMessage.includes('dollar') || 
-        /\$?\d+\s*(dolar|dollar|price|wali|mein|under)/i.test(message)) {
+        /\$?\d+\s*(dolar|dollar|price|wali|mein|under)/i.test(message) ||
+        /\d+\s*dollar/i.test(message) || /\d+\s*dolar/i.test(message) ||
+        /\d+\s*price/i.test(message) || /\d+\s*wali/i.test(message)) {
+      // Enhanced price extraction to handle various formats
       const budgetMatch = message.match(/\$?(\d+)/);
       const budget = budgetMatch ? parseInt(budgetMatch[1]) : null;
       
+      console.log('Price search detected:', { message, budgetMatch, budget });
+      
             if (budget) {
         // Find cars at exact price or within ±15% range (corrected logic)
-        const exactPriceCars = availableCars.filter(car => car.numeric_price === budget);
+        const exactPriceCars = availableCars.filter(car => {
+          const price = car.numeric_price || parseFloat(car.price) || 0;
+          return price === budget;
+        });
         const nearPriceCars = availableCars.filter(car => {
-          const price = car.numeric_price;
-          return price >= budget * 0.85 && price <= budget * 1.15;
+          const price = car.numeric_price || parseFloat(car.price) || 0;
+          return price >= budget * 0.85 && price <= budget * 1.15 && price !== budget;
+        });
+        
+        console.log('Price search results:', { 
+          budget, 
+          exactCount: exactPriceCars.length, 
+          nearCount: nearPriceCars.length,
+          totalCars: availableCars.length 
         });
         
         if (exactPriceCars.length > 0) {
@@ -837,7 +852,8 @@ ${sortedCities.map(([city, stats]) =>
              lowerMessage.includes('gujranwala') || lowerMessage.includes('bahawalpur') || lowerMessage.includes('sargodha') ||
              /\w+\s+city\s+cars/i.test(message) || /\w+\s+shahar\s+cars/i.test(message) || 
              /\w+\s+mein\s+cars/i.test(message) || /\w+\s+ke\s+cars/i.test(message) ||
-             /\w+\s+mein\s+kya\s+hai/i.test(message) || /\w+\s+ke\s+options/i.test(message)) {
+             /\w+\s+mein\s+kya\s+hai/i.test(message) || /\w+\s+ke\s+options/i.test(message) ||
+             lowerMessage.includes('cities') || lowerMessage.includes('shahar') || lowerMessage.includes('district')) {
       
       console.log('🚀 City query detected:', message);
       
@@ -852,6 +868,13 @@ ${sortedCities.map(([city, stats]) =>
       ))];
       
       console.log('🏙️ Available cities in database:', allCities);
+      console.log('🏙️ Sample car data with cities:', availableCars.slice(0, 3).map(car => ({
+        id: car.id || car.car_id,
+        title: car.title,
+        city: getCarCity(car),
+        reg_district: car.reg_district,
+        district: car.district
+      })));
       
       // Extract city name from message with multiple patterns
       const cities = [
@@ -906,6 +929,42 @@ ${sortedCities.map(([city, stats]) =>
       }
       
       console.log('🎯 Final city match:', cityMatch);
+      
+      // If user just asks for cities without specifying one
+      if (!cityMatch && (lowerMessage.includes('cities') || lowerMessage.includes('shahar') || lowerMessage.includes('district'))) {
+        const cityStats = allCities.map(city => {
+          const cityCars = availableCars.filter(car => getCarCity(car) === city);
+          const avgPrice = Math.round(
+            cityCars.reduce((sum, car) => {
+              const price = car.numeric_price || parseFloat(car.price) || 0;
+              return sum + price;
+            }, 0) / cityCars.length
+          );
+          return { city, count: cityCars.length, avgPrice };
+        }).sort((a, b) => b.count - a.count);
+        
+        const response = `🏙️ **Available Cities with Cars:**
+        
+📊 **Cities by Car Count:**
+${cityStats.map(stat => 
+  `• **${stat.city}:** ${stat.count} cars (avg: $${stat.avgPrice})`
+).join('\n')}
+
+💡 **How to search by city:**
+• **English:** "cars in Karachi", "cars in Lahore"
+• **Urdu:** "Karachi mein cars", "Lahore ke cars"
+• **Alternative:** "Karachi mein kya hai", "Rawalpindi ke options"
+
+🎯 **Top cities:** ${cityStats.slice(0, 3).map(stat => stat.city).join(', ')} have the most cars
+
+🔍 **Try these examples:**
+• "cars in Islamabad" → Islamabad cars
+• "Rawalpindi mein cars" → Rawalpindi options
+• "Karachi ke cars" → Karachi availability
+• "Lahore mein kya hai" → Lahore overview`;
+        
+        return res.status(200).json({ message: response, success: true });
+      }
       
       if (cityMatch) {
         // Find cars in the specified city

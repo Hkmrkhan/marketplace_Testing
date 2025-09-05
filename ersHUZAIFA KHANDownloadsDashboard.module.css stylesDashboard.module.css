@@ -1,0 +1,10 @@
+[33m8a52d3a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m cars comparison maxium 4
+[33medea2c9[m add Forum, Reviews and profile pic, UI UPDATE WITH CHAT SYSTEM IMPROVEMENT
+[33me99ec1e[m add whatsapp number in contact pages and minor changes in pages
+[33m1970c97[m Admin can admit and Revoke
+[33m8ceb339[m about and contact page update
+[33m737fa22[m After setting stripe, resolve issue that are occuring in the testing phase
+[33m0b4d497[m fix build error: remove micro dependency from stripe-webhook
+[33m1ef533d[m connect_functionality
+[33m89752fd[m admin_Signup
+[33me5bd4c6[m Admin_dashb

@@ -8,6 +8,7 @@ export default function DiscussionDetail() {
   const [replies, setReplies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
   const [newReply, setNewReply] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [replyingToReply, setReplyingToReply] = useState(null);
@@ -64,12 +65,22 @@ export default function DiscussionDetail() {
             if (session?.user) {
               console.log('✅ User already authenticated:', session.user);
               setUser(session.user);
+              
+              // Fetch user profile
+              const { data: profile } = await supabase
+                .from('profiles')
+                .select('user_type')
+                .eq('id', session.user.id)
+                .single();
+              setUserProfile(profile);
+              
               await fetchDiscussion(discussionId);
               await fetchReplies(discussionId);
               await fetchUserLikes(discussionId);
             } else {
               console.log('❌ No authenticated session found');
               setUser(null);
+              setUserProfile(null);
               await fetchDiscussion(discussionId);
               await fetchReplies(discussionId);
             }
@@ -756,16 +767,16 @@ export default function DiscussionDetail() {
   };
 
   const goToDashboard = () => {
-    if (user) {
-      // Redirect based on user type
-      if (user.user_type === 'buyer') {
-        router.push('/buyer-dashboard');
-      } else if (user.user_type === 'seller') {
-        router.push('/seller-dashboard');
-      } else if (user.user_type === 'admin') {
-        router.push('/admin-dashboard');
+    if (user && userProfile) {
+      // Redirect based on user type with force refresh
+      if (userProfile.user_type === 'admin') {
+        window.location.href = '/admin-dashboard';
+      } else if (userProfile.user_type === 'seller') {
+        window.location.href = '/seller-dashboard';
+      } else if (userProfile.user_type === 'buyer') {
+        window.location.href = '/buyer-dashboard';
       } else {
-        router.push('/buyer-dashboard'); // Default to buyer dashboard
+        window.location.href = '/buyer-dashboard'; // Default to buyer dashboard
       }
     } else {
       router.push('/');

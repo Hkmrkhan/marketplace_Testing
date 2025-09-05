@@ -21,7 +21,6 @@ export default function Footer({ userType }) {
           <h4>Useful Links</h4>
           <ul className={styles.footerLinks}>
             <li><Link href="/">Home</Link></li>
-            <li><Link href="/cars">Cars</Link></li>
             <li><Link href="/about">About</Link></li>
             <li><Link href="/contact">Contact</Link></li>
           </ul>

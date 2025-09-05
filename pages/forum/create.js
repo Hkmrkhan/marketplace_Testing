@@ -5,6 +5,7 @@ import styles from '../../styles/Forum.module.css';
 
 export default function CreateDiscussion() {
   const [user, setUser] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [cars, setCars] = useState([]);
@@ -39,6 +40,15 @@ export default function CreateDiscussion() {
       return;
     }
     setUser(user);
+    
+    // Fetch user profile to get user_type
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('user_type')
+      .eq('id', user.id)
+      .single();
+    setUserProfile(profile);
+    
     setLoading(false);
   };
 
@@ -119,7 +129,16 @@ export default function CreateDiscussion() {
   };
 
   const goBack = () => {
-    router.push('/forum');
+    // Redirect based on user type with force refresh
+    if (userProfile?.user_type === 'admin') {
+      window.location.href = '/admin-dashboard';
+    } else if (userProfile?.user_type === 'seller') {
+      window.location.href = '/seller-dashboard';
+    } else if (userProfile?.user_type === 'buyer') {
+      window.location.href = '/buyer-dashboard';
+    } else {
+      router.push('/forum');
+    }
   };
 
   if (loading) {

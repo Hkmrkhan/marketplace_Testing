@@ -7,6 +7,7 @@ export default function ForumHome() {
   const [discussions, setDiscussions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [selectedDiscussion, setSelectedDiscussion] = useState(null);
   const [replyContent, setReplyContent] = useState('');
@@ -43,8 +44,26 @@ export default function ForumHome() {
   }, []);
 
   const fetchUser = async () => {
+    console.log('🔍 Fetching user...');
     const { data: { user } } = await supabase.auth.getUser();
+    console.log('🔍 User fetched:', user);
     setUser(user);
+    
+    if (user) {
+      console.log('🔍 Fetching user profile...');
+      // Fetch user profile to get user_type
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('user_type')
+        .eq('id', user.id)
+        .single();
+      
+      console.log('🔍 Profile fetched:', profile, 'Error:', error);
+      setUserProfile(profile);
+    } else {
+      console.log('🔍 No user found');
+      setUserProfile(null);
+    }
   };
 
   const fetchDiscussions = async () => {
@@ -220,19 +239,63 @@ export default function ForumHome() {
     router.push(`/forum/discussion/${discussionId}`);
   };
 
-  const handleBackToDashboard = () => {
-    if (user) {
-      // Redirect based on user type
-      if (user.user_type === 'buyer') {
-        router.push('/buyer-dashboard');
-      } else if (user.user_type === 'seller') {
-        router.push('/seller-dashboard');
-      } else if (user.user_type === 'admin') {
-        router.push('/admin-dashboard');
+  const handleBackToDashboard = async () => {
+    console.log('🔍 Back to Dashboard clicked');
+    console.log('🔍 User:', user);
+    console.log('🔍 UserProfile:', userProfile);
+    
+    // If userProfile is not loaded, try to fetch it
+    if (user && !userProfile) {
+      console.log('🔍 UserProfile not loaded, fetching...');
+      try {
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('user_type')
+          .eq('id', user.id)
+          .single();
+        
+        console.log('🔍 Profile fetched on demand:', profile, 'Error:', error);
+        
+        if (profile) {
+          // Redirect based on user type with force refresh
+          if (profile.user_type === 'admin') {
+            console.log('🔍 Redirecting to admin dashboard');
+            window.location.href = '/admin-dashboard';
+          } else if (profile.user_type === 'seller') {
+            console.log('🔍 Redirecting to seller dashboard');
+            window.location.href = '/seller-dashboard';
+          } else if (profile.user_type === 'buyer') {
+            console.log('🔍 Redirecting to buyer dashboard');
+            window.location.href = '/buyer-dashboard';
+          } else {
+            console.log('🔍 Default redirect to buyer dashboard');
+            window.location.href = '/buyer-dashboard';
+          }
+          return;
+        }
+      } catch (error) {
+        console.error('🔍 Error fetching profile:', error);
+      }
+    }
+    
+    if (user && userProfile) {
+      console.log('🔍 User type:', userProfile.user_type);
+      // Redirect based on user type with force refresh
+      if (userProfile.user_type === 'admin') {
+        console.log('🔍 Redirecting to admin dashboard');
+        window.location.href = '/admin-dashboard';
+      } else if (userProfile.user_type === 'seller') {
+        console.log('🔍 Redirecting to seller dashboard');
+        window.location.href = '/seller-dashboard';
+      } else if (userProfile.user_type === 'buyer') {
+        console.log('🔍 Redirecting to buyer dashboard');
+        window.location.href = '/buyer-dashboard';
       } else {
-        router.push('/buyer-dashboard'); // Default to buyer dashboard
+        console.log('🔍 Default redirect to buyer dashboard');
+        window.location.href = '/buyer-dashboard'; // Default to buyer dashboard
       }
     } else {
+      console.log('🔍 No user or profile, redirecting to home');
       router.push('/');
     }
   };
@@ -424,7 +487,7 @@ export default function ForumHome() {
               marginLeft: '20px'
             }}
           >
-            ← Back to Dashboard
+            ← Back to {userProfile?.user_type === 'admin' ? 'Admin' : userProfile?.user_type === 'seller' ? 'Seller' : userProfile?.user_type === 'buyer' ? 'Buyer' : ''} Dashboard
           </button>
           
                      <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginRight: '20px' }}>

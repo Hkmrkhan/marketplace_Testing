@@ -13,6 +13,8 @@ export default function EditCarPage() {
   const [message, setMessage] = useState('');
   const [user, setUser] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
+  const [videoFile, setVideoFile] = useState(null);
+  const [videoPreview, setVideoPreview] = useState('');
 
   useEffect(() => {
     const fetchUserAndCar = async () => {
@@ -62,6 +64,29 @@ export default function EditCarPage() {
     setCar({ ...car, [e.target.name]: e.target.value });
   };
 
+  const handleVideoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('video/')) {
+        alert('Please select a video file (MP4, AVI, MOV, etc.)');
+        return;
+      }
+      
+      // Validate file size (max 50MB)
+      if (file.size > 50 * 1024 * 1024) {
+        alert('Video file size must be less than 50MB');
+        return;
+      }
+      
+      setVideoFile(file);
+      
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setVideoPreview(previewUrl);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
@@ -71,6 +96,37 @@ export default function EditCarPage() {
     }
     
     try {
+      let videoUrl = car.video_url;
+      
+      // Upload new video file if provided
+      if (videoFile) {
+        setMessage('📹 Uploading new video...');
+        
+        // Create unique filename
+        const fileExt = videoFile.name.split('.').pop();
+        const fileName = `video-${user.id}-${Date.now()}.${fileExt}`;
+        const filePath = `videos/${user.id}/${fileName}`;
+
+        // Upload to Supabase storage
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('car_videos')
+          .upload(filePath, videoFile);
+
+        if (uploadError) {
+          console.error('Video upload error:', uploadError);
+          setMessage('❌ Error uploading video: ' + uploadError.message);
+          return;
+        }
+
+        // Get public URL
+        const { data: urlData } = supabase.storage
+          .from('car_videos')
+          .getPublicUrl(filePath);
+        
+        videoUrl = urlData.publicUrl;
+        console.log('Video uploaded successfully:', videoUrl);
+      }
+
       // Update car in Supabase with all fields
       const { error } = await supabase.from('cars').update({
         title: car.title,
@@ -80,7 +136,8 @@ export default function EditCarPage() {
         reg_district: car.reg_district || 'Other',
         year: car.year ? parseInt(car.year) : 2020,
         image_url: car.image_url,
-        additional_images: car.additional_images?.filter(img => img && img.trim() !== '') || []
+        additional_images: car.additional_images?.filter(img => img && img.trim() !== '') || [],
+        video_url: videoUrl
       }).eq('id', car.id);
       
       if (error) {
@@ -212,6 +269,55 @@ export default function EditCarPage() {
                 max="2025"
               />
             </div>
+          </div>
+          
+          <div className={styles.formGroup}>
+            <label className={styles.label}>Car Video (Optional)</label>
+            <p className={styles.helperText}>Upload a new video file to replace existing video (MP4, AVI, MOV - Max 50MB)</p>
+            <input
+              type="file"
+              accept="video/*"
+              onChange={handleVideoChange}
+              className={styles.input}
+            />
+            {car.video_url && !videoPreview && (
+              <div style={{ marginTop: '1rem' }}>
+                <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '0.5rem' }}>
+                  Current Video:
+                </p>
+                <video
+                  src={car.video_url}
+                  controls
+                  style={{
+                    width: '100%',
+                    maxWidth: '400px',
+                    height: '200px',
+                    borderRadius: '8px',
+                    border: '1px solid #e2e8f0'
+                  }}
+                >
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            )}
+            {videoPreview && (
+              <div style={{ marginTop: '1rem' }}>
+                <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '0.5rem' }}>
+                  New Video Preview:
+                </p>
+                <video
+                  src={videoPreview}
+                  controls
+                  style={{
+                    width: '100%',
+                    maxWidth: '400px',
+                    height: '200px',
+                    borderRadius: '8px',
+                    border: '1px solid #e2e8f0'
+                  }}
+                />
+              </div>
+            )}
           </div>
           
           <div className={styles.formGroup}>
