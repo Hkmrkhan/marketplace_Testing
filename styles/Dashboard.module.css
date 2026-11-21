@@ -3,7 +3,7 @@
 .dashboardContainer {
     display: flex;
     min-height: calc(100vh - 80px);
-    background: #f8f9fa;
+    background: #f1f5f9;
     overflow-x: hidden;
     align-items: flex-start;
   }
@@ -37,7 +37,7 @@
   .sidebar {
     width: 280px;
     background: #fff;
-    border-right: 1px solid #e1e5e9;
+    border-right: 1px solid #e2e8f0;
     padding: 2rem;
     box-shadow: 2px 0 10px rgba(0,0,0,0.1);
     position: sticky;
@@ -121,7 +121,7 @@
     text-align: center;
     margin-bottom: 1.5rem;
     padding-bottom: 1.5rem;
-    border-bottom: 1px solid #e1e5e9;
+    border-bottom: 1px solid #e2e8f0;
     flex-shrink: 0;
     order: 1;
   }
@@ -130,7 +130,7 @@
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
     color: #fff;
     display: flex;
     align-items: center;
@@ -142,13 +142,13 @@
   
   .userInfo h3 {
     margin: 0 0 0.5rem 0;
-    color: #333;
+    color: #1e293b;
     font-size: 1.3rem;
   }
   
   .userInfo p {
     margin: 0;
-    color: #666;
+    color: #64748b;
     font-size: 0.9rem;
   }
   
@@ -170,7 +170,7 @@
     text-align: left;
     font-size: 1rem;
     font-weight: 500;
-    color: #666;
+    color: #64748b;
     cursor: pointer;
     transition: all 0.3s ease;
     white-space: nowrap;
@@ -184,15 +184,15 @@
   }
   
   .navItem:hover {
-    background: #f8f9fa;
-    color: #333;
+    background: #f1f5f9;
+    color: #1e293b;
     transform: translateX(4px);
   }
   
   .navItem.active {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
     color: #fff;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
     transform: translateX(4px);
   }
   
@@ -212,7 +212,7 @@
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
     color: white;
     border: none;
     cursor: pointer;
@@ -315,7 +315,7 @@
   }
   
   .chatBtn {
-    background: #667eea !important;
+    background: #6366f1 !important;
     color: #fff !important;
     border: none !important;
     border-radius: 8px !important;
@@ -330,13 +330,13 @@
     margin-top: 10px !important;
     position: relative !important;
     transition: all 0.3s ease !important;
-    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3) !important;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3) !important;
   }
   
   .chatBtn:hover {
-    background: #5a6fd8 !important;
+    background: #4f46e5 !important;
     transform: translateY(-2px) !important;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4) !important;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4) !important;
   }
   
   .chatBtn::after {
@@ -375,7 +375,7 @@
     overflow-x: hidden;
     scroll-behavior: smooth;
     scrollbar-width: thin;
-    scrollbar-color: #ccc #f1f1f1;
+    scrollbar-color: #cbd5e1 #f1f1f1;
   }
   
   /* Responsive main content */
@@ -414,12 +414,12 @@
   }
   
   .mainContent::-webkit-scrollbar-thumb {
-    background: #ccc;
+    background: #cbd5e1;
     border-radius: 4px;
   }
   
   .mainContent::-webkit-scrollbar-thumb:hover {
-    background: #999;
+    background: #94a3b8;
   }
   
   .sectionHeader {
@@ -433,7 +433,7 @@
     margin: 0;
     font-size: 2.5rem;
     font-weight: 700;
-    color: #333;
+    color: #1e293b;
   }
   
   .searchBox {
@@ -442,7 +442,7 @@
   
   .searchInput {
     padding: 0.8rem 1rem;
-    border: 2px solid #e1e5e9;
+    border: 2px solid #e2e8f0;
     border-radius: 12px;
     font-size: 1rem;
     width: 300px;
@@ -451,8 +451,8 @@
   
   .searchInput:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
   }
   
   .statsGrid {
@@ -479,7 +479,7 @@
     margin: 0 0 0.5rem 0;
     font-size: 2.5rem;
     font-weight: 700;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -487,7 +487,7 @@
   
   .statCard p {
     margin: 0;
-    color: #666;
+    color: #64748b;
     font-size: 0.9rem;
     font-weight: 500;
   }
@@ -524,7 +524,7 @@
     background: #fff;
     border-radius: 24px;
     overflow: hidden;
-    border: 1px solid #e9ecef;
+    border: 1px solid #e2e8f0;
     box-shadow: 0 10px 30px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.06);
     transition: all 0.3s ease;
     display: flex;
@@ -538,7 +538,7 @@
   .carCard:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 35px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.08);
-    border-color: #667eea;
+    border-color: #6366f1;
   }
   
   .carImageContainer {
@@ -575,7 +575,7 @@
     align-items: center;
     flex-wrap: nowrap;
     scrollbar-width: thin;
-    scrollbar-color: #ccc transparent;
+    scrollbar-color: #cbd5e1 transparent;
   }
   
   .thumbnailsRow::-webkit-scrollbar {
@@ -587,12 +587,12 @@
   }
   
   .thumbnailsRow::-webkit-scrollbar-thumb {
-    background: #ccc;
+    background: #cbd5e1;
     border-radius: 2px;
   }
   
   .thumbnailsRow::-webkit-scrollbar-thumb:hover {
-    background: #999;
+    background: #94a3b8;
   }
   
   .thumbnail {
@@ -611,12 +611,12 @@
   }
   
   .thumbnail:hover {
-    border-color: #007bff;
+    border-color: #6366f1;
     transform: scale(1.05);
   }
   
   .activeThumbnail {
-    border-color: #007bff;
+    border-color: #6366f1;
     box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.3);
   }
   
@@ -633,7 +633,7 @@
   .carTitle {
     font-size: 1.2rem;
     font-weight: 600;
-    color: #333;
+    color: #1e293b;
     margin: 0 0 12px 0;
     padding: 0 16px;
   }
@@ -647,7 +647,7 @@
   }
   
   .carDescription {
-    color: #666;
+    color: #64748b;
     font-size: 0.9rem;
     line-height: 1.4;
     margin: 0;
@@ -663,7 +663,7 @@
   }
   
   .priceLabel {
-    color: #666;
+    color: #64748b;
     font-size: 0.9rem;
     font-weight: 500;
   }
@@ -671,11 +671,11 @@
   .price {
     font-size: 1.4rem;
     font-weight: 700;
-    color: #667eea;
-    background: rgba(102, 126, 234, 0.1);
+    color: #6366f1;
+    background: rgba(99, 102, 241, 0.1);
     padding: 4px 12px;
     border-radius: 8px;
-    border: 1px solid rgba(102, 126, 234, 0.2);
+    border: 1px solid rgba(99, 102, 241, 0.2);
   }
   
   .statusContainer {
@@ -684,7 +684,7 @@
   
   .availableBadge {
     display: inline-block;
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
     color: white;
     padding: 6px 12px;
     border-radius: 20px;
@@ -697,7 +697,7 @@
   
   .soldBadge {
     display: inline-block;
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
     color: white;
     padding: 6px 12px;
     border-radius: 20px;
@@ -712,13 +712,13 @@
   .carTitle {
     font-size: 1.3rem;
     font-weight: 700;
-    color: #333;
+    color: #1e293b;
     margin: 0 0 8px 0;
     line-height: 1.2;
   }
   
   .carDescription {
-    color: #666;
+    color: #64748b;
     font-size: 0.9rem;
     line-height: 1.4;
     margin: 0 0 12px 0;
@@ -747,17 +747,17 @@
   }
   
   .approvalBadge.approved {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
     color: white;
   }
   
   .approvalBadge.pending {
-    background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+    background: linear-gradient(135deg, #f59e0b 0%, #f59e0b 100%);
     color: white;
   }
   
   .approvalBadge.rejected {
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
     color: white;
   }
   
@@ -771,7 +771,7 @@
   }
   
   .editBtn {
-    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    background: linear-gradient(135deg, #6366f1 0%, #0056b3 100%);
     color: white;
     border: none;
     padding: 12px 20px;
@@ -794,7 +794,7 @@
   }
   
   .deleteBtn {
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
     color: white;
     border: none;
     padding: 12px 20px;
@@ -811,7 +811,7 @@
   }
   
   .deleteBtn:hover {
-    background: linear-gradient(135deg, #c82333 0%, #a71e2a 100%);
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(220, 53, 69, 0.35);
   }
@@ -822,9 +822,9 @@
     gap: 12px;
     margin: 12px 0;
     padding: 12px;
-    background: #f8f9fa;
+    background: #f1f5f9;
     border-radius: 8px;
-    border: 1px solid #e9ecef;
+    border: 1px solid #e2e8f0;
   }
   
   .sellerAvatar {
@@ -844,7 +844,7 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
     color: white;
     display: flex;
     align-items: center;
@@ -863,13 +863,13 @@
   }
   
   .sellerName {
-    color: #333;
+    color: #1e293b;
     font-size: 0.95rem;
     font-weight: 500;
   }
   
   .sellerEmail {
-    color: #888;
+    color: #94a3b8;
     font-size: 0.85rem;
   }
   
@@ -881,7 +881,7 @@
   }
   
   .buyBtn {
-    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
     color: white;
     border: none;
     padding: 12px 24px;
@@ -896,13 +896,13 @@
   }
   
   .buyBtn:hover {
-    background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+    background: linear-gradient(135deg, #059669 0%, #1e7e34 100%);
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4);
   }
   
   .messageBtn {
-    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    background: linear-gradient(135deg, #0ea5e9 0%, #138496 100%);
     color: white;
     border: none;
     padding: 12px 24px;
@@ -970,7 +970,7 @@
   
   .carInfo p {
     margin: 0;
-    color: #666;
+    color: #64748b;
     font-size: 0.95rem;
     line-height: 1.4;
     flex: 1;
@@ -981,7 +981,7 @@
     font-weight: 700;
     color: #1a1a1a;
     margin: 16px 0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -1023,7 +1023,7 @@
   }
   
   .buyBtn {
-    background: #28a745;
+    background: #10b981;
     color: white;
     border: none;
     padding: 0.8rem 1.5rem;
@@ -1040,7 +1040,7 @@
   }
   
   .buyBtn:hover {
-    background: #218838;
+    background: #059669;
   }
   
   .whatsappBtn {
@@ -1076,12 +1076,12 @@
   
   .emptyState p {
     margin: 0 0 1.5rem 0;
-    color: #666;
+    color: #64748b;
     font-size: 1.1rem;
   }
   
   .addCarBtn, .browseBtn, .buyBtn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
     color: #fff;
     border: none;
     padding: 1rem 2rem;
@@ -1094,7 +1094,7 @@
   
   .addCarBtn:hover, .browseBtn:hover, .buyBtn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
   }
   
   .soldBadge {
@@ -1112,7 +1112,7 @@
   }
   
   .refreshBtn {
-    background: #28a745;
+    background: #10b981;
     color: #fff;
     border: none;
     padding: 0.8rem 1.5rem;
@@ -1124,7 +1124,7 @@
   }
   
   .refreshBtn:hover {
-    background: #218838;
+    background: #059669;
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
   }
@@ -1153,18 +1153,18 @@
   
   .profileInfo h3 {
     margin: 0 0 0.5rem 0;
-    color: #333;
+    color: #1e293b;
     font-size: 1.3rem;
   }
   
   .profileInfo p {
     margin: 0 0 0.2rem 0;
-    color: #666;
+    color: #64748b;
     font-size: 0.9rem;
   }
   
   .editProfileBtn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
     color: #fff;
     border: none;
     padding: 0.8rem 1.5rem;
@@ -1177,7 +1177,7 @@
   
   .editProfileBtn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3);
   }
   
   .loadingContainer {
@@ -1189,7 +1189,7 @@
   
   .spinner {
     font-size: 1.2rem;
-    color: #667eea;
+    color: #6366f1;
   }
   
   .myCars, .recentListings, .purchases, .availableCars {
@@ -1221,7 +1221,7 @@
     font-weight: 700;
     margin-bottom: 1rem;
     text-align: center;
-    color: #333;
+    color: #1e293b;
   }
   .purchases {
     display: grid;
@@ -1368,7 +1368,7 @@
       max-width: 100%;
       padding: 0.6rem 1rem;
       font-size: 0.8rem;
-      background: #007bff;
+      background: #6366f1;
       color: white;
       border: none;
       border-radius: 8px;
@@ -1382,7 +1382,7 @@
       max-width: 100%;
       padding: 0.6rem 1rem;
       font-size: 0.8rem;
-      background: #dc3545;
+      background: #ef4444;
       color: white;
       border: none;
       border-radius: 8px;
@@ -1397,7 +1397,7 @@
       max-width: 100%;
       padding: 0.6rem 1rem;
       font-size: 0.8rem;
-      background: #007bff;
+      background: #6366f1;
       color: white;
       border: none;
       border-radius: 8px;
@@ -1411,7 +1411,7 @@
       max-width: 100%;
       padding: 0.6rem 1rem;
       font-size: 0.8rem;
-      background: #dc3545;
+      background: #ef4444;
       color: white;
       border: none;
       border-radius: 8px;
@@ -1474,14 +1474,14 @@
       font-size: 1.1rem;
       margin: 0 0 0.5rem 0;
       word-wrap: break-word;
-      color: #333;
+      color: #1e293b;
     }
     
     .userInfo p {
       font-size: 0.8rem;
       margin: 0;
       word-wrap: break-word;
-      color: #666;
+      color: #64748b;
     }
     
     .navItem {
@@ -1495,28 +1495,28 @@
       display: block;
       text-align: center;
       border: none;
-      background: #f8f9fa;
-      color: #333;
+      background: #f1f5f9;
+      color: #1e293b;
       transition: all 0.2s ease;
     }
     
     .navItem:hover {
-      background: #e9ecef;
+      background: #e2e8f0;
     }
     
     .navItem.active {
-      background: #007bff;
+      background: #6366f1;
       color: white;
     }
     
     .logoutBtn {
-      background: #dc3545 !important;
+      background: #ef4444 !important;
       color: white !important;
       margin-top: 1rem;
     }
     
     .logoutBtn:hover {
-      background: #c82333 !important;
+      background: #dc2626 !important;
     }
     
     .mainContent {
@@ -1538,7 +1538,7 @@
       font-size: 2rem;
       margin: 0 0 1rem 0;
       word-wrap: break-word;
-      color: #333;
+      color: #1e293b;
       font-weight: bold;
     }
     
@@ -1548,7 +1548,7 @@
       width: 100%;
       box-sizing: border-box;
       max-width: 100%;
-      border: 1px solid #ddd;
+      border: 1px solid #cbd5e1;
       border-radius: 8px;
     }
     
@@ -1572,14 +1572,14 @@
     .statCard h3 {
       font-size: 2rem;
       word-wrap: break-word;
-      color: #333;
+      color: #1e293b;
       margin: 0 0 0.5rem 0;
     }
     
     .statCard p {
       font-size: 0.8rem;
       word-wrap: break-word;
-      color: #666;
+      color: #64748b;
       margin: 0;
     }
     
@@ -1643,7 +1643,7 @@
       margin: 0 0 0.5rem 0;
       word-wrap: break-word;
       line-height: 1.3;
-      color: #333;
+      color: #1e293b;
       font-weight: bold;
     }
     
@@ -1652,14 +1652,14 @@
       margin: 0 0 0.5rem 0;
       word-wrap: break-word;
       line-height: 1.4;
-      color: #666;
+      color: #64748b;
     }
     
     .price {
       font-size: 1rem;
       margin: 0.5rem 0;
       word-wrap: break-word;
-      color: #28a745;
+      color: #10b981;
       font-weight: bold;
     }
     
@@ -1725,12 +1725,12 @@
     }
     
     .thumbnail:hover {
-      border-color: #007bff;
+      border-color: #6366f1;
       transform: scale(1.05);
     }
     
     .activeThumbnail {
-      border-color: #007bff;
+      border-color: #6366f1;
       box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.3);
     }
     
@@ -1758,7 +1758,7 @@
       font-size: 1.5rem;
       margin: 0 auto;
       border-radius: 50%;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
       color: white;
       display: flex;
       align-items: center;
@@ -1768,14 +1768,14 @@
     .profileInfo h3 {
       font-size: 1.2rem;
       word-wrap: break-word;
-      color: #333;
+      color: #1e293b;
       margin: 0 0 0.5rem 0;
     }
     
     .profileInfo p {
       font-size: 0.8rem;
       word-wrap: break-word;
-      color: #666;
+      color: #64748b;
       margin: 0;
     }
     
@@ -1787,7 +1787,7 @@
       box-sizing: border-box;
       display: block;
       text-align: center;
-      background: #007bff;
+      background: #6366f1;
       color: white;
       border: none;
       border-radius: 8px;
@@ -1824,7 +1824,7 @@
     .emptyState p {
       font-size: 0.9rem;
       word-wrap: break-word;
-      color: #666;
+      color: #64748b;
       margin: 0;
     }
     
@@ -1836,7 +1836,7 @@
       box-sizing: border-box;
       display: block;
       text-align: center;
-      background: #28a745;
+      background: #10b981;
       color: white;
       border: none;
       border-radius: 8px;
@@ -1846,7 +1846,7 @@
     }
     
     .addCarBtn:hover, .browseBtn:hover {
-      background: #218838;
+      background: #059669;
     }
     
     .loadingContainer {
@@ -1859,7 +1859,7 @@
     
     .spinner {
       font-size: 1.5rem;
-      color: #007bff;
+      color: #6366f1;
     }
   }
   
@@ -2737,7 +2737,7 @@
     margin: 0 0 1.2rem 0;
     font-size: 1.5rem;
     font-weight: 600;
-    color: #333;
+    color: #1e293b;
   }
   .picturesRow {
     display: flex;
@@ -2752,13 +2752,13 @@
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.10);
     object-fit: cover;
-    background: #f8f9fa;
+    background: #f1f5f9;
     margin-bottom: 0.5rem;
     transition: transform 0.2s;
   }
   .picturesImage:hover {
     transform: scale(1.04);
-    box-shadow: 0 6px 18px rgba(102, 126, 234, 0.18);
+    box-shadow: 0 6px 18px rgba(99, 102, 241, 0.18);
   }
   @media (max-width: 768px) {
     .picturesImage {
@@ -2778,7 +2778,7 @@
   } 
   
   .buyBtn {
-    background: #28a745;
+    background: #10b981;
     color: white;
     border: none;
     padding: 0.8rem 1.5rem;
@@ -2794,7 +2794,7 @@
   }
   
   .buyBtn:hover {
-    background: #218838;
+    background: #059669;
   }
   
   .whatsappBtn {
@@ -3076,7 +3076,7 @@
     align-items: center;
     flex-wrap: nowrap;
     scrollbar-width: thin;
-    scrollbar-color: #ccc transparent;
+    scrollbar-color: #cbd5e1 transparent;
   }
   
   .thumbnailsRow::-webkit-scrollbar {
@@ -3088,12 +3088,12 @@
   }
   
   .thumbnailsRow::-webkit-scrollbar-thumb {
-    background: #ccc;
+    background: #cbd5e1;
     border-radius: 2px;
   }
   
   .thumbnailsRow::-webkit-scrollbar-thumb:hover {
-    background: #999;
+    background: #94a3b8;
   }
   
   .thumbnail {
@@ -3112,12 +3112,12 @@
   }
   
   .thumbnail:hover {
-    border-color: #007bff;
+    border-color: #6366f1;
     transform: scale(1.05);
   }
   
   .activeThumbnail {
-    border-color: #007bff;
+    border-color: #6366f1;
     box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.3);
   }
   
@@ -3612,7 +3612,7 @@
   }
   
   .aiAssistant .sectionHeader {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
     color: white;
     padding: 20px 30px;
     text-align: center;
@@ -3636,7 +3636,7 @@
   
   .chatSection {
     padding: 0;
-    background: #f8f9fa;
+    background: #f1f5f9;
   }
   
   /* Input Container Styles (matching AI Chat) */
@@ -3675,7 +3675,7 @@
   .sendButton {
     width: 40px;
     height: 40px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
     border: none;
     border-radius: 50%;
     color: white;
@@ -3692,7 +3692,7 @@
   }
   
   .sendButton:disabled {
-    background: #ccc;
+    background: #cbd5e1;
     cursor: not-allowed;
     transform: none;
   }
@@ -4120,7 +4120,7 @@
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
     color: white;
     display: flex;
     align-items: center;
@@ -4132,17 +4132,17 @@
   .profileInfo h3 {
     margin: 0 0 0.5rem 0;
     font-size: 1.5rem;
-    color: #333;
+    color: #1e293b;
   }
   
   .profileInfo p {
     margin: 0;
-    color: #666;
+    color: #64748b;
     font-size: 0.9rem;
   }
   
   .editProfileBtn {
-    background: #007bff;
+    background: #6366f1;
     color: white;
     border: none;
     padding: 0.8rem 1.5rem;
@@ -4169,7 +4169,7 @@
   }
   
   .buyBtn {
-    background: #28a745;
+    background: #10b981;
     color: white;
     border: none;
     padding: 0.8rem 1.5rem;
@@ -4183,19 +4183,19 @@
   }
   
   .buyBtn:hover {
-    background: #218838;
+    background: #059669;
   }
   
   .sellerInfo {
     margin: 0.5rem 0;
     padding: 0.5rem;
-    background: #f8f9fa;
+    background: #f1f5f9;
     border-radius: 6px;
     font-size: 0.9rem;
   }
   
   .soldBadge {
-    background: #dc3545;
+    background: #ef4444;
     color: white;
     padding: 0.3rem 0.8rem;
     border-radius: 6px;
@@ -7178,7 +7178,7 @@
     flex: 1 1 0%;
     padding: 10px 12px;
     border-radius: 12px 0px 0px 12px;
-    border: 1px solid #ccc;
+    border: 1px solid #cbd5e1;
     outline: none;
     box-shadow: none;
     font-size: 16px;
@@ -7192,7 +7192,7 @@
   
   .car-chat-input-row button {
     padding: 10px 12px;
-    background: #667eea;
+    background: #6366f1;
     color: white;
     border: none;
     border-radius: 8px;
@@ -7224,7 +7224,7 @@
   }
   
   .car-chat-input-row button:hover:not(:disabled) {
-    background: #5a6fd8;
+    background: #4f46e5;
     transform: scale(1.05);
     transition: all 0.2s ease;
   }
@@ -7418,13 +7418,13 @@
     align-items: center;
     padding: 1rem 2rem;
     background: #fff;
-    border-bottom: 1px solid #e1e5e9;
+    border-bottom: 1px solid #e2e8f0;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   }
   
   .dashboardHeader h1 {
     margin: 0;
-    color: #333;
+    color: #1e293b;
     font-size: 1.8rem;
     font-weight: 700;
   }
@@ -7440,32 +7440,32 @@
     gap: 0.5rem;
     padding: 1rem 2rem;
     background: #fff;
-    border-bottom: 1px solid #e1e5e9;
+    border-bottom: 1px solid #e2e8f0;
     overflow-x: auto;
   }
   
   .navBtn {
     padding: 0.75rem 1.5rem;
     border: none;
-    background: #f8f9fa;
+    background: #f1f5f9;
     border-radius: 8px;
     font-size: 0.9rem;
     font-weight: 500;
-    color: #666;
+    color: #64748b;
     cursor: pointer;
     transition: all 0.3s ease;
     white-space: nowrap;
   }
   
   .navBtn:hover {
-    background: #e9ecef;
-    color: #333;
+    background: #e2e8f0;
+    color: #1e293b;
   }
   
   .navBtn.active {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
     color: #fff;
-    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
   }
   
   .dashboardMain {
@@ -7500,14 +7500,14 @@
   
   .statCard h3 {
     margin: 0 0 0.5rem 0;
-    color: #666;
+    color: #64748b;
     font-size: 0.9rem;
     font-weight: 500;
   }
   
   .statNumber {
     margin: 0;
-    color: #333;
+    color: #1e293b;
     font-size: 2rem;
     font-weight: 700;
   }
@@ -7526,7 +7526,7 @@
   .soldSection h2,
   .allCarsSection h2 {
     margin: 0 0 1.5rem 0;
-    color: #333;
+    color: #1e293b;
     font-size: 1.5rem;
     font-weight: 600;
   }
@@ -7549,22 +7549,22 @@
   }
   
   .approveBtn {
-    background: #28a745;
+    background: #10b981;
     color: #fff;
   }
   
   .approveBtn:hover {
-    background: #218838;
+    background: #059669;
     transform: translateY(-1px);
   }
   
   .rejectBtn {
-    background: #dc3545;
+    background: #ef4444;
     color: #fff;
   }
   
   .rejectBtn:hover {
-    background: #c82333;
+    background: #dc2626;
     transform: translateY(-1px);
   }
   
@@ -7575,27 +7575,27 @@
   }
   
   .soldCarCard {
-    background: #f8f9fa;
+    background: #f1f5f9;
     padding: 1.5rem;
     border-radius: 8px;
-    border-left: 4px solid #28a745;
+    border-left: 4px solid #10b981;
   }
   
   .soldCarInfo h3 {
     margin: 0 0 0.5rem 0;
-    color: #333;
+    color: #1e293b;
     font-size: 1.2rem;
     font-weight: 600;
   }
   
   .soldCarInfo p {
     margin: 0.25rem 0;
-    color: #666;
+    color: #64748b;
     font-size: 0.9rem;
   }
   
   .soldCarInfo strong {
-    color: #333;
+    color: #1e293b;
   }
   
   .status {
@@ -7606,23 +7606,23 @@
   }
   
   .status.pending {
-    background: #fff3cd;
-    color: #856404;
+    background: #fef3c7;
+    color: #92400e;
   }
   
   .status.approved {
-    background: #d4edda;
-    color: #155724;
+    background: #d1fae5;
+    color: #065f46;
   }
   
   .status.rejected {
-    background: #f8d7da;
-    color: #721c24;
+    background: #fee2e2;
+    color: #991b1b;
   }
   
   .status.sold {
-    background: #d1ecf1;
-    color: #0c5460;
+    background: #dbeafe;
+    color: #1e3a5f;
   }
   
   @media (max-width: 768px) {
@@ -7703,15 +7703,15 @@
   }
   
   .message.success {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
   }
   
   .message.error {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
   }
   
   /* Users section styles */
@@ -7725,7 +7725,7 @@
   
   .usersSection h2 {
     margin: 0 0 1.5rem 0;
-    color: #333;
+    color: #1e293b;
     font-size: 1.5rem;
     font-weight: 600;
   }
@@ -7737,41 +7737,41 @@
   }
   
   .userCard {
-    background: #f8f9fa;
+    background: #f1f5f9;
     padding: 1.5rem;
     border-radius: 8px;
-    border-left: 4px solid #007bff;
+    border-left: 4px solid #6366f1;
   }
   
   .userInfo h3 {
     margin: 0 0 0.5rem 0;
-    color: #333;
+    color: #1e293b;
     font-size: 1.2rem;
     font-weight: 600;
   }
   
   .userInfo p {
     margin: 0.25rem 0;
-    color: #666;
+    color: #64748b;
     font-size: 0.9rem;
   }
   
   .userInfo strong {
-    color: #333;
+    color: #1e293b;
   }
   
   .status.admin {
-    background: #dc3545;
+    background: #ef4444;
     color: #fff;
   }
   
   .status.buyer {
-    background: #28a745;
+    background: #10b981;
     color: #fff;
   }
   
   .status.seller {
-    background: #ffc107;
+    background: #f59e0b;
     color: #212529;
   }
   
@@ -7787,23 +7787,23 @@
   }
   
   .approvalStatus.pending {
-    background: #ffc107;
+    background: #f59e0b;
     color: #212529;
   }
   
   .approvalStatus.approved {
-    background: #28a745;
+    background: #10b981;
     color: #fff;
   }
   
   .approvalStatus.rejected {
-    background: #dc3545;
+    background: #ef4444;
     color: #fff;
   }
   
   /* Approval Banner Styles */
   .approvalBanner {
-    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
     border: 1px solid #fdcb6e;
     border-radius: 12px;
     padding: 16px 20px;
@@ -7816,11 +7816,11 @@
   
   .approvalIcon {
     font-size: 1.5rem;
-    color: #856404;
+    color: #92400e;
   }
   
   .approvalText {
-    color: #856404;
+    color: #92400e;
     font-size: 0.95rem;
     line-height: 1.4;
   }

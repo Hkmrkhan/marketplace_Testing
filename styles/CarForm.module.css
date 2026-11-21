@@ -1,5 +1,5 @@
 .formContainer {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   border-radius: 20px;
   padding: 2rem;
   box-shadow: 0 10px 30px rgba(0,0,0,0.2);
@@ -61,7 +61,7 @@
 
 .helperText {
   margin: 0 0 1rem 0;
-  color: #666;
+  color: #64748b;
   font-size: 0.9rem;
   font-style: italic;
 }
@@ -87,7 +87,7 @@
 .textarea {
   width: 100%;
   padding: 1.2rem;
-  border: 2px solid #e1e5e9;
+  border: 2px solid #e2e8f0;
   border-radius: 15px;
   font-size: 1rem;
   transition: all 0.3s ease;
@@ -99,9 +99,9 @@
 .input:focus,
 .textarea:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #6366f1;
   background: #fff;
-  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1), 0 4px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1), 0 4px 15px rgba(0,0,0,0.1);
   transform: translateY(-2px);
 }
 
@@ -116,7 +116,7 @@
 }
 
 .submitBtn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   color: #fff;
   border: none;
   padding: 1.2rem 3rem;
@@ -128,15 +128,15 @@
   display: inline-block;
   text-transform: uppercase;
   letter-spacing: 1px;
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3);
   position: relative;
   overflow: hidden;
 }
 
 .submitBtn:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+  background: linear-gradient(135deg, #4f46e5 0%, #6a4190 100%);
 }
 
 .submitBtn:active {
@@ -205,13 +205,13 @@
 
 .confirmationContent h3 {
   margin: 0 0 1rem 0;
-  color: #333;
+  color: #1e293b;
   font-size: 1.3rem;
 }
 
 .confirmationContent p {
   margin: 0 0 1.5rem 0;
-  color: #666;
+  color: #64748b;
   font-size: 1rem;
 }
 

@@ -1,3 +1,5 @@
+/* ── Modern UI Redesign – Global Styles ── */
+
 html {
   scroll-behavior: smooth;
   overflow-x: hidden;
@@ -7,18 +9,43 @@ html {
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Segoe UI', Arial, sans-serif;
-  background: #f7f7f7;
-  color: #222;
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: #f8fafc;
+  color: #0f172a;
   line-height: 1.6;
   overflow-x: hidden;
   min-height: 100vh;
   height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Selection highlight */
+::selection {
+  background: rgba(99, 102, 241, 0.2);
+  color: #312e81;
+}
+
+::-moz-selection {
+  background: rgba(99, 102, 241, 0.2);
+  color: #312e81;
 }
 
 a {
   color: inherit;
   text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Focus ring for accessibility */
+:focus-visible {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 /* Responsive typography */
@@ -83,25 +110,44 @@ html {
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: #ccc #f1f1f1;
+  scrollbar-color: #94a3b8 #f1f5f9;
 }
 
 .scroll-container::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 .scroll-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
+  background: #f1f5f9;
+  border-radius: 8px;
 }
 
 .scroll-container::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 4px;
+  background: #94a3b8;
+  border-radius: 8px;
 }
 
 .scroll-container::-webkit-scrollbar-thumb:hover {
-  background: #999;
+  background: #64748b;
+}
+
+/* Global scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
 }
 
 /* Responsive images */
@@ -113,14 +159,19 @@ img {
 /* Responsive headings */
 h1 {
   font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
 }
 
 h2 {
   font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
 h3 {
   font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+  font-weight: 600;
 }
 
 /* Responsive spacing */
@@ -138,4 +189,23 @@ h3 {
   .section {
     padding: 1rem 0;
   }
+}
+
+/* Smooth transitions for interactive elements */
+button, a, input, select, textarea {
+  transition: all 0.2s ease;
+}
+
+/* Placeholder styling */
+::placeholder {
+  color: #94a3b8;
+  opacity: 1;
+}
+
+:-ms-input-placeholder {
+  color: #94a3b8;
+}
+
+::-ms-input-placeholder {
+  color: #94a3b8;
 }

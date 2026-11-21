@@ -17,7 +17,7 @@ export default function TestAIPage() {
             style={{
               padding: '15px 30px',
               fontSize: '18px',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
               color: 'white',
               border: 'none',
               borderRadius: '8px',
@@ -34,7 +34,7 @@ export default function TestAIPage() {
             </div>
           )}
           
-          <div style={{ marginTop: '30px', padding: '20px', background: '#f8f9fa', borderRadius: '8px' }}>
+          <div style={{ marginTop: '30px', padding: '20px', background: '#f1f5f9', borderRadius: '8px' }}>
             <h3>🎉 AI Chatbot is Now Global!</h3>
             <p>The AI chatbot floating button now appears on <strong>ALL pages</strong> of the website!</p>
             <ul style={{ textAlign: 'left', maxWidth: '500px', margin: '0 auto' }}>
@@ -44,7 +44,7 @@ export default function TestAIPage() {
               <li>✅ Seller dashboard</li>
               <li>✅ All other pages</li>
             </ul>
-            <p style={{ marginTop: '15px', fontWeight: 'bold', color: '#667eea' }}>
+            <p style={{ marginTop: '15px', fontWeight: 'bold', color: '#6366f1' }}>
               🤖 Look for the blue floating button at the bottom right of any page!
             </p>
             
@@ -70,7 +70,7 @@ export default function TestAIPage() {
         position: 'fixed', 
         bottom: '20px', 
         left: '20px', 
-        background: '#667eea', 
+        background: '#6366f1', 
         color: 'white', 
         padding: '10px', 
         borderRadius: '8px',

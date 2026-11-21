@@ -1,5 +1,5 @@
 .footer {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
   color: #fff;
   margin-top: 4rem;
   position: relative;
@@ -13,7 +13,7 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #c084fc 100%);
 }
 
 .footerContent {
@@ -50,14 +50,14 @@
   left: 0;
   width: 30px;
   height: 2px;
-  background: linear-gradient(90deg, #667eea, #764ba2);
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
 }
 
 .footerLogo h3 {
   margin: 0 0 1rem 0;
   font-size: 1.8rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -82,7 +82,7 @@
   color: #b0b0b0;
   text-decoration: none;
   padding: 0.5rem 1rem;
-  border: 1px solid #333;
+  border: 1px solid #1e293b;
   border-radius: 20px;
   font-size: 0.9rem;
   transition: all 0.3s ease;
@@ -91,10 +91,10 @@
 
 .socialLink:hover {
   color: #fff;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   border-color: transparent;
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
 }
 
 .footerLinks {
@@ -117,7 +117,7 @@
 }
 
 .footerLinks a:hover {
-  color: #667eea;
+  color: #6366f1;
   padding-left: 5px;
 }
 
@@ -127,7 +127,7 @@
   left: -15px;
   opacity: 0;
   transition: all 0.3s ease;
-  color: #667eea;
+  color: #6366f1;
 }
 
 .footerLinks a:hover::before {
@@ -150,7 +150,7 @@
 
 .footerBottom {
   background: rgba(0, 0, 0, 0.3);
-  border-top: 1px solid #333;
+  border-top: 1px solid #1e293b;
   padding: 1.5rem 2rem;
 }
 
@@ -183,7 +183,7 @@
 }
 
 .footerBottomLinks a:hover {
-  color: #667eea;
+  color: #6366f1;
 }
 
 @media (max-width: 1024px) {

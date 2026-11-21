@@ -136,7 +136,7 @@
 }
 
 .heroButtonPrimary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   color: white;
   border: none;
   padding: 1rem 2rem;
@@ -145,12 +145,12 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
 }
 
 .heroButtonPrimary:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.6);
 }
 
 .heroButtonSecondary {
@@ -233,25 +233,25 @@
 .heroText h1 {
   font-size: 2.5rem;
   margin-bottom: 1rem;
-  color: #0070f3;
+  color: #6366f1;
 }
 
 .heroDescription {
   font-size: 1.2rem;
   line-height: 1.6;
-  color: #333;
+  color: #1e293b;
   margin-bottom: 1rem;
 }
 
 .heroSubtext {
   font-size: 1.1rem;
-  color: #666;
+  color: #64748b;
   font-weight: 500;
 }
 
 /* Car Showcase Carousel */
 .carShowcaseSection {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 25%, #c084fc 50%, #f43f5e 75%, #38bdf8 100%);
   padding: 2rem 2rem;
   margin: 2rem 0;
   width: 100%;
@@ -284,8 +284,8 @@
   right: 0;
   bottom: 0;
   background: linear-gradient(135deg, 
-    rgba(102, 126, 234, 0.8) 0%, 
-    rgba(118, 75, 162, 0.7) 25%, 
+    rgba(99, 102, 241, 0.8) 0%, 
+    rgba(139, 92, 246, 0.7) 25%, 
     rgba(240, 147, 251, 0.6) 50%, 
     rgba(245, 87, 108, 0.7) 75%, 
     rgba(79, 172, 254, 0.8) 100%
@@ -518,7 +518,7 @@
   font-size: 3rem;
   font-weight: 700;
   margin-bottom: 1.5rem;
-  background: linear-gradient(45deg, #fff, #f0f0f0);
+  background: linear-gradient(45deg, #fff, #f1f5f9);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -760,7 +760,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -799,7 +799,7 @@
 
 /* Sell Car Section */
 .sellCarSection {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 25%, #c084fc 50%, #f43f5e 75%, #38bdf8 100%);
   padding: 4rem 2rem;
   margin: 2rem 0;
   width: 100%;
@@ -835,8 +835,8 @@
   right: 0;
   bottom: 0;
   background: linear-gradient(135deg, 
-    rgba(102, 126, 234, 0.8) 0%, 
-    rgba(118, 75, 162, 0.7) 25%, 
+    rgba(99, 102, 241, 0.8) 0%, 
+    rgba(139, 92, 246, 0.7) 25%, 
     rgba(240, 147, 251, 0.6) 50%, 
     rgba(245, 87, 108, 0.7) 75%, 
     rgba(79, 172, 254, 0.8) 100%
@@ -1092,7 +1092,7 @@
 
 /* Features Section */
 .featuresSection {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   padding: 2rem 2rem;
   margin: 2rem 0;
   width: 100%;
@@ -1243,7 +1243,7 @@
 
 /* Stats Section */
 .statsSection {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 25%, #c084fc 50%, #f43f5e 75%, #38bdf8 100%);
   padding: 4rem 2rem;
   margin: 2rem 0;
   width: 100%;
@@ -1276,8 +1276,8 @@
   right: 0;
   bottom: 0;
   background: linear-gradient(135deg, 
-    rgba(102, 126, 234, 0.8) 0%, 
-    rgba(118, 75, 162, 0.7) 25%, 
+    rgba(99, 102, 241, 0.8) 0%, 
+    rgba(139, 92, 246, 0.7) 25%, 
     rgba(240, 147, 251, 0.6) 50%, 
     rgba(245, 87, 108, 0.7) 75%, 
     rgba(79, 172, 254, 0.8) 100%
@@ -1365,7 +1365,7 @@
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
-  background: linear-gradient(45deg, #fff, #f0f0f0);
+  background: linear-gradient(45deg, #fff, #f1f5f9);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1408,7 +1408,7 @@
 
 /* Process Section */
 .processSection {
-  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  background: linear-gradient(135deg, #f472b6 0%, #fbbf24 100%);
   padding: 4rem 2rem;
   margin: 2rem 0;
   width: 100%;
@@ -1439,8 +1439,8 @@
   right: 0;
   bottom: 0;
   background: linear-gradient(135deg, 
-    rgba(250, 112, 154, 0.9) 0%, 
-    rgba(254, 225, 64, 0.9) 100%
+    rgba(244, 114, 182, 0.9) 0%, 
+    rgba(251, 191, 36, 0.9) 100%
   );
   z-index: 2;
 }
@@ -1734,8 +1734,8 @@
 @keyframes gradientShift {
   0%, 100% {
     background: linear-gradient(135deg, 
-      rgba(102, 126, 234, 0.8) 0%, 
-      rgba(118, 75, 162, 0.7) 25%, 
+      rgba(99, 102, 241, 0.8) 0%, 
+      rgba(139, 92, 246, 0.7) 25%, 
       rgba(240, 147, 251, 0.6) 50%, 
       rgba(245, 87, 108, 0.7) 75%, 
       rgba(79, 172, 254, 0.8) 100%
@@ -1743,11 +1743,11 @@
   }
   25% {
     background: linear-gradient(135deg, 
-      rgba(118, 75, 162, 0.8) 0%, 
+      rgba(139, 92, 246, 0.8) 0%, 
       rgba(240, 147, 251, 0.7) 25%, 
       rgba(245, 87, 108, 0.6) 50%, 
       rgba(79, 172, 254, 0.7) 75%, 
-      rgba(102, 126, 234, 0.8) 100%
+      rgba(99, 102, 241, 0.8) 100%
     );
   }
   50% {
@@ -1755,16 +1755,16 @@
       rgba(240, 147, 251, 0.8) 0%, 
       rgba(245, 87, 108, 0.7) 25%, 
       rgba(79, 172, 254, 0.6) 50%, 
-      rgba(102, 126, 234, 0.7) 75%, 
-      rgba(118, 75, 162, 0.8) 100%
+      rgba(99, 102, 241, 0.7) 75%, 
+      rgba(139, 92, 246, 0.8) 100%
     );
   }
   75% {
     background: linear-gradient(135deg, 
       rgba(245, 87, 108, 0.8) 0%, 
       rgba(79, 172, 254, 0.7) 25%, 
-      rgba(102, 126, 234, 0.6) 50%, 
-      rgba(118, 75, 162, 0.7) 75%, 
+      rgba(99, 102, 241, 0.6) 50%, 
+      rgba(139, 92, 246, 0.7) 75%, 
       rgba(240, 147, 251, 0.8) 100%
     );
   }
@@ -1972,14 +1972,14 @@
 .section h2 {
   margin: 0 0 0.5rem 0;
   font-size: 2rem;
-  color: #0070f3;
+  color: #6366f1;
 }
 .sectionAlt h2 {
   color: #ff9900;
 }
 .section p {
   font-size: 1.1rem;
-  color: #333;
+  color: #1e293b;
 }
 
 @media (max-width: 768px) {

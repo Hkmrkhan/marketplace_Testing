@@ -37,7 +37,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   color: white;
   font-size: 3rem;
 }
@@ -57,12 +57,12 @@
 }
 
 .uploadArea:hover {
-  border-color: #667eea;
+  border-color: #6366f1;
   background: #f0f4ff;
 }
 
 .uploadArea.dragActive {
-  border-color: #667eea;
+  border-color: #6366f1;
   background: #e0e7ff;
   transform: scale(1.02);
 }
@@ -100,7 +100,7 @@
 
 .uploadButton {
   padding: 10px 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   color: white;
   border: none;
   border-radius: 6px;
@@ -112,7 +112,7 @@
 
 .uploadButton:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
 }
 
 .uploadButton:disabled {
@@ -147,7 +147,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #667eea;
+  color: #6366f1;
   font-weight: 500;
 }
 
@@ -155,7 +155,7 @@
   width: 20px;
   height: 20px;
   border: 2px solid #e5e7eb;
-  border-top: 2px solid #667eea;
+  border-top: 2px solid #6366f1;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }

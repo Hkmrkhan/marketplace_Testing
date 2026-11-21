@@ -139,7 +139,7 @@ export default function TestStorage() {
             onClick={checkStorage}
             disabled={loading}
             style={{
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
               color: 'white',
               border: 'none',
               borderRadius: '8px',

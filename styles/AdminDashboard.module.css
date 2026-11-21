@@ -2,19 +2,19 @@
 
 .container {
   min-height: 100vh;
-  background: #f8f9fa;
+  background: #f1f5f9;
 }
 
 .dashboardContainer {
   display: flex;
   min-height: calc(100vh - 80px);
-  background: #f8f9fa;
+  background: #f1f5f9;
 }
 
 .sidebar {
   width: 280px;
   background: #fff;
-  border-right: 1px solid #e1e5e9;
+  border-right: 1px solid #e2e8f0;
   padding: 2rem;
   box-shadow: 2px 0 10px rgba(0,0,0,0.1);
   position: sticky;
@@ -30,14 +30,14 @@
   text-align: center;
   margin-bottom: 2rem;
   padding-bottom: 2rem;
-  border-bottom: 1px solid #e1e5e9;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .avatar {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   color: #fff;
   display: flex;
   align-items: center;
@@ -49,13 +49,13 @@
 
 .userInfo h3 {
   margin: 0 0 0.5rem 0;
-  color: #333;
+  color: #1e293b;
   font-size: 1.3rem;
 }
 
 .userInfo p {
   margin: 0;
-  color: #666;
+  color: #64748b;
   font-size: 0.9rem;
 }
 
@@ -74,7 +74,7 @@
   text-align: left;
   font-size: 1rem;
   font-weight: 500;
-  color: #666;
+  color: #64748b;
   cursor: pointer;
   transition: all 0.3s ease;
   white-space: nowrap;
@@ -88,13 +88,13 @@
 }
 
 .navItem:hover {
-  background: #f8f9fa;
-  color: #333;
+  background: #f1f5f9;
+  color: #1e293b;
   transform: translateX(4px);
 }
 
 .navItem.active {
-  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   color: #fff;
   box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
   transform: translateX(4px);
@@ -112,14 +112,14 @@
 
 .header h1 {
   margin: 0 0 0.5rem 0;
-  color: #333;
+  color: #1e293b;
   font-size: 2rem;
   font-weight: 700;
 }
 
 .header p {
   margin: 0;
-  color: #666;
+  color: #64748b;
   font-size: 1rem;
 }
 
@@ -131,15 +131,15 @@
 }
 
 .message.success {
-  background: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
 }
 
 .message.error {
-  background: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
 }
 
 .section {
@@ -152,7 +152,7 @@
 
 .section h2 {
   margin: 0 0 1.5rem 0;
-  color: #333;
+  color: #1e293b;
   font-size: 1.5rem;
   font-weight: 600;
 }
@@ -160,7 +160,7 @@
 .emptyState {
   text-align: center;
   padding: 3rem 2rem;
-  color: #666;
+  color: #64748b;
 }
 
 .emptyState p {
@@ -175,10 +175,10 @@
 }
 
 .carCard {
-  background: #f8f9fa;
+  background: #f1f5f9;
   border-radius: 12px;
   padding: 1.5rem;
-  border: 1px solid #e1e5e9;
+  border: 1px solid #e2e8f0;
   transition: all 0.3s ease;
 }
 
@@ -203,14 +203,14 @@
 
 .carInfo h3 {
   margin: 0 0 0.5rem 0;
-  color: #333;
+  color: #1e293b;
   font-size: 1.2rem;
   font-weight: 600;
 }
 
 .carInfo p {
   margin: 0.25rem 0;
-  color: #666;
+  color: #64748b;
   font-size: 0.9rem;
   line-height: 1.4;
 }
@@ -218,7 +218,7 @@
 .price {
   font-size: 1.3rem;
   font-weight: 700;
-  color: #28a745;
+  color: #10b981;
   margin: 0.5rem 0;
 }
 
@@ -227,7 +227,7 @@
   padding: 1rem;
   border-radius: 8px;
   margin: 1rem 0;
-  border: 1px solid #e1e5e9;
+  border: 1px solid #e2e8f0;
 }
 
 .sellerInfo p {
@@ -236,7 +236,7 @@
 }
 
 .sellerInfo strong {
-  color: #333;
+  color: #1e293b;
 }
 
 .approvalActions {
@@ -257,22 +257,22 @@
 }
 
 .approveBtn {
-  background: #28a745;
+  background: #10b981;
   color: #fff;
 }
 
 .approveBtn:hover {
-  background: #218838;
+  background: #059669;
   transform: translateY(-1px);
 }
 
 .rejectBtn {
-  background: #dc3545;
+  background: #ef4444;
   color: #fff;
 }
 
 .rejectBtn:hover {
-  background: #c82333;
+  background: #dc2626;
   transform: translateY(-1px);
 }
 
@@ -288,14 +288,14 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: #f8f9fa;
+  background: #f1f5f9;
 }
 
 .spinner {
   width: 40px;
   height: 40px;
-  border: 4px solid #e1e5e9;
-  border-top: 4px solid #dc3545;
+  border: 4px solid #e2e8f0;
+  border-top: 4px solid #ef4444;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
@@ -312,17 +312,17 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: #f8f9fa;
+  background: #f1f5f9;
   text-align: center;
 }
 
 .errorContainer h2 {
-  color: #dc3545;
+  color: #ef4444;
   margin-bottom: 1rem;
 }
 
 .errorContainer p {
-  color: #666;
+  color: #64748b;
   font-size: 1.1rem;
 }
 
@@ -397,10 +397,10 @@
 }
 
 .userCard {
-  background: #f8f9fa;
+  background: #f1f5f9;
   border-radius: 12px;
   padding: 1.5rem;
-  border: 1px solid #e1e5e9;
+  border: 1px solid #e2e8f0;
   transition: all 0.3s ease;
 }
 
@@ -411,14 +411,14 @@
 
 .userInfo h3 {
   margin: 0 0 0.5rem 0;
-  color: #333;
+  color: #1e293b;
   font-size: 1.2rem;
   font-weight: 600;
 }
 
 .userInfo p {
   margin: 0.25rem 0;
-  color: #666;
+  color: #64748b;
   font-size: 0.9rem;
 }
 
@@ -431,17 +431,17 @@
 }
 
 .userType.admin {
-  background: #dc3545;
+  background: #ef4444;
   color: #fff;
 }
 
 .userType.buyer {
-  background: #28a745;
+  background: #10b981;
   color: #fff;
 }
 
 .userType.seller {
-  background: #ffc107;
+  background: #f59e0b;
   color: #212529;
 }
 
@@ -452,10 +452,10 @@
 }
 
 .soldCarCard {
-  background: #f8f9fa;
+  background: #f1f5f9;
   border-radius: 12px;
   padding: 1.5rem;
-  border: 1px solid #e1e5e9;
+  border: 1px solid #e2e8f0;
   transition: all 0.3s ease;
 }
 
@@ -488,13 +488,13 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #28a745, #20c997, #17a2b8);
+  background: linear-gradient(90deg, #10b981, #14b8a6, #0ea5e9);
 }
 
 .commissionCard:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-  border-color: #28a745;
+  border-color: #10b981;
 }
 
 .commissionCard .carImage {
@@ -503,12 +503,12 @@
   overflow: hidden;
   border-radius: 12px;
   margin-bottom: 20px;
-  border: 2px solid #f8f9fa;
+  border: 2px solid #f1f5f9;
   transition: all 0.3s ease;
 }
 
 .commissionCard:hover .carImage {
-  border-color: #28a745;
+  border-color: #10b981;
 }
 
 .commissionCard .carImage img {
@@ -529,18 +529,18 @@
   font-weight: 700;
   text-align: center;
   padding: 12px;
-  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
   border-radius: 8px;
-  border-left: 4px solid #28a745;
+  border-left: 4px solid #10b981;
 }
 
 /* Price Section */
 .priceSection {
-  background: #f8f9fa;
+  background: #f1f5f9;
   padding: 16px;
   border-radius: 10px;
   margin-bottom: 20px;
-  border: 1px solid #e9ecef;
+  border: 1px solid #e2e8f0;
 }
 
 .priceRow {
@@ -548,7 +548,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 8px 0;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .priceRow:last-child {
@@ -563,17 +563,17 @@
 
 .priceValue {
   font-weight: 700;
-  color: #28a745;
+  color: #10b981;
   font-size: 1.1rem;
 }
 
 /* User Section */
 .userSection {
-  background: #fff3cd;
+  background: #fef3c7;
   padding: 16px;
   border-radius: 10px;
   margin-bottom: 20px;
-  border: 1px solid #ffeaa7;
+  border: 1px solid #fde68a;
 }
 
 .userRow {
@@ -581,7 +581,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 8px 0;
-  border-bottom: 1px solid #ffeaa7;
+  border-bottom: 1px solid #fde68a;
 }
 
 .userRow:last-child {
@@ -590,7 +590,7 @@
 
 .userLabel {
   font-weight: 600;
-  color: #856404;
+  color: #92400e;
   font-size: 0.9rem;
 }
 
@@ -605,10 +605,10 @@
 
 /* Date Section */
 .dateSection {
-  background: #d1ecf1;
+  background: #dbeafe;
   padding: 16px;
   border-radius: 10px;
-  border: 1px solid #bee5eb;
+  border: 1px solid #bfdbfe;
 }
 
 .dateRow {
@@ -616,8 +616,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 8px 0;
-  border-bottom: 1px solid #bee5eb;
-  border-bottom: 1px solid #bee5eb;
+  border-bottom: 1px solid #bfdbfe;
+  border-bottom: 1px solid #bfdbfe;
 }
 
 .dateRow:last-child {
@@ -626,7 +626,7 @@
 
 .dateLabel {
   font-weight: 600;
-  color: #0c5460;
+  color: #1e3a5f;
   font-size: 0.9rem;
 }
 
@@ -645,7 +645,7 @@
   padding: 2rem;
   margin-bottom: 2rem;
   box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-  border: 1px solid #e1e5e9;
+  border: 1px solid #e2e8f0;
 }
 
 .summaryGrid {
@@ -660,16 +660,16 @@
   align-items: center;
   gap: 1rem;
   padding: 1rem;
-  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
   border-radius: 12px;
-  border: 1px solid #dee2e6;
+  border: 1px solid #cbd5e1;
   transition: all 0.3s ease;
 }
 
 .summaryItem:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-  border-color: #28a745;
+  border-color: #10b981;
 }
 
 .summaryIcon {
@@ -679,7 +679,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #28a745, #20c997);
+  background: linear-gradient(135deg, #10b981, #14b8a6);
   color: white;
   border-radius: 12px;
 }
@@ -711,7 +711,7 @@
   font-weight: 700;
   text-align: center;
   padding: 1rem;
-  background: linear-gradient(135deg, #28a745, #20c997);
+  background: linear-gradient(135deg, #10b981, #14b8a6);
   color: white;
   border-radius: 12px;
   margin-bottom: 2rem;
@@ -719,12 +719,12 @@
 
 .commissionSummary p {
   margin: 0.5rem 0;
-  color: #666;
+  color: #64748b;
   font-size: 1rem;
 }
 
 .commissionSummary strong {
-  color: #333;
+  color: #1e293b;
   font-weight: 600;
 }
 
@@ -743,7 +743,7 @@
   box-shadow: 0 2px 12px rgba(0,0,0,0.08);
   text-align: center;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border: 1px solid #e9ecef;
+  border: 1px solid #e2e8f0;
 }
 
 .statCard:hover {
@@ -759,7 +759,7 @@
 
 .statCard h3 {
   margin: 0 0 0.4rem 0;
-  color: #666;
+  color: #64748b;
   font-size: 0.9rem;
   font-weight: 500;
   text-transform: uppercase;
@@ -768,7 +768,7 @@
 
 .statNumber {
   margin: 0;
-  color: #333;
+  color: #1e293b;
   font-size: 2rem;
   font-weight: 700;
 }
@@ -783,7 +783,7 @@
 
 .recentActivity h3 {
   margin: 0 0 1.5rem 0;
-  color: #333;
+  color: #1e293b;
   font-size: 1.3rem;
   font-weight: 600;
 }
@@ -799,9 +799,9 @@
   align-items: center;
   gap: 1rem;
   padding: 1rem;
-  background: #f8f9fa;
+  background: #f1f5f9;
   border-radius: 8px;
-  border-left: 4px solid #007bff;
+  border-left: 4px solid #6366f1;
   transition: all 0.3s ease;
 }
 
@@ -812,18 +812,18 @@
 
 .activityIcon {
   font-size: 1.5rem;
-  color: #007bff;
+  color: #6366f1;
 }
 
 .activityInfo p {
   margin: 0 0 0.25rem 0;
-  color: #333;
+  color: #1e293b;
   font-size: 0.95rem;
   font-weight: 500;
 }
 
 .activityInfo small {
-  color: #666;
+  color: #64748b;
   font-size: 0.85rem;
 }
 
@@ -889,7 +889,7 @@
 /* Professional Refresh Button Styling */
 .refreshBtn {
   padding: 10px 20px;
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -905,7 +905,7 @@
 .refreshBtn:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
-  background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
+  background: linear-gradient(135deg, #059669 0%, #0d9488 100%);
 }
 
 .refreshBtn:active {
@@ -946,37 +946,37 @@
 }
 
 .statusBadge.available {
-  background: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
 }
 
 .statusBadge.sold {
-  background: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
 }
 
 .statusBadge.approved {
-  background: #d1ecf1;
-  color: #0c5460;
-  border: 1px solid #bee5eb;
+  background: #dbeafe;
+  color: #1e3a5f;
+  border: 1px solid #bfdbfe;
 }
 
 .statusBadge.rejected {
-  background: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
 }
 
 .statusBadge.pending {
-  background: #fff3cd;
-  color: #856404;
-  border: 1px solid #ffeaa7;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
 }
 
 .sellerName {
-  color: #666;
+  color: #64748b;
   font-size: 0.9rem;
   font-style: italic;
 }
@@ -984,26 +984,26 @@
 .approvalStatus {
   margin-top: 0.5rem;
   padding: 0.5rem;
-  background: #f8f9fa;
+  background: #f1f5f9;
   border-radius: 8px;
-  border-left: 4px solid #28a745;
+  border-left: 4px solid #10b981;
 }
 
 .approvalStatus small {
   display: block;
   margin-top: 0.25rem;
-  color: #666;
+  color: #64748b;
   font-size: 0.8rem;
 }
 
 /* Backfill Commissions Section */
 .backfillSection {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   border-radius: 12px;
   padding: 1.5rem;
   margin-bottom: 2rem;
   color: white;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
 }
 
 .backfillSection h3 {
@@ -1105,18 +1105,18 @@
 }
 
 .activateBtn {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
   color: white;
 }
 
 .activateBtn:hover {
-  background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
+  background: linear-gradient(135deg, #059669 0%, #0d9488 100%);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
 }
 
 .revokeBtn {
-  background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+  background: linear-gradient(135deg, #ef4444 0%, #f59e0b 100%);
   color: white;
   width: auto;
   min-width: 80px;
@@ -1124,7 +1124,7 @@
 }
 
 .revokeBtn:hover {
-  background: linear-gradient(135deg, #c82333 0%, #e8590c 100%);
+  background: linear-gradient(135deg, #dc2626 0%, #e8590c 100%);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
 }
@@ -1140,12 +1140,12 @@
 }
 
 .accountStatus.active {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
   color: white;
 }
 
 .accountStatus.revoked {
-  background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+  background: linear-gradient(135deg, #ef4444 0%, #f59e0b 100%);
   color: white;
 }
 
@@ -1157,7 +1157,7 @@
 }
 
 .adminEditBtn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -1169,22 +1169,22 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
 }
 
 .adminEditBtn:hover {
-  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+  background: linear-gradient(135deg, #4f46e5 0%, #6a4190 100%);
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
 }
 
 .adminEditBtn:active {
   transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
 }
 
 .adminDeleteBtn {
-  background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+  background: linear-gradient(135deg, #ef4444 0%, #f59e0b 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -1200,7 +1200,7 @@
 }
 
 .adminDeleteBtn:hover {
-  background: linear-gradient(135deg, #c82333 0%, #e8590c 100%);
+  background: linear-gradient(135deg, #dc2626 0%, #e8590c 100%);
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(220, 53, 69, 0.4);
 }
@@ -1236,7 +1236,7 @@
 }
 
 .confirmationHeader {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   color: white;
   padding: 20px;
   border-radius: 16px 16px 0 0;
@@ -1286,7 +1286,7 @@
   border-radius: 8px;
   padding: 15px;
   margin: 15px 0;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid #6366f1;
   display: flex;
   justify-content: space-between;
   align-items: center;

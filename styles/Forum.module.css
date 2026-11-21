@@ -11,7 +11,7 @@
   text-align: center;
   margin-bottom: 40px;
   padding: 30px 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   color: white;
   border-radius: 12px;
   position: relative;
@@ -393,7 +393,7 @@
   align-items: center;
   gap: 15px;
   margin-top: 10px;
-  color: #666;
+  color: #64748b;
   font-size: 14px;
 }
 
@@ -402,7 +402,7 @@
   align-items: center;
   gap: 5px;
   padding: 6px 12px;
-  background: #f8f9fa;
+  background: #f1f5f9;
   border-radius: 15px;
   font-weight: 500;
 }
@@ -416,7 +416,7 @@
 .authorAvatar {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -1419,9 +1419,9 @@
 .addReplyForm {
   margin-bottom: 20px;
   padding: 16px;
-  background: #f8f9fa;
+  background: #f1f5f9;
   border-radius: 8px;
-  border: 1px solid #e9ecef;
+  border: 1px solid #e2e8f0;
 }
 
 .replyInputWrapper {
@@ -1481,14 +1481,14 @@
 .nestedRepliesCount {
   margin: 8px 0 8px 52px;
   padding: 4px 8px;
-  background: #f8f9fa;
+  background: #f1f5f9;
   border-radius: 12px;
   display: inline-block;
 }
 
 .nestedCountText {
   font-size: 12px;
-  color: #666;
+  color: #64748b;
   font-weight: 500;
 }
 
@@ -1496,14 +1496,14 @@
 .nestedRepliesCount {
   margin: 8px 0 8px 20px;
   padding: 4px 8px;
-  background: #f8f9fa;
+  background: #f1f5f9;
   border-radius: 12px;
   display: inline-block;
 }
 
 .nestedCountText {
   font-size: 12px;
-  color: #666;
+  color: #64748b;
   font-weight: 500;
 }
 
@@ -1517,7 +1517,7 @@
   gap: 10px;
   margin-bottom: 12px;
   padding: 12px;
-  background: #f8f9fa;
+  background: #f1f5f9;
   border-radius: 8px;
   border-left: 3px solid #065fd4;
 }
@@ -1555,24 +1555,24 @@
 
 .nestedReplyTime {
   font-size: 12px;
-  color: #666;
+  color: #64748b;
 }
 
 .nestedReplyText {
-  color: #333;
+  color: #1e293b;
   font-size: 14px;
   line-height: 1.4;
 }
 
 /* Toggle Button for Nested Replies */
 .toggleNestedBtn {
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
   padding: 6px 12px;
   border-radius: 15px;
   cursor: pointer;
   font-size: 12px;
-  color: #666;
+  color: #64748b;
   font-weight: 500;
   transition: all 0.2s ease;
   margin: 8px 0 8px 20px;
@@ -1580,8 +1580,8 @@
 }
 
 .toggleNestedBtn:hover {
-  background: #e9ecef;
-  border-color: #dee2e6;
+  background: #e2e8f0;
+  border-color: #cbd5e1;
 }
 
 /* Reply Actions in Popup */
@@ -1598,7 +1598,7 @@
   border-radius: 15px;
   cursor: pointer;
   font-size: 12px;
-  color: #666;
+  color: #64748b;
   font-weight: 500;
   transition: all 0.2s ease;
   display: flex;
@@ -1607,7 +1607,7 @@
 }
 
 .actionBtn:hover {
-  background: #f8f9fa;
+  background: #f1f5f9;
 }
 
 .actionBtn.liked {
@@ -1675,14 +1675,14 @@
 /* Action Button Default State (White) */
 .actionBtn {
   background-color: white;
-  color: #666;
-  border: 1px solid #e9ecef;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
   transition: all 0.2s ease;
 }
 
 .actionBtn:hover {
-  background-color: #f8f9fa;
-  border-color: #dee2e6;
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
 }
 
 /* Action Button Liked State (Blue) */
@@ -1706,7 +1706,7 @@
 }
 
 .replyContent:hover {
-  background-color: #f8f9fa;
+  background-color: #f1f5f9;
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -1722,7 +1722,7 @@
   align-items: center;
   gap: 4px;
   padding: 8px 12px;
-  color: #666;
+  color: #64748b;
   font-size: 14px;
   font-weight: 500;
 }
@@ -1737,7 +1737,7 @@
   margin: 0;
   font-size: 1.5rem;
   font-weight: 600;
-  color: #333;
+  color: #1e293b;
   max-width: 400px;
   overflow: hidden;
   text-overflow: ellipsis;

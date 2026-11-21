@@ -1031,7 +1031,7 @@ export default function AdminDashboard() {
                   className={styles.refreshBtn}
                   style={{ 
                     padding: '10px 20px', 
-                    backgroundColor: '#28a745', 
+                    backgroundColor: '#10b981', 
                     color: 'white', 
                     border: 'none', 
                     borderRadius: '6px', 
@@ -1047,7 +1047,7 @@ export default function AdminDashboard() {
                     e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
                   }}
                   onMouseOut={(e) => {
-                    e.target.style.backgroundColor = '#28a745';
+                    e.target.style.backgroundColor = '#10b981';
                     e.target.style.transform = 'translateY(0)';
                     e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
                   }}
@@ -1062,7 +1062,7 @@ export default function AdminDashboard() {
                   <p><strong>Debug Info:</strong> Commission records: {commissionData.length}</p>
                   <button 
                     onClick={loadCommissionData}
-                    style={{ padding: '8px 16px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', marginTop: '10px' }}
+                    style={{ padding: '8px 16px', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', marginTop: '10px' }}
                   >
                     🔄 Force Refresh
                   </button>
@@ -1110,7 +1110,7 @@ export default function AdminDashboard() {
                       onClick={loadCommissionData}
                       style={{
                         padding: '12px 24px',
-                        backgroundColor: '#28a745',
+                        backgroundColor: '#10b981',
                         color: 'white',
                         border: 'none',
                         borderRadius: '8px',
@@ -1281,7 +1281,7 @@ export default function AdminDashboard() {
                             height: '100%', 
                             objectFit: 'cover', 
                             borderRadius: '50%',
-                            border: '3px solid #667eea'
+                            border: '3px solid #6366f1'
                           }}
                         />
                       </div>
@@ -1315,7 +1315,7 @@ export default function AdminDashboard() {
                     <label
                       htmlFor="adminAvatarInput"
                       style={{
-                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
                         color: 'white',
                         border: 'none',
                         borderRadius: '8px',

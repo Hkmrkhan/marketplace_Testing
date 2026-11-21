@@ -12,7 +12,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   color: white;
 }
 
@@ -76,13 +76,13 @@
 
 .filterLabel {
   font-weight: 600;
-  color: #333;
+  color: #1e293b;
   font-size: 14px;
 }
 
 .filterInput, .filterSelect {
   padding: 10px 12px;
-  border: 1px solid #ddd;
+  border: 1px solid #cbd5e1;
   border-radius: 6px;
   font-size: 14px;
   transition: border-color 0.2s;
@@ -90,8 +90,8 @@
 
 .filterInput:focus, .filterSelect:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
 }
 
 .priceRange {
@@ -103,7 +103,7 @@
 .priceInput {
   flex: 1;
   padding: 10px 12px;
-  border: 1px solid #ddd;
+  border: 1px solid #cbd5e1;
   border-radius: 6px;
   font-size: 14px;
   transition: border-color 0.2s;
@@ -111,12 +111,12 @@
 
 .priceInput:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
 }
 
 .priceSeparator {
-  color: #666;
+  color: #64748b;
   font-weight: 500;
 }
 
@@ -128,24 +128,24 @@
 
 .quickFilter {
   padding: 8px 12px;
-  border: 1px solid #ddd;
+  border: 1px solid #cbd5e1;
   border-radius: 6px;
   background: white;
-  color: #333;
+  color: #1e293b;
   font-size: 12px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .quickFilter:hover {
-  background: #f8f9fa;
-  border-color: #667eea;
+  background: #f1f5f9;
+  border-color: #6366f1;
 }
 
 .quickFilter.active {
-  background: #667eea;
+  background: #6366f1;
   color: white;
-  border-color: #667eea;
+  border-color: #6366f1;
 }
 
 /* Save Filter Styles */
@@ -156,9 +156,9 @@
 
 .saveFilterBtn {
   padding: 8px 12px;
-  border: 1px solid #28a745;
+  border: 1px solid #10b981;
   border-radius: 6px;
-  background: #28a745;
+  background: #10b981;
   color: white;
   font-size: 12px;
   cursor: pointer;
@@ -167,13 +167,13 @@
 }
 
 .saveFilterBtn:hover:not(:disabled) {
-  background: #218838;
-  border-color: #218838;
+  background: #059669;
+  border-color: #059669;
 }
 
 .saveFilterBtn:disabled {
-  background: #ccc;
-  border-color: #ccc;
+  background: #cbd5e1;
+  border-color: #cbd5e1;
   cursor: not-allowed;
 }
 
@@ -186,9 +186,9 @@
   border: 1px solid #e0e0e0;
   border-radius: 6px;
   padding: 6px;
-  background: #f8f9fa;
+  background: #f1f5f9;
   scrollbar-width: thin;
-  scrollbar-color: #667eea #f8f9fa;
+  scrollbar-color: #6366f1 #f1f5f9;
 }
 
 .savedFiltersList::-webkit-scrollbar {
@@ -196,17 +196,17 @@
 }
 
 .savedFiltersList::-webkit-scrollbar-track {
-  background: #f8f9fa;
+  background: #f1f5f9;
   border-radius: 4px;
 }
 
 .savedFiltersList::-webkit-scrollbar-thumb {
-  background: #667eea;
+  background: #6366f1;
   border-radius: 4px;
 }
 
 .savedFiltersList::-webkit-scrollbar-thumb:hover {
-  background: #5a6fd8;
+  background: #4f46e5;
 }
 
 .savedFilterItem {
@@ -218,10 +218,10 @@
 .loadFilterBtn {
   flex: 1;
   padding: 6px 10px;
-  border: 1px solid #ddd;
+  border: 1px solid #cbd5e1;
   border-radius: 6px;
   background: white;
-  color: #333;
+  color: #1e293b;
   font-size: 11px;
   cursor: pointer;
   transition: all 0.2s;
@@ -230,15 +230,15 @@
 }
 
 .loadFilterBtn:hover {
-  background: #f8f9fa;
-  border-color: #667eea;
+  background: #f1f5f9;
+  border-color: #6366f1;
 }
 
 .deleteFilterBtn {
   padding: 4px 6px;
-  border: 1px solid #dc3545;
+  border: 1px solid #ef4444;
   border-radius: 4px;
-  background: #dc3545;
+  background: #ef4444;
   color: white;
   font-size: 9px;
   cursor: pointer;
@@ -246,8 +246,8 @@
 }
 
 .deleteFilterBtn:hover {
-  background: #c82333;
-  border-color: #c82333;
+  background: #dc2626;
+  border-color: #dc2626;
 }
 
 /* Save Dialog Styles */
@@ -275,20 +275,20 @@
 
 .saveDialogContent h3 {
   margin: 0 0 12px 0;
-  color: #333;
+  color: #1e293b;
   font-size: 18px;
 }
 
 .saveDialogContent p {
   margin: 0 0 16px 0;
-  color: #666;
+  color: #64748b;
   font-size: 14px;
 }
 
 .saveDialogInput {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #ddd;
+  border: 1px solid #cbd5e1;
   border-radius: 6px;
   font-size: 14px;
   margin-bottom: 16px;
@@ -297,8 +297,8 @@
 
 .saveDialogInput:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
 }
 
 .saveDialogActions {
@@ -309,9 +309,9 @@
 
 .saveDialogBtn {
   padding: 8px 16px;
-  border: 1px solid #28a745;
+  border: 1px solid #10b981;
   border-radius: 6px;
-  background: #28a745;
+  background: #10b981;
   color: white;
   font-size: 14px;
   cursor: pointer;
@@ -319,13 +319,13 @@
 }
 
 .saveDialogBtn:hover:not(:disabled) {
-  background: #218838;
-  border-color: #218838;
+  background: #059669;
+  border-color: #059669;
 }
 
 .saveDialogBtn:disabled {
-  background: #ccc;
-  border-color: #ccc;
+  background: #cbd5e1;
+  border-color: #cbd5e1;
   cursor: not-allowed;
 }
 
@@ -348,10 +348,10 @@
 .noFiltersMessage {
   text-align: center;
   padding: 20px;
-  color: #666;
+  color: #64748b;
   font-style: italic;
-  background: #f8f9fa;
-  border: 1px dashed #ddd;
+  background: #f1f5f9;
+  border: 1px dashed #cbd5e1;
   border-radius: 6px;
 }
 

@@ -14,7 +14,7 @@ export default function LoadingSpinner({ message = "Loading..." }) {
         width: '40px',
         height: '40px',
         border: '4px solid #f3f3f3',
-        borderTop: '4px solid #667eea',
+        borderTop: '4px solid #6366f1',
         borderRadius: '50%',
         animation: 'spin 1s linear infinite',
         marginBottom: '1rem'

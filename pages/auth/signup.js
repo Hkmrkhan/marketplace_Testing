@@ -369,13 +369,13 @@ export default function SignupPage() {
 
           <form onSubmit={handleSignup} className={styles.authForm}>
             <div style={{ 
-              backgroundColor: '#f8f9fa', 
+              backgroundColor: '#f1f5f9', 
               padding: '10px', 
               borderRadius: '5px', 
               marginBottom: '20px',
               fontSize: '14px',
-              color: '#666',
-              border: '1px solid #e9ecef'
+              color: '#64748b',
+              border: '1px solid #e2e8f0'
             }}>
               <span style={{color: 'red'}}>*</span> Required fields
             </div>

@@ -270,7 +270,7 @@ export default function CarDetails() {
               onClick={() => router.push('/cars')}
               style={{
                 padding: '0.8rem 1.5rem',
-                backgroundColor: '#667eea',
+                backgroundColor: '#6366f1',
                 color: 'white',
                 border: 'none',
                 borderRadius: '8px',
@@ -679,7 +679,7 @@ export default function CarDetails() {
             width: '40px',
             height: '40px',
             border: '4px solid #f3f3f3',
-            borderTop: '4px solid #667eea',
+            borderTop: '4px solid #6366f1',
             borderRadius: '50%',
             animation: 'spin 1s linear infinite',
             marginBottom: '1rem'
@@ -806,7 +806,7 @@ export default function CarDetails() {
             <div style={{ marginBottom: '1.5rem' }}>
               <h3 style={{ margin: '0 0 0.5rem 0', color: '#333' }}>{car.title}</h3>
               <p style={{ margin: '0 0 1rem 0', color: '#666' }}>
-                Price: <strong style={{ color: '#667eea', fontSize: '1.2rem' }}>${car.price?.toLocaleString()}</strong>
+                Price: <strong style={{ color: '#6366f1', fontSize: '1.2rem' }}>${car.price?.toLocaleString()}</strong>
               </p>
             </div>
             

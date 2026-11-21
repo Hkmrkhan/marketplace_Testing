@@ -1488,7 +1488,7 @@ export default function BuyerDashboard() {
               flex: 1, 
               overflowY: 'auto', 
               padding: '16px',
-              background: '#f8f9fa',
+              background: '#f1f5f9',
               minHeight: '250px'
             }}>
               {localMessages.length > 0 ? (
@@ -1674,7 +1674,7 @@ export default function BuyerDashboard() {
               justifyContent: 'space-between', 
               alignItems: 'center', 
               padding: '24px 32px',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
               color: 'white'
             }}>
               <h2 style={{ margin: 0, color: 'white', fontSize: '24px', fontWeight: '700' }}>Edit Profile</h2>
@@ -1715,9 +1715,9 @@ export default function BuyerDashboard() {
                   textAlign: 'center', 
                   marginBottom: '24px',
                   padding: '20px',
-                  background: '#f8f9fa',
+                  background: '#f1f5f9',
                   borderRadius: '12px',
-                  border: '1px solid #e9ecef'
+                  border: '1px solid #e2e8f0'
                 }}>
                   <div style={{ 
                     width: '120px', 
@@ -1734,7 +1734,7 @@ export default function BuyerDashboard() {
                           height: '100%', 
                           objectFit: 'cover', 
                           borderRadius: '50%',
-                          border: '3px solid #667eea'
+                          border: '3px solid #6366f1'
                         }}
                       />
                     ) : (
@@ -1766,7 +1766,7 @@ export default function BuyerDashboard() {
                   <label
                     htmlFor="buyerModalAvatarInput"
                     style={{
-                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
                       color: 'white',
                       border: 'none',
                       borderRadius: '8px',
@@ -1827,7 +1827,7 @@ export default function BuyerDashboard() {
                     className={authStyles.submitBtn} 
                     style={{ 
                       flex: 1,
-                      background: (editName !== originalName || editEmail !== originalEmail) ? '#667eea' : '#ccc',
+                      background: (editName !== originalName || editEmail !== originalEmail) ? '#6366f1' : '#ccc',
                       color: (editName !== originalName || editEmail !== originalEmail) ? 'white' : '#666',
                       cursor: (editName !== originalName || editEmail !== originalEmail) ? 'pointer' : 'not-allowed'
                     }}
@@ -1839,7 +1839,7 @@ export default function BuyerDashboard() {
                     type="button" 
                     className={authStyles.submitBtn} 
                     style={{ 
-                      background: '#dc3545', 
+                      background: '#ef4444', 
                       color: 'white',
                       flex: 1,
                       border: 'none',
@@ -1855,7 +1855,7 @@ export default function BuyerDashboard() {
                       e.target.style.transform = 'translateY(-1px)';
                     }}
                     onMouseOut={(e) => {
-                      e.target.style.background = '#dc3545';
+                      e.target.style.background = '#ef4444';
                       e.target.style.transform = 'translateY(0)';
                     }}
                   >

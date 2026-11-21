@@ -412,7 +412,7 @@ function UnifiedSellerChat({ sellerId, myCars, buyersByCar }) {
         padding: '20px', 
         textAlign: 'center', 
         color: '#666',
-        background: '#f8f9fa',
+        background: '#f1f5f9',
         borderRadius: '8px',
         margin: '20px 0'
       }}>
@@ -432,7 +432,7 @@ function UnifiedSellerChat({ sellerId, myCars, buyersByCar }) {
     }}>
       {/* Header with buyer selection */}
       <div style={{
-        background: '#667eea',
+        background: '#6366f1',
         color: 'white',
         padding: '16px 20px',
         borderBottom: '1px solid #e0e0e0'
@@ -558,7 +558,7 @@ function UnifiedSellerChat({ sellerId, myCars, buyersByCar }) {
               marginBottom: '12px'
             }}>
               <div style={{
-                background: msg.sender_id === sellerId ? '#667eea' : '#e9ecef',
+                background: msg.sender_id === sellerId ? '#6366f1' : '#e2e8f0',
                 color: msg.sender_id === sellerId ? 'white' : '#333',
                 padding: '8px 12px',
                 borderRadius: '12px',
@@ -610,7 +610,7 @@ function UnifiedSellerChat({ sellerId, myCars, buyersByCar }) {
             disabled={loading || !newMessage.trim() || !selectedBuyer}
             style={{
               padding: '10px 16px',
-              background: '#667eea',
+              background: '#6366f1',
               color: 'white',
               border: 'none',
               borderRadius: '6px',
@@ -659,7 +659,7 @@ function UnifiedSellerChat({ sellerId, myCars, buyersByCar }) {
             }}
             style={{
               padding: '8px 12px',
-              background: '#28a745',
+              background: '#10b981',
               color: 'white',
               border: 'none',
               borderRadius: '6px',
@@ -2513,7 +2513,7 @@ export default function SellerDashboard() {
             {/* Left Side - Chat List */}
             <div style={{
               width: '350px',
-              background: '#f8f9fa',
+              background: '#f1f5f9',
               borderRight: '1px solid #e0e0e0',
               display: 'flex',
               flexDirection: 'column'
@@ -2521,7 +2521,7 @@ export default function SellerDashboard() {
               {/* Chat List Header */}
               <div style={{
                 padding: '20px',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
                 color: 'white',
                 borderTopLeftRadius: '16px'
               }}>
@@ -2834,7 +2834,7 @@ export default function SellerDashboard() {
                         cursor: 'pointer',
                         transition: 'all 0.2s ease',
                         background: (chatCarId === carId && chatBuyerId === buyerId) ? '#e3f2fd' : 'transparent',
-                        borderLeft: (chatCarId === carId && chatBuyerId === buyerId) ? '4px solid #667eea' : '4px solid transparent'
+                        borderLeft: (chatCarId === carId && chatBuyerId === buyerId) ? '4px solid #6366f1' : '4px solid transparent'
                       }}
                       onMouseOver={(e) => {
                         if (chatCarId !== carId || chatBuyerId !== buyerId) {
@@ -2857,7 +2857,7 @@ export default function SellerDashboard() {
                           width: '48px',
                           height: '48px',
                           borderRadius: '50%',
-                          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                          background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -2893,7 +2893,7 @@ export default function SellerDashboard() {
                             
                             {/* Message Count Badge */}
                             <span style={{
-                              background: '#667eea',
+                              background: '#6366f1',
                               color: 'white',
                               borderRadius: '50%',
                               padding: '4px 8px',
@@ -2970,7 +2970,7 @@ export default function SellerDashboard() {
           }}>
             {/* Chat Header */}
             <div style={{
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
               color: 'white',
                 padding: '24px',
               display: 'flex',
@@ -3049,7 +3049,7 @@ export default function SellerDashboard() {
               flex: 1, 
               overflowY: 'auto', 
               padding: '16px',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
               minHeight: '250px',
               position: 'relative'
             }}>
@@ -3188,7 +3188,7 @@ export default function SellerDashboard() {
                   lineHeight: '1.4'
                 }}
                 onFocus={(e) => {
-                  e.target.style.borderColor = '#667eea';
+                  e.target.style.borderColor = '#6366f1';
                   e.target.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
                 }}
                 onBlur={(e) => {
@@ -3202,7 +3202,7 @@ export default function SellerDashboard() {
                 onClick={handleSendMessage}
                 disabled={!localMessage.trim() || sending}
                 style={{
-                  background: localMessage.trim() && !sending ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#e0e0e0',
+                  background: localMessage.trim() && !sending ? 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)' : '#e0e0e0',
                   color: 'white',
                   border: 'none',
                   borderRadius: '50%',
@@ -3264,7 +3264,7 @@ export default function SellerDashboard() {
               justifyContent: 'space-between', 
               alignItems: 'center', 
               padding: '24px 32px',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
               color: 'white'
             }}>
               <h2 style={{ margin: 0, color: 'white', fontSize: '24px', fontWeight: '700' }}>Edit Profile</h2>
@@ -3305,9 +3305,9 @@ export default function SellerDashboard() {
                   textAlign: 'center', 
                   marginBottom: '24px',
                   padding: '20px',
-                  background: '#f8f9fa',
+                  background: '#f1f5f9',
                   borderRadius: '12px',
-                  border: '1px solid #e9ecef'
+                  border: '1px solid #e2e8f0'
                 }}>
                   <div style={{ 
                     width: '120px', 
@@ -3324,7 +3324,7 @@ export default function SellerDashboard() {
                           height: '100%', 
                           objectFit: 'cover', 
                           borderRadius: '50%',
-                          border: '3px solid #667eea'
+                          border: '3px solid #6366f1'
                         }}
                       />
                     ) : (
@@ -3356,7 +3356,7 @@ export default function SellerDashboard() {
                   <label
                     htmlFor="sellerModalAvatarInput"
                     style={{
-                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
                       color: 'white',
                       border: 'none',
                       borderRadius: '8px',
@@ -3417,7 +3417,7 @@ export default function SellerDashboard() {
                     className={authStyles.submitBtn} 
                     style={{ 
                       flex: 1,
-                      background: (editName !== originalName || editEmail !== originalEmail) ? '#667eea' : '#ccc',
+                      background: (editName !== originalName || editEmail !== originalEmail) ? '#6366f1' : '#ccc',
                       color: (editName !== originalName || editEmail !== originalEmail) ? 'white' : '#666',
                       cursor: (editName !== originalName || editEmail !== originalEmail) ? 'pointer' : 'not-allowed'
                     }}
@@ -3429,7 +3429,7 @@ export default function SellerDashboard() {
                     type="button" 
                     className={authStyles.submitBtn} 
                     style={{ 
-                      background: '#dc3545', 
+                      background: '#ef4444', 
                       color: 'white',
                       flex: 1,
                       border: 'none',
@@ -3445,7 +3445,7 @@ export default function SellerDashboard() {
                       e.target.style.transform = 'translateY(-1px)';
                     }}
                     onMouseOut={(e) => {
-                      e.target.style.background = '#dc3545';
+                      e.target.style.background = '#ef4444';
                       e.target.style.transform = 'translateY(0)';
                     }}
                   >
@@ -3496,7 +3496,7 @@ export default function SellerDashboard() {
             <div style={{
               width: isMobile ? '100%' : '350px',
               minHeight: isMobile ? '100%' : 'auto',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
               color: 'white',
               display: 'flex',
               flexDirection: 'column'
@@ -3756,7 +3756,7 @@ export default function SellerDashboard() {
                     flex: 1,
                     overflowY: 'auto',
                     padding: '20px 16px',
-                    background: '#f8f9fa',
+                    background: '#f1f5f9',
                     minHeight: '250px',
                     position: 'relative',
                     zIndex: 3
@@ -3857,7 +3857,7 @@ export default function SellerDashboard() {
                         borderRadius: '24px',
                         fontSize: '15px',
                         outline: 'none',
-                        background: '#f8f9fa',
+                        background: '#f1f5f9',
                         transition: 'all 0.2s ease',
                         boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.1)'
                       }}
@@ -3867,7 +3867,7 @@ export default function SellerDashboard() {
                       }}
                       onBlur={(e) => {
                         e.target.style.border = '1px solid #e0e0e0';
-                        e.target.style.background = '#f8f9fa';
+                        e.target.style.background = '#f1f5f9';
                       }}
                     />
                     <button
@@ -3941,7 +3941,7 @@ export default function SellerDashboard() {
                         <span>👤 {chatBuyerId ? (buyerProfiles[chatBuyerId]?.full_name || buyerProfiles[chatBuyerId]?.email || 'Buyer') : 'Not Selected'}</span>
                     {currentChatMessages.length > 0 && (
                       <span style={{ 
-                        background: '#667eea', 
+                        background: '#6366f1', 
                         color: 'white', 
                         padding: '2px 8px', 
                         borderRadius: '12px', 
@@ -3989,7 +3989,7 @@ export default function SellerDashboard() {
                     style={{
                       background: 'rgba(102, 126, 234, 0.1)',
                       border: 'none',
-                      color: '#667eea',
+                      color: '#6366f1',
                       borderRadius: '50%',
                       width: '32px',
                       height: '32px',
@@ -4011,7 +4011,7 @@ export default function SellerDashboard() {
                 flex: 1,
                 overflowY: 'auto',
                 padding: '16px',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
                 minHeight: '250px',
                 position: 'relative'
               }}>
@@ -4116,7 +4116,7 @@ export default function SellerDashboard() {
                   disabled={sending || !localMessage.trim()}
                   style={{
                     padding: '12px 20px',
-                    background: sending || !localMessage.trim() ? '#ccc' : '#667eea',
+                    background: sending || !localMessage.trim() ? '#ccc' : '#6366f1',
                     color: 'white',
                     border: 'none',
                     borderRadius: '24px',

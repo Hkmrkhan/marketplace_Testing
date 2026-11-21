@@ -1,6 +1,6 @@
 .contactPage {
   min-height: 100vh;
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #667eea 100%);
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #6366f1 100%);
 }
 
 .mainContent {
@@ -31,7 +31,7 @@
   left: 0;
   width: 60px;
   height: 4px;
-  background: linear-gradient(90deg, #667eea, #764ba2);
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
   border-radius: 2px;
 }
 
@@ -97,7 +97,7 @@
 
 .formGroup label {
   font-weight: 600;
-  color: #333;
+  color: #1e293b;
   margin-bottom: 8px;
   font-size: 0.95rem;
 }
@@ -105,19 +105,19 @@
 .input,
 .textarea {
   padding: 15px;
-  border: 2px solid #e1e5e9;
+  border: 2px solid #e2e8f0;
   border-radius: 12px;
   font-size: 1rem;
   transition: all 0.3s ease;
-  background: #f8f9fa;
+  background: #f1f5f9;
 }
 
 .input:focus,
 .textarea:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #6366f1;
   background: white;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 .textarea {
@@ -126,7 +126,7 @@
 }
 
 .submitBtn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   color: white;
   border: none;
   padding: 16px 32px;
@@ -140,7 +140,7 @@
 
 .submitBtn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
 }
 
 .submitBtn:active {
@@ -164,23 +164,23 @@
 .cancelBtn,
 .backBtn {
   padding: 12px 24px;
-  border: 2px solid #e1e5e9;
+  border: 2px solid #e2e8f0;
   border-radius: 8px;
   background: white;
-  color: #666;
+  color: #64748b;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .cancelBtn:hover {
-  background: #f8f9fa;
-  border-color: #dc3545;
-  color: #dc3545;
+  background: #f1f5f9;
+  border-color: #ef4444;
+  color: #ef4444;
 }
 
 .backBtn:hover {
-  background: #f8f9fa;
+  background: #f1f5f9;
   border-color: #6c757d;
   color: #6c757d;
 }
@@ -215,7 +215,7 @@
 }
 
 .confirmationContent p {
-  color: #666;
+  color: #64748b;
   margin-bottom: 25px;
   line-height: 1.5;
 }
@@ -237,12 +237,12 @@
 }
 
 .confirmBtn {
-  background: #dc3545;
+  background: #ef4444;
   color: white;
 }
 
 .confirmBtn:hover {
-  background: #c82333;
+  background: #dc2626;
   transform: translateY(-2px);
 }
 

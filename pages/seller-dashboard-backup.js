@@ -440,7 +440,7 @@ function UnifiedSellerChat({ sellerId, myCars, buyersByCar }) {
         padding: '20px', 
         textAlign: 'center', 
         color: '#666',
-        background: '#f8f9fa',
+        background: '#f1f5f9',
         borderRadius: '8px',
         margin: '20px 0'
       }}>
@@ -460,7 +460,7 @@ function UnifiedSellerChat({ sellerId, myCars, buyersByCar }) {
     }}>
       {/* Header with buyer selection */}
       <div style={{
-        background: '#667eea',
+        background: '#6366f1',
         color: 'white',
         padding: '16px 20px',
         borderBottom: '1px solid #e0e0e0'
@@ -586,7 +586,7 @@ function UnifiedSellerChat({ sellerId, myCars, buyersByCar }) {
               marginBottom: '12px'
             }}>
               <div style={{
-                background: msg.sender_id === sellerId ? '#667eea' : '#e9ecef',
+                background: msg.sender_id === sellerId ? '#6366f1' : '#e2e8f0',
                 color: msg.sender_id === sellerId ? 'white' : '#333',
                 padding: '8px 12px',
                 borderRadius: '12px',
@@ -638,7 +638,7 @@ function UnifiedSellerChat({ sellerId, myCars, buyersByCar }) {
             disabled={loading || !newMessage.trim() || !selectedBuyer}
             style={{
               padding: '10px 16px',
-              background: '#667eea',
+              background: '#6366f1',
               color: 'white',
               border: 'none',
               borderRadius: '6px',
@@ -687,7 +687,7 @@ function UnifiedSellerChat({ sellerId, myCars, buyersByCar }) {
             }}
             style={{
               padding: '8px 12px',
-              background: '#28a745',
+              background: '#10b981',
               color: 'white',
               border: 'none',
               borderRadius: '6px',
