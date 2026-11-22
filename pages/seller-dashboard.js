@@ -2080,7 +2080,7 @@ export default function SellerDashboard() {
                 <img 
                   src={userProfile.avatar_url} 
                   alt="Profile" 
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center', borderRadius: '50%' }}
                 />
               ) : (
                 userProfile?.full_name?.charAt(0) || 'S'
@@ -3324,6 +3324,7 @@ export default function SellerDashboard() {
                           width: '100%', 
                           height: '100%', 
                           objectFit: 'cover', 
+                          objectPosition: 'top center',
                           borderRadius: '50%',
                           border: '3px solid #6366f1'
                         }}

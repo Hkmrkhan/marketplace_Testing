@@ -8109,3 +8109,19 @@
       max-height: 180px !important;
     }
   }
+
+  /* User & Seller Avatar Framing - Never cut off forehead/face */
+  .avatar {
+    overflow: hidden !important;
+  }
+
+  .avatar img,
+  .sellerAvatar img,
+  .avatarImage {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: top center !important;
+    border-radius: 50% !important;
+    display: block !important;
+  }
