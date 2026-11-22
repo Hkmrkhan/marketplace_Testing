@@ -2256,24 +2256,24 @@ export default function SellerDashboard() {
                               alt={car.title}
                               className={styles.mainImage}
                             />
-                            {/* Thumbnails row - only show if more than 1 image */}
-                            {getAllImages(car).length > 1 && (
-                              <div className={styles.thumbnailsRow}>
-                                {getAllImages(car).map((img, idx) => (
-                                  <img
-                                    key={idx}
-                                    src={img}
-                                    alt={`Thumbnail ${idx + 1}`}
-                                    className={
-                                      styles.thumbnail +
-                                      ((imageIndexes[car.id] || 0) === idx ? ' ' + styles.activeThumbnail : '')
-                                    }
-                                    onClick={() => setImageIndexes(prev => ({ ...prev, [car.id]: idx }))}
-                                  />
-                                ))}
-                              </div>
-                            )}
                           </div>
+                          {/* Thumbnails row - only show if more than 1 image */}
+                          {getAllImages(car).length > 1 && (
+                            <div className={styles.thumbnailsRow}>
+                              {getAllImages(car).map((img, idx) => (
+                                <img
+                                  key={idx}
+                                  src={img}
+                                  alt={`Thumbnail ${idx + 1}`}
+                                  className={
+                                    styles.thumbnail +
+                                    ((imageIndexes[car.id] || 0) === idx ? ' ' + styles.activeThumbnail : '')
+                                  }
+                                  onClick={() => setImageIndexes(prev => ({ ...prev, [car.id]: idx }))}
+                                />
+                              ))}
+                            </div>
+                          )}
                           
                           {/* Enhanced Car Info Section */}
                           <div className={styles.carInfo}>
@@ -2357,25 +2357,26 @@ export default function SellerDashboard() {
                           <img
                             src={getAllImages(car)[imageIndexes[car.id] || 0]}
                             alt={car.title}
+                            className={styles.mainImage}
                           />
-                          {/* Thumbnails row */}
-                          {getAllImages(car).length > 1 && (
-                            <div className={styles.thumbnailsRow}>
-                              {getAllImages(car).map((img, idx) => (
-                                <img
-                                  key={idx}
-                                  src={img}
-                                  alt={`Thumbnail ${idx + 1}`}
-                                  className={
-                                    styles.thumbnail +
-                                    ((imageIndexes[car.id] || 0) === idx ? ' ' + styles.activeThumbnail : '')
-                                  }
-                                  onClick={() => setImageIndexes(prev => ({ ...prev, [car.id]: idx }))}
-                                />
-                              ))}
-                            </div>
-                          )}
                         </div>
+                        {/* Thumbnails row */}
+                        {getAllImages(car).length > 1 && (
+                          <div className={styles.thumbnailsRow}>
+                            {getAllImages(car).map((img, idx) => (
+                              <img
+                                key={idx}
+                                src={img}
+                                alt={`Thumbnail ${idx + 1}`}
+                                className={
+                                  styles.thumbnail +
+                                  ((imageIndexes[car.id] || 0) === idx ? ' ' + styles.activeThumbnail : '')
+                                }
+                                onClick={() => setImageIndexes(prev => ({ ...prev, [car.id]: idx }))}
+                              />
+                            ))}
+                          </div>
+                        )}
                         {/* Enhanced Car Info Section */}
                         <div className={styles.carInfo}>
                           {/* Car Title - Bold and Large */}

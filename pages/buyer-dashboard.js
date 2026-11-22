@@ -1330,43 +1330,43 @@ export default function BuyerDashboard() {
                         <h3 className={styles.carTitle}>{purchase.title || purchase.cars?.title || "Car"}</h3>
                         
                         {/* Gallery block for purchased cars - improved version */}
-                      <div className={styles.carImageContainer}>
-                        {/* Main image */}
-                        <img
+                        <div className={styles.carImageContainer}>
+                          {/* Main image */}
+                          <img
                             src={purchaseImages[currentImageIndex] || '/carp2.png'}
-                          alt={purchase.title || purchase.cars?.title || "Car"}
+                            alt={purchase.title || purchase.cars?.title || "Car"}
                             className={styles.mainImage}
                             onError={(e) => {
                               e.target.src = '/carp2.png';
                               console.log('Purchase image failed to load, using fallback');
                             }}
-                        />
+                          />
+                        </div>
                           
-                          {/* Thumbnails row - only show if more than 1 image */}
-                          {purchaseImages.length > 1 && (
+                        {/* Thumbnails row - only show if more than 1 image */}
+                        {purchaseImages.length > 1 && (
                           <div className={styles.thumbnailsRow}>
-                              {purchaseImages.map((img, idx) => (
+                            {purchaseImages.map((img, idx) => (
                               <img
                                 key={idx}
                                 src={img}
                                 alt={`Thumbnail ${idx + 1}`}
                                 className={
                                   styles.thumbnail +
-                                    (currentImageIndex === idx ? ' ' + styles.activeThumbnail : '')
-                                  }
-                                  onClick={() => {
-                                    console.log('Clicking purchase thumbnail:', idx, 'for purchase:', purchase.id);
-                                    setImageIndexes(prev => ({ ...prev, [purchase.id]: idx }));
-                                  }}
-                                  onError={(e) => {
-                                    e.target.src = '/carp2.png';
-                                    console.log('Purchase thumbnail failed to load, using fallback');
-                                  }}
+                                  (currentImageIndex === idx ? ' ' + styles.activeThumbnail : '')
+                                }
+                                onClick={() => {
+                                  console.log('Clicking purchase thumbnail:', idx, 'for purchase:', purchase.id);
+                                  setImageIndexes(prev => ({ ...prev, [purchase.id]: idx }));
+                                }}
+                                onError={(e) => {
+                                  e.target.src = '/carp2.png';
+                                  console.log('Purchase thumbnail failed to load, using fallback');
+                                }}
                               />
                             ))}
                           </div>
-                          )}
-                        </div>
+                        )}
                         
                         <div className={styles.carDetails}>
                           <p className={styles.carDescription}>{purchase.description || purchase.cars?.description}</p>
