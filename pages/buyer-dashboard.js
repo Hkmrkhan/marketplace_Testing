@@ -1158,12 +1158,7 @@ export default function BuyerDashboard() {
                     
                     return (
                       <div key={car.id} className={styles.carCard}>
-                        {/* Car Title - Clear and Professional */}
-                        <h3 className={styles.carTitle}>
-                          {car.title || `${car.make || 'Car'} ${car.model || ''} ${car.year || ''}`}
-                        </h3>
-                        
-                        {/* Gallery block - improved version */}
+                        {/* Gallery block - at top */}
                         <div className={styles.carImageContainer}>
                           {/* Main image */}
                           <img
@@ -1175,6 +1170,16 @@ export default function BuyerDashboard() {
                               console.log('Image failed to load, using fallback');
                             }}
                           />
+                          <div className={styles.imageOverlayTop}>
+                            <span className={car.status === 'sold' ? styles.soldBadgeFloating : styles.availableBadgeFloating}>
+                              {car.status === 'sold' ? 'Sold' : 'Available'}
+                            </span>
+                            {carImages.length > 1 && (
+                              <span className={styles.photoCountBadge}>
+                                📷 {carImages.length}
+                              </span>
+                            )}
+                          </div>
                         </div>
                         
                         {/* Thumbnails row - only show if more than 1 image */}
@@ -1203,21 +1208,18 @@ export default function BuyerDashboard() {
                         )}
                         
                         <div className={styles.carDetails}>
+                          {/* Car Title & Price Header */}
+                          <div className={styles.carCardHeader}>
+                            <h3 className={styles.carTitle}>
+                              {car.title || `${car.make || 'Car'} ${car.model || ''} ${car.year || ''}`}
+                            </h3>
+                            <div className={styles.priceContainer}>
+                              <span className={styles.price}>${car.price?.toLocaleString() || '0'}</span>
+                            </div>
+                          </div>
+                          
                           {/* Car Description */}
                           <p className={styles.carDescription}>{car.description}</p>
-                          
-                          {/* Price - Professional Badge Style */}
-                          <div className={styles.priceContainer}>
-                            <span className={styles.priceLabel}>Price:</span>
-                            <span className={styles.price}>${car.price?.toLocaleString() || '0'}</span>
-                          </div>
-                          
-                          {/* Status Badge - Professional Style */}
-                          <div className={styles.statusContainer}>
-                            <span className={car.status === 'sold' ? styles.soldBadge : styles.availableBadge}>
-                          {car.status === 'sold' ? 'Sold' : 'Available'}
-                            </span>
-                          </div>
                           
                           {/* Seller Info - Enhanced with Avatar */}
                           <div className={styles.sellerInfo}>
@@ -1235,8 +1237,9 @@ export default function BuyerDashboard() {
                               )}
                             </div>
                             <div className={styles.sellerDetails}>
+                              <span className={styles.sellerRole}>SELLER</span>
                               <span className={styles.sellerName}>
-                                <strong>Seller:</strong> {car.seller?.full_name || 'N/A'}
+                                {car.seller?.full_name || 'N/A'}
                               </span>
                               {car.seller?.email && (
                                 <span className={styles.sellerEmail}>{car.seller.email}</span>
@@ -1246,19 +1249,22 @@ export default function BuyerDashboard() {
                           
                           {/* Action Buttons - Professional Layout */}
                           <div className={styles.actionButtons}>
-                          {car.status === 'available' ? (
-                            <button 
-                              className={styles.buyBtn}
-                            onClick={() => setCheckoutCar({ ...car, seller_id: car.seller_id })}
-                            >
-                              Buy Now
-                            </button>
-                          ) : (
-                            <div className={styles.soldBadge}>
-                              Sold
-                          </div>
-                        )}
-                          
+                            {car.status === 'available' ? (
+                              <button 
+                                className={styles.buyBtn}
+                                onClick={() => setCheckoutCar({ ...car, seller_id: car.seller_id })}
+                              >
+                                <svg className="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                </svg>
+                                Buy Now
+                              </button>
+                            ) : (
+                              <div className={styles.soldBadgeButton}>
+                                Sold
+                              </div>
+                            )}
+                            
                             {/* Message Button - Integrated */}
                             <button 
                               className={styles.messageBtn}
@@ -1288,30 +1294,13 @@ export default function BuyerDashboard() {
                               }}
                               style={{ position: 'relative' }}
                             >
-                              💬 Message
+                              <svg className="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                              </svg>
+                              Message Seller
                               {/* Unread Count Badge */}
                               {unreadCounts[car.id] > 0 && (
-                                <span 
-                                  style={{
-                                    position: 'absolute',
-                                    top: '-8px',
-                                    right: '-8px',
-                                    background: 'red',
-                                    color: 'white',
-                                    borderRadius: '50%',
-                                    padding: '4px 8px',
-                                    fontSize: '12px',
-                                    fontWeight: 'bold',
-                                    minWidth: '20px',
-                                    height: '20px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    border: '2px solid white',
-                                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                                    zIndex: 10
-                                  }}
-                                >
+                                <span className={styles.unreadBadge}>
                                   {unreadCounts[car.id]}
                                 </span>
                               )}
@@ -1340,9 +1329,7 @@ export default function BuyerDashboard() {
                     
                     return (
                       <div key={purchase.id} className={styles.carCard}>
-                        <h3 className={styles.carTitle}>{purchase.title || purchase.cars?.title || "Car"}</h3>
-                        
-                        {/* Gallery block for purchased cars - improved version */}
+                        {/* Gallery block for purchased cars */}
                         <div className={styles.carImageContainer}>
                           {/* Main image */}
                           <img
@@ -1354,6 +1341,16 @@ export default function BuyerDashboard() {
                               console.log('Purchase image failed to load, using fallback');
                             }}
                           />
+                          <div className={styles.imageOverlayTop}>
+                            <span className={styles.purchasedBadgeFloating}>
+                              ✓ Purchased
+                            </span>
+                            {purchaseImages.length > 1 && (
+                              <span className={styles.photoCountBadge}>
+                                📷 {purchaseImages.length}
+                              </span>
+                            )}
+                          </div>
                         </div>
                           
                         {/* Thumbnails row - only show if more than 1 image */}
@@ -1382,20 +1379,34 @@ export default function BuyerDashboard() {
                         )}
                         
                         <div className={styles.carDetails}>
-                          <p className={styles.carDescription}>{purchase.description || purchase.cars?.description}</p>
-                      <p className={styles.price}>${purchase.price || purchase.cars?.price || 'N/A'}</p>
-                          
-                      <div className={styles.sellerInfo}>
-                        <div>Seller: <b>{purchase.seller_name || purchase.seller?.full_name || 'Unknown'}</b></div>
-                        {(purchase.seller_email || purchase.seller?.email) && (
-                          <div style={{ color: '#888', fontSize: '12px' }}>
-                            {purchase.seller_email || purchase.seller?.email}
+                          <div className={styles.carCardHeader}>
+                            <h3 className={styles.carTitle}>{purchase.title || purchase.cars?.title || "Car"}</h3>
+                            <div className={styles.priceContainer}>
+                              <span className={styles.price}>${purchase.price || purchase.cars?.price || 'N/A'}</span>
+                            </div>
                           </div>
-                        )}
-                      </div>
                           
-                      <div className={styles.soldBadge}>Purchased</div>
-                    </div>
+                          <p className={styles.carDescription}>{purchase.description || purchase.cars?.description}</p>
+                          
+                          <div className={styles.sellerInfo}>
+                            <div className={styles.sellerAvatar}>
+                              <div className={styles.avatarPlaceholder}>
+                                {(purchase.seller_name || purchase.seller?.full_name || 'S').charAt(0).toUpperCase()}
+                              </div>
+                            </div>
+                            <div className={styles.sellerDetails}>
+                              <span className={styles.sellerRole}>SELLER</span>
+                              <span className={styles.sellerName}>
+                                {purchase.seller_name || purchase.seller?.full_name || 'Unknown'}
+                              </span>
+                              {(purchase.seller_email || purchase.seller?.email) && (
+                                <span className={styles.sellerEmail}>
+                                  {purchase.seller_email || purchase.seller?.email}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     );
                   })}

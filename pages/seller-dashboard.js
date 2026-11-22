@@ -2263,7 +2263,7 @@ export default function SellerDashboard() {
                   return (
                     <div className={styles.carsGrid}>
                       {availableApprovedCars.map(car => (
-                        <div key={car.id} className={styles.carCard} style={{ marginBottom: 32 }}>
+                        <div key={car.id} className={styles.carCard}>
                           {/* Gallery block - Enhanced */}
                           <div className={styles.carImageContainer}>
                             {/* Main image */}
@@ -2272,6 +2272,17 @@ export default function SellerDashboard() {
                               alt={car.title}
                               className={styles.mainImage}
                             />
+                            <div className={styles.imageOverlayTop}>
+                              <span className={car.status === 'sold' ? styles.soldBadgeFloating : styles.availableBadgeFloating}>
+                                {car.status === 'sold' ? 'Sold' : 'Available'}
+                              </span>
+                              {car.admin_approvals && car.admin_approvals.length > 0 && (
+                                <span className={`${styles.approvalBadgeFloating} ${styles[car.admin_approvals[car.admin_approvals.length - 1].approval_status]}`}>
+                                  {car.admin_approvals[car.admin_approvals.length - 1].approval_status === 'approved' ? '✓ Approved' : 
+                                   car.admin_approvals[car.admin_approvals.length - 1].approval_status === 'pending' ? '⏳ Pending' : '✕ Rejected'}
+                                </span>
+                              )}
+                            </div>
                           </div>
                           {/* Thumbnails row - only show if more than 1 image */}
                           {getAllImages(car).length > 1 && (
@@ -2291,36 +2302,18 @@ export default function SellerDashboard() {
                             </div>
                           )}
                           
-                          {/* Enhanced Car Info Section */}
-                          <div className={styles.carInfo}>
-                            {/* Car Title - Bold and Large */}
-                            <h3 className={styles.carTitle}>{car.title}</h3>
+                          {/* Enhanced Car Details Section */}
+                          <div className={styles.carDetails}>
+                            {/* Car Title & Price Header */}
+                            <div className={styles.carCardHeader}>
+                              <h3 className={styles.carTitle}>{car.title}</h3>
+                              <div className={styles.priceContainer}>
+                                <span className={styles.price}>${car.price?.toLocaleString() || '0'}</span>
+                              </div>
+                            </div>
                             
                             {/* Car Description */}
                             <p className={styles.carDescription}>{car.description}</p>
-                            
-                            {/* Price - Professional Badge Style */}
-                            <div className={styles.priceContainer}>
-                              <span className={styles.priceLabel}>Price:</span>
-                              <span className={styles.price}>${car.price?.toLocaleString() || '0'}</span>
-                            </div>
-                            
-                            {/* Status Section - Combined Badge */}
-                            <div className={styles.statusSection}>
-                              <div className={styles.statusRow}>
-                                <span className={car.status === 'sold' ? styles.soldBadge : styles.availableBadge}>
-                              {car.status === 'sold' ? 'Sold' : 'Available'}
-                                </span>
-                                
-                                {/* Approval Status */}
-                            {car.admin_approvals && car.admin_approvals.length > 0 && (
-                                  <span className={`${styles.approvalBadge} ${styles[car.admin_approvals[car.admin_approvals.length - 1].approval_status]}`}>
-                                    {car.admin_approvals[car.admin_approvals.length - 1].approval_status === 'approved' ? '✅ Approved' : 
-                                     car.admin_approvals[car.admin_approvals.length - 1].approval_status === 'pending' ? '⏳ Pending' : '❌ Rejected'}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
                           </div>
                         </div>
                       ))}
@@ -2366,7 +2359,7 @@ export default function SellerDashboard() {
                     }
                     
                     return (
-                      <div key={car.car_id || car.id} className={styles.carCard} style={{ marginBottom: 32 }}>
+                      <div key={car.car_id || car.id} className={styles.carCard}>
                         {/* Gallery block */}
                         <div className={styles.carImageContainer}>
                           {/* Main image */}
@@ -2375,6 +2368,16 @@ export default function SellerDashboard() {
                             alt={car.title}
                             className={styles.mainImage}
                           />
+                          <div className={styles.imageOverlayTop}>
+                            <span className={car.status === 'sold' ? styles.soldBadgeFloating : styles.availableBadgeFloating}>
+                              {car.status === 'sold' ? 'Sold' : 'Available'}
+                            </span>
+                            <span className={`${styles.approvalBadgeFloating} ${styles[approvalStatusClass]}`}>
+                              {car.status === 'sold' ? '✓ Auto-Approved' : 
+                               approvalStatus === 'approved' ? '✓ Approved' : 
+                               approvalStatus === 'pending' ? '⏳ Pending' : '✕ Rejected'}
+                            </span>
+                          </div>
                         </div>
                         {/* Thumbnails row */}
                         {getAllImages(car).length > 1 && (
@@ -2393,72 +2396,67 @@ export default function SellerDashboard() {
                             ))}
                           </div>
                         )}
-                        {/* Enhanced Car Info Section */}
-                        <div className={styles.carInfo}>
-                          {/* Car Title - Bold and Large */}
-                          <h3 className={styles.carTitle}>{car.title}</h3>
+                        {/* Enhanced Car Details Section */}
+                        <div className={styles.carDetails}>
+                          {/* Car Title & Price Header */}
+                          <div className={styles.carCardHeader}>
+                            <h3 className={styles.carTitle}>{car.title}</h3>
+                            <div className={styles.priceContainer}>
+                              <span className={styles.price}>${car.price?.toLocaleString() || '0'}</span>
+                            </div>
+                          </div>
                           
                           {/* Car Description */}
                           <p className={styles.carDescription}>{car.description}</p>
                           
-                          {/* Price - Professional Badge Style */}
-                          <div className={styles.priceContainer}>
-                            <span className={styles.priceLabel}>Price:</span>
-                            <span className={styles.price}>${car.price?.toLocaleString() || '0'}</span>
-                          </div>
-                          
-                          {/* Status Section - Combined Badge */}
-                          <div className={styles.statusSection}>
-                            <div className={styles.statusRow}>
-                              <span className={car.status === 'sold' ? styles.soldBadge : styles.availableBadge}>
-                              {car.status === 'sold' ? 'Sold' : 'Available'}
-                              </span>
-                            
-                            {/* Approval Status */}
-                              <span className={`${styles.approvalBadge} ${styles[approvalStatusClass]}`}>
-                                {car.status === 'sold' ? '✅ Auto-Approved' : 
-                                 approvalStatus === 'approved' ? '✅ Approved' : 
-                                 approvalStatus === 'pending' ? '⏳ Pending' : '❌ Rejected'}
-                              </span>
-                            </div>
-                          </div>
-                          
                           {/* Buyer Info for Sold Cars */}
                           {car.status === 'sold' && sales.find(s => s.car_id === car.id) && (
-                            <div className={styles.buyerInfo}>
+                            <div className={styles.sellerInfo}>
                               {(() => {
                                 const sale = sales.find(s => s.car_id === car.id);
                                 return (
                                   <>
-                                    <span>Buyer: <b>{sale.buyer_name || 'N/A'}</b></span>
-                                    {sale.buyer_email && (
-                                      <span style={{ marginLeft: 8, color: '#888' }}>({sale.buyer_email})</span>
-                                    )}
+                                    <div className={styles.sellerAvatar}>
+                                      <div className={styles.avatarPlaceholder}>
+                                        {(sale.buyer_name || 'B').charAt(0).toUpperCase()}
+                                      </div>
+                                    </div>
+                                    <div className={styles.sellerDetails}>
+                                      <span className={styles.sellerRole}>BUYER</span>
+                                      <span className={styles.sellerName}>{sale.buyer_name || 'N/A'}</span>
+                                      {sale.buyer_email && (
+                                        <span className={styles.sellerEmail}>{sale.buyer_email}</span>
+                                      )}
+                                    </div>
                                   </>
                                 );
                               })()}
                             </div>
                           )}
-                        </div>
-                          
-                                                {/* Enhanced Action Buttons with Chat Integration */}
+                          {/* Action Buttons */}
                           {car.status !== 'sold' && (
-                            <div className={styles.carActions}>
+                            <div className={styles.actionButtonsRow}>
                               <button 
                                 className={styles.editBtn}
                                 onClick={() => router.push(`/edit-car/${car.car_id || car.id}`)}
-             >
-               Edit
-             </button>
+                              >
+                                <svg className="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                                Edit
+                              </button>
                               <button
                                 className={styles.deleteBtn}
                                 onClick={() => handleDeleteCar(car.car_id || car.id)}
                               >
+                                <svg className="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
                                 Delete
-             </button>
-
+                              </button>
                             </div>
                           )}
+                        </div>
                           
                                  {/* Chat Section for each car - Hidden but functional for badge count */}
          <div style={{ display: 'none' }}>

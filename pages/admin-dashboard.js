@@ -870,37 +870,67 @@ export default function AdminDashboard() {
                 <div className={styles.carsGrid}>
                   {pendingCars.map(car => (
                     <div key={car.id} className={styles.carCard}>
-                      <div className={styles.carImage}>
-                        <img src={car.image_url || '/carp2.png'} alt={car.title} />
+                      <div className={styles.carImageContainer}>
+                        <img src={car.image_url || '/carp2.png'} alt={car.title} className={styles.mainImage} />
+                        <div className={styles.imageOverlayTop}>
+                          <span className={styles.pendingBadgeFloating}>
+                            ⏳ Pending Approval
+                          </span>
+                        </div>
                       </div>
                       
-                      <div className={styles.carInfo}>
-                        <h3>{car.title}</h3>
-                        <p>{car.description}</p>
-                        <p className={styles.price}>${car.price?.toLocaleString()}</p>
-                        
-                        <div className={styles.sellerInfo}>
-                          <p><strong>Seller:</strong> {car.profiles?.full_name}</p>
-                          <p><strong>Email:</strong> {car.profiles?.email}</p>
-                          {car.profiles?.whatsapp_number && (
-                            <p><strong>WhatsApp:</strong> {car.profiles.whatsapp_number}</p>
-                          )}
+                      <div className={styles.carDetails}>
+                        <div className={styles.carCardHeader}>
+                          <h3 className={styles.carTitle}>{car.title}</h3>
+                          <div className={styles.priceContainer}>
+                            <span className={styles.price}>${car.price?.toLocaleString()}</span>
+                          </div>
                         </div>
                         
-                        <div className={styles.approvalActions}>
+                        <p className={styles.carDescription}>{car.description}</p>
+                        
+                        <div className={styles.sellerInfo}>
+                          <div className={styles.sellerAvatar}>
+                            {car.profiles?.avatar_url ? (
+                              <img src={car.profiles.avatar_url} alt="Seller Avatar" className={styles.avatarImage} />
+                            ) : (
+                              <div className={styles.avatarPlaceholder}>
+                                {(car.profiles?.full_name || 'S').charAt(0).toUpperCase()}
+                              </div>
+                            )}
+                          </div>
+                          <div className={styles.sellerDetails}>
+                            <span className={styles.sellerRole}>SELLER</span>
+                            <span className={styles.sellerName}>{car.profiles?.full_name || 'N/A'}</span>
+                            {car.profiles?.email && (
+                              <span className={styles.sellerEmail}>{car.profiles.email}</span>
+                            )}
+                            {car.profiles?.whatsapp_number && (
+                              <span className={styles.sellerEmail}>📱 {car.profiles.whatsapp_number}</span>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <div className={styles.actionButtonsRow}>
                           <button 
                             className={styles.approveBtn}
                             onClick={() => approveCar(car.id)}
                             disabled={loading}
                           >
-                            ✅ Approve
+                            <svg className="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            Approve
                           </button>
                           <button 
                             className={styles.rejectBtn}
                             onClick={() => rejectCar(car.id, 'Rejected by admin')}
                             disabled={loading}
                           >
-                            ❌ Reject
+                            <svg className="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            Reject
                           </button>
                         </div>
                       </div>
@@ -970,28 +1000,50 @@ export default function AdminDashboard() {
                   {/* Show available approved cars */}
                   {availableCars.map(car => (
                     <div key={car.id} className={styles.carCard}>
-                      <div className={styles.carImage}>
-                        <img src={car.image_url || '/carp2.png'} alt={car.title} />
-                      </div>
-                      <div className={styles.carInfo}>
-                        <h3>{car.title}</h3>
-                        <p>{car.description}</p>
-                        <p className={styles.price}>${car.price?.toLocaleString()}</p>
-                        <div className={styles.carStatus}>
-                          <span className={`${styles.statusBadge} ${styles[car.status]}`}>{car.status}</span>
-                          <span className={styles.sellerName}>by {car.profiles?.full_name}</span>
-                        </div>
-                        {car.admin_approvals && car.admin_approvals.length > 0 && (
-                          <div className={styles.approvalStatus}>
-                            <span className={`${styles.statusBadge} ${styles[car.admin_approvals[0].approval_status]}`}>
-                              {car.admin_approvals[0].approval_status}
+                      <div className={styles.carImageContainer}>
+                        <img src={car.image_url || '/carp2.png'} alt={car.title} className={styles.mainImage} />
+                        <div className={styles.imageOverlayTop}>
+                          <span className={car.status === 'sold' ? styles.soldBadgeFloating : styles.availableBadgeFloating}>
+                            {car.status === 'sold' ? 'Sold' : 'Available'}
+                          </span>
+                          {car.admin_approvals && car.admin_approvals.length > 0 && (
+                            <span className={styles.approvedBadgeFloating}>
+                              ✓ Approved
                             </span>
-                            <small>Approved at: {car.admin_approvals[0].approved_at ? new Date(car.admin_approvals[0].approved_at).toLocaleDateString() : 'N/A'}</small>
+                          )}
+                        </div>
+                      </div>
+                      <div className={styles.carDetails}>
+                        <div className={styles.carCardHeader}>
+                          <h3 className={styles.carTitle}>{car.title}</h3>
+                          <div className={styles.priceContainer}>
+                            <span className={styles.price}>${car.price?.toLocaleString()}</span>
                           </div>
-                        )}
+                        </div>
+                        <p className={styles.carDescription}>{car.description}</p>
+                        <div className={styles.sellerInfo}>
+                          <div className={styles.sellerAvatar}>
+                            {car.profiles?.avatar_url ? (
+                              <img src={car.profiles.avatar_url} alt="Seller Avatar" className={styles.avatarImage} />
+                            ) : (
+                              <div className={styles.avatarPlaceholder}>
+                                {(car.profiles?.full_name || 'S').charAt(0).toUpperCase()}
+                              </div>
+                            )}
+                          </div>
+                          <div className={styles.sellerDetails}>
+                            <span className={styles.sellerRole}>SELLER</span>
+                            <span className={styles.sellerName}>{car.profiles?.full_name || 'N/A'}</span>
+                            {car.admin_approvals && car.admin_approvals[0]?.approved_at && (
+                              <span className={styles.sellerEmail}>
+                                Approved: {new Date(car.admin_approvals[0].approved_at).toLocaleDateString()}
+                              </span>
+                            )}
+                          </div>
+                        </div>
                         
                         {/* Admin Edit Button for Available Cars */}
-                        <div className={styles.adminCarActions}>
+                        <div className={styles.actionButtonsRow}>
                           <button 
                             onClick={() => {
                               setCarToEdit(car);
@@ -1000,7 +1052,10 @@ export default function AdminDashboard() {
                             className={styles.adminEditBtn}
                             title="Edit car information"
                           >
-                            ✏️ Edit Car
+                            <svg className="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                            Edit Car
                           </button>
                           <button 
                             onClick={() => {
@@ -1010,7 +1065,10 @@ export default function AdminDashboard() {
                             className={styles.adminDeleteBtn}
                             title="Delete car"
                           >
-                            🗑️ Delete Car
+                            <svg className="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            Delete Car
                           </button>
                         </div>
                       </div>
@@ -1020,22 +1078,36 @@ export default function AdminDashboard() {
                   {/* Show sold cars */}
                   {commissionData.map(commission => (
                     <div key={commission.id} className={styles.carCard}>
-                      <div className={styles.carImage}>
-                        <img src={commission.car_image_url || '/carp2.png'} alt={commission.car_title} />
-                      </div>
-                      <div className={styles.carInfo}>
-                        <h3>{commission.car_title}</h3>
-                        <p>Sold car - {commission.car_description || 'No description available'}</p>
-                        <p className={styles.price}>${commission.sale_amount?.toLocaleString()}</p>
-                        <div className={styles.carStatus}>
-                          <span className={`${styles.statusBadge} ${styles.sold}`}>sold</span>
-                          <span className={styles.sellerName}>by {commission.seller_name}</span>
+                      <div className={styles.carImageContainer}>
+                        <img src={commission.car_image_url || '/carp2.png'} alt={commission.car_title} className={styles.mainImage} />
+                        <div className={styles.imageOverlayTop}>
+                          <span className={styles.soldBadgeFloating}>Sold</span>
+                          <span className={styles.approvedBadgeFloating}>✓ Approved</span>
                         </div>
-                        <div className={styles.approvalStatus}>
-                          <span className={`${styles.statusBadge} ${styles.approved}`}>
-                            approved
-                          </span>
-                          <small>Sold at: {commission.sale_date ? new Date(commission.sale_date).toLocaleDateString() : 'N/A'}</small>
+                      </div>
+                      <div className={styles.carDetails}>
+                        <div className={styles.carCardHeader}>
+                          <h3 className={styles.carTitle}>{commission.car_title}</h3>
+                          <div className={styles.priceContainer}>
+                            <span className={styles.price}>${commission.sale_amount?.toLocaleString()}</span>
+                          </div>
+                        </div>
+                        <p className={styles.carDescription}>Sold car - {commission.car_description || 'No description available'}</p>
+                        <div className={styles.sellerInfo}>
+                          <div className={styles.sellerAvatar}>
+                            <div className={styles.avatarPlaceholder}>
+                              {(commission.seller_name || 'S').charAt(0).toUpperCase()}
+                            </div>
+                          </div>
+                          <div className={styles.sellerDetails}>
+                            <span className={styles.sellerRole}>SELLER</span>
+                            <span className={styles.sellerName}>{commission.seller_name}</span>
+                            {commission.sale_date && (
+                              <span className={styles.sellerEmail}>
+                                Sold: {new Date(commission.sale_date).toLocaleDateString()}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
