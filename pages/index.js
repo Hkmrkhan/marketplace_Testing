@@ -109,14 +109,6 @@ export default function HomePage() {
             
             {/* Left Column: Text & CTAs */}
             <div className="lg:col-span-7 flex flex-col items-start text-left space-y-6">
-              
-              {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-xl bg-white/[0.08] border border-white/15 shadow-inner">
-                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
-                <span className="text-xs uppercase tracking-wider font-semibold bg-gradient-to-r from-cyan-400 to-indigo-300 bg-clip-text text-transparent">
-                  Next-Gen Automotive Trading
-                </span>
-              </div>
 
               {/* Title */}
               <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] text-white">
