@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import styles from '../styles/CarForm.module.css';
 
 export default function CarForm({ onSubmit, onCancel }) {
   const [title, setTitle] = useState('');
@@ -8,12 +7,11 @@ export default function CarForm({ onSubmit, onCancel }) {
   const [miles, setMiles] = useState('');
   const [reg_district, setRegDistrict] = useState('');
   const [year, setYear] = useState('');
-  const [images, setImages] = useState(['', '', '', '']); // 4 additional images
-  const [videoFile, setVideoFile] = useState(null); // Video file
-  const [videoPreview, setVideoPreview] = useState(''); // Video preview URL
+  const [images, setImages] = useState(['', '', '', '']);
+  const [videoFile, setVideoFile] = useState(null);
+  const [videoPreview, setVideoPreview] = useState('');
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
-  // Check if form has any data
   const hasFormData = () => {
     return title.trim() || description.trim() || price.trim() || miles.trim() || 
            reg_district.trim() || year.trim() || images.some(img => img.trim() !== '') || videoFile;
@@ -40,21 +38,15 @@ export default function CarForm({ onSubmit, onCancel }) {
   const handleVideoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validate file type
       if (!file.type.startsWith('video/')) {
         alert('Please select a video file (MP4, AVI, MOV, etc.)');
         return;
       }
-      
-      // Validate file size (max 50MB)
       if (file.size > 50 * 1024 * 1024) {
         alert('Video file size must be less than 50MB');
         return;
       }
-      
       setVideoFile(file);
-      
-      // Create preview URL
       const previewUrl = URL.createObjectURL(file);
       setVideoPreview(previewUrl);
     }
@@ -71,7 +63,6 @@ export default function CarForm({ onSubmit, onCancel }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Filter out empty image URLs and ensure at least one image
     const validImages = images.filter(img => img.trim() !== '');
     if (validImages.length === 0) {
       alert('Please add at least one image for your car.');
@@ -81,254 +72,178 @@ export default function CarForm({ onSubmit, onCancel }) {
   };
 
   return (
-    <div className={styles.formContainer}>
-      <div className={styles.formHeader}>
-        <h2>Add Your Car Details</h2>
-        <p>Fill in the information below to list your car</p>
+    <div className="rounded-3xl backdrop-blur-2xl bg-slate-900/80 border border-white/10 p-6 sm:p-10 shadow-2xl">
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-white tracking-tight">Add Your Car Details</h2>
+        <p className="text-xs sm:text-sm text-slate-400 mt-1">Fill in the information below to list your car</p>
       </div>
       
-      <form className={styles.form} onSubmit={handleSubmit}>
-        <div className={styles.formGroup}>
-          <label className={styles.label}>Car Title <span className={styles.required}>*</span></label>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div>
+          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+            Car Title <span className="text-rose-400">*</span>
+          </label>
           <input
             type="text"
             placeholder="e.g., Toyota Corolla 2020"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className={styles.input}
+            className="w-full px-4 py-3 rounded-xl bg-slate-950/60 border border-white/15 text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             required
           />
         </div>
 
-        <div className={styles.formGroup}>
-          <label className={styles.label}>Description <span className={styles.required}>*</span></label>
+        <div>
+          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+            Description <span className="text-rose-400">*</span>
+          </label>
           <textarea
             placeholder="Describe your car's features, condition, and any special details..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className={styles.textarea}
+            className="w-full px-4 py-3 rounded-xl bg-slate-950/60 border border-white/15 text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
             rows="4"
             required
           />
         </div>
 
-        <div className={styles.formRow}>
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Price ($) <span className={styles.required}>*</span></label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+              Price ($) <span className="text-rose-400">*</span>
+            </label>
             <input
               type="number"
               placeholder="15000"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              className={styles.input}
+              className="w-full px-4 py-3 rounded-xl bg-slate-950/60 border border-white/15 text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               min="0"
               step="100"
               required
             />
           </div>
           
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Miles <span className={styles.required}>*</span></label>
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+              Miles <span className="text-rose-400">*</span>
+            </label>
             <input
               type="number"
               placeholder="50000"
               value={miles}
               onChange={(e) => setMiles(e.target.value)}
-              className={styles.input}
+              className="w-full px-4 py-3 rounded-xl bg-slate-950/60 border border-white/15 text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               min="0"
               step="1000"
               required
             />
           </div>
           
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Year <span className={styles.required}>*</span></label>
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+              Year <span className="text-rose-400">*</span>
+            </label>
             <select
               value={year}
               onChange={(e) => setYear(e.target.value)}
-              className={styles.input}
+              className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-white/15 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               required
             >
               <option value="">Select Year</option>
-              <option value="2024">2024</option>
-              <option value="2023">2023</option>
-              <option value="2022">2022</option>
-              <option value="2021">2021</option>
-              <option value="2020">2020</option>
-              <option value="2019">2019</option>
-              <option value="2018">2018</option>
-              <option value="2017">2017</option>
-              <option value="2016">2016</option>
-              <option value="2015">2015</option>
-              <option value="2014">2014</option>
-              <option value="2013">2013</option>
-              <option value="2012">2012</option>
-              <option value="2011">2011</option>
-              <option value="2010">2010</option>
-              <option value="2009">2009</option>
-              <option value="2008">2008</option>
-              <option value="2007">2007</option>
-              <option value="2006">2006</option>
-              <option value="2005">2005</option>
-              <option value="2004">2004</option>
-              <option value="2003">2003</option>
-              <option value="2002">2002</option>
-              <option value="2001">2001</option>
-              <option value="2000">2000</option>
-              <option value="1999">1999</option>
-              <option value="1998">1998</option>
-              <option value="1997">1997</option>
-              <option value="1996">1996</option>
-              <option value="1995">1995</option>
-              <option value="1994">1994</option>
-              <option value="1993">1993</option>
-              <option value="1992">1992</option>
-              <option value="1991">1991</option>
-              <option value="1990">1990</option>
-              <option value="1989">1989</option>
-              <option value="1988">1988</option>
-              <option value="1987">1987</option>
-              <option value="1986">1986</option>
-              <option value="1985">1985</option>
-              <option value="1984">1984</option>
-              <option value="1983">1983</option>
-              <option value="1982">1982</option>
-              <option value="1981">1981</option>
-              <option value="1980">1980</option>
+              {Array.from({ length: 45 }, (_, i) => 2024 - i).map(yr => (
+                <option key={yr} value={yr}>{yr}</option>
+              ))}
             </select>
           </div>
 
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Registration City <span className={styles.required}>*</span></label>
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+              Registration City <span className="text-rose-400">*</span>
+            </label>
             <select
               value={reg_district}
               onChange={(e) => setRegDistrict(e.target.value)}
-              className={styles.input}
+              className="w-full px-4 py-3 rounded-xl bg-slate-950 border border-white/15 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               required
             >
               <option value="">Select City</option>
-              <option value="Karachi">Karachi</option>
-              <option value="Lahore">Lahore</option>
-              <option value="Islamabad">Islamabad</option>
-              <option value="Rawalpindi">Rawalpindi</option>
-              <option value="Faisalabad">Faisalabad</option>
-              <option value="Multan">Multan</option>
-              <option value="Peshawar">Peshawar</option>
-              <option value="Quetta">Quetta</option>
-              <option value="Gujranwala">Gujranwala</option>
-              <option value="Sialkot">Sialkot</option>
-              <option value="Bahawalpur">Bahawalpur</option>
-              <option value="Sargodha">Sargodha</option>
-              <option value="Sukkur">Sukkur</option>
-              <option value="Larkana">Larkana</option>
-              <option value="Sheikhupura">Sheikhupura</option>
-              <option value="Rahim Yar Khan">Rahim Yar Khan</option>
-              <option value="Jhang">Jhang</option>
-              <option value="Gujrat">Gujrat</option>
-              <option value="Mardan">Mardan</option>
-              <option value="Kasur">Kasur</option>
-              <option value="Dera Ghazi Khan">Dera Ghazi Khan</option>
-              <option value="Sahiwal">Sahiwal</option>
-              <option value="Nawabshah">Nawabshah</option>
-              <option value="Mirpur Khas">Mirpur Khas</option>
-              <option value="Okara">Okara</option>
-              <option value="Mandi Bahauddin">Mandi Bahauddin</option>
-              <option value="Jacobabad">Jacobabad</option>
-              <option value="Saddiqabad">Saddiqabad</option>
-              <option value="Muzaffargarh">Muzaffargarh</option>
-              <option value="Murree">Murree</option>
-              <option value="Abbottabad">Abbottabad</option>
-              <option value="Jhelum">Jhelum</option>
-              <option value="Mianwali">Mianwali</option>
-              <option value="Toba Tek Singh">Toba Tek Singh</option>
-              <option value="Khanewal">Khanewal</option>
-              <option value="Dera Ismail Khan">Dera Ismail Khan</option>
-              <option value="Vehari">Vehari</option>
-              <option value="Nowshera">Nowshera</option>
-              <option value="Charsadda">Charsadda</option>
-              <option value="Jampur">Jampur</option>
-              <option value="Attock">Attock</option>
-              <option value="Kot Addu">Kot Addu</option>
-              <option value="Rawalakot">Rawalakot</option>
-              <option value="Gilgit">Gilgit</option>
-              <option value="Skardu">Skardu</option>
-              <option value="Chitral">Chitral</option>
-              <option value="Other">Other</option>
+              {['Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad', 'Multan', 'Peshawar', 'Quetta', 'Gujranwala', 'Sialkot', 'Other'].map(city => (
+                <option key={city} value={city}>{city}</option>
+              ))}
             </select>
           </div>
-                  </div>
+        </div>
 
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Car Video (Optional)</label>
-            <p className={styles.helperText}>Upload a video file to showcase your car (MP4, AVI, MOV - Max 50MB)</p>
-            <input
-              type="file"
-              accept="video/*"
-              onChange={handleVideoChange}
-              className={styles.input}
-            />
-            {videoPreview && (
-              <div style={{ marginTop: '1rem' }}>
-                <video
-                  src={videoPreview}
-                  controls
-                  style={{
-                    width: '100%',
-                    maxWidth: '400px',
-                    height: '200px',
-                    borderRadius: '8px',
-                    border: '1px solid #e2e8f0'
-                  }}
-                />
-                <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '0.5rem' }}>
-                  Video Preview
-                </p>
-              </div>
-            )}
-          </div>
+        <div>
+          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1">
+            Car Video (Optional)
+          </label>
+          <p className="text-[11px] text-slate-400 mb-2">Upload a video to showcase your car (MP4, AVI, MOV - Max 50MB)</p>
+          <input
+            type="file"
+            accept="video/*"
+            onChange={handleVideoChange}
+            className="w-full px-4 py-2.5 rounded-xl bg-slate-950/60 border border-white/15 text-slate-300 text-xs file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500"
+          />
+          {videoPreview && (
+            <div className="mt-4">
+              <video
+                src={videoPreview}
+                controls
+                className="w-full max-w-sm rounded-2xl border border-white/10"
+              />
+            </div>
+          )}
+        </div>
 
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Car Images (Up to 5) <span className={styles.required}>*</span></label>
-            <p className={styles.helperText}>Add image URLs for your car. At least one image is required.</p>
-            
+        <div>
+          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1">
+            Car Images (Up to 5) <span className="text-rose-400">*</span>
+          </label>
+          <p className="text-[11px] text-slate-400 mb-3">Add image URLs for your car. At least one image is required.</p>
+          
+          <div className="space-y-3">
             {images.map((image, index) => (
-              <div key={index} className={styles.imageInputGroup}>
-                <label className={styles.imageLabel}>
-                  Image {index + 1} {index === 0 && <span className={styles.required}>*</span>}
-                </label>
+              <div key={index} className="flex flex-col sm:flex-row sm:items-center gap-2">
+                <span className="text-xs text-slate-400 sm:w-24">
+                  Image {index + 1} {index === 0 && <span className="text-rose-400">*</span>}
+                </span>
                 <input
                   type="url"
                   placeholder={`https://example.com/car-image-${index + 1}.jpg`}
                   value={image}
                   onChange={(e) => handleImageChange(index, e.target.value)}
-                  className={styles.input}
-                  required={index === 0} // Only first image is required
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-slate-950/60 border border-white/15 text-white placeholder-slate-500 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  required={index === 0}
                 />
               </div>
             ))}
           </div>
+        </div>
 
-        <div className={styles.formActions}>
-          <button type="submit" className={styles.submitBtn}>
+        <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-white/10">
+          <button 
+            type="submit" 
+            className="px-8 py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-indigo-500 to-cyan-500 hover:from-indigo-600 hover:to-cyan-600 shadow-lg shadow-indigo-500/25 active:scale-[0.99] transition-all cursor-pointer text-sm"
+          >
             Add Car to Marketplace
           </button>
-          <div className={styles.buttonGroup}>
-            {/* Show Cancel button only when form has data */}
-            {hasFormData() && (
+
+          <div>
+            {hasFormData() ? (
               <button 
                 type="button" 
-                className={styles.cancelBtn}
                 onClick={handleCancel}
+                className="px-5 py-2.5 rounded-xl text-xs font-semibold text-rose-400 hover:bg-rose-500/10 border border-rose-500/20 transition-all cursor-pointer"
               >
                 Cancel
               </button>
-            )}
-            {/* Show Back button only when form has no data */}
-            {!hasFormData() && (
+            ) : (
               <button 
                 type="button" 
-                className={styles.backBtn}
                 onClick={() => window.history.back()}
+                className="px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white bg-white/5 transition-all cursor-pointer"
               >
                 Back
               </button>
@@ -336,24 +251,23 @@ export default function CarForm({ onSubmit, onCancel }) {
           </div>
         </div>
 
-        {/* Cancel Confirmation Dialog */}
         {showCancelConfirm && (
-          <div className={styles.confirmationDialog}>
-            <div className={styles.confirmationContent}>
-              <h3>Are you sure you want to cancel?</h3>
-              <p>All your entered data will be lost.</p>
-              <div className={styles.confirmationButtons}>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+            <div className="w-full max-w-sm rounded-3xl bg-slate-900 border border-white/20 p-6 shadow-2xl text-center">
+              <h3 className="text-base font-bold text-white mb-2">Are you sure you want to cancel?</h3>
+              <p className="text-xs text-slate-400 mb-6">All entered details will be lost.</p>
+              <div className="flex gap-3">
                 <button 
                   type="button" 
-                  className={styles.confirmBtn}
                   onClick={confirmCancel}
+                  className="flex-1 py-2.5 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 transition-all cursor-pointer"
                 >
                   Yes
                 </button>
                 <button 
                   type="button" 
-                  className={styles.denyBtn}
                   onClick={() => setShowCancelConfirm(false)}
+                  className="flex-1 py-2.5 rounded-xl text-xs font-semibold text-slate-300 bg-white/10 hover:bg-white/20 transition-all cursor-pointer"
                 >
                   No
                 </button>

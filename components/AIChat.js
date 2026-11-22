@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import { AI_CONFIG } from '../utils/aiConfig';
-import styles from '../styles/AIChat.module.css';
 
 export default function AIChat({ context = 'general', isFloating = false, onClose, userId = null }) {
   const [messages, setMessages] = useState([
@@ -29,7 +28,6 @@ ${context === 'global' ? '🌐 **Global Mode:** Available on all pages!' : ''}`,
   const [error, setError] = useState(null);
   const messagesEndRef = useRef(null);
 
-  // Enhanced search suggestions with better categorization
   const searchSuggestions = {
     buyer: [
       "Budget $500 mein kya milega?",
@@ -81,7 +79,6 @@ ${context === 'global' ? '🌐 **Global Mode:** Available on all pages!' : ''}`,
     ]
   };
 
-  // Enhanced autocorrect dictionary
   const autocorrect = {
     'sellig': 'selling',
     'sellng': 'selling', 
@@ -97,24 +94,7 @@ ${context === 'global' ? '🌐 **Global Mode:** Available on all pages!' : ''}`,
     'recomnd': 'recommend',
     'analsis': 'analysis',
     'anaylsis': 'analysis',
-    'pric': 'price',
-    'prce': 'price',
-    'maket': 'market',
-    'mrket': 'market',
-    'availabe': 'available',
-    'availble': 'available',
-    'budgt': 'budget',
-    'budjet': 'budget',
-    'cars': 'car',
-    'car': 'cars',
-    'tips': 'tip',
-    'tip': 'tips',
-    'dolar': 'dollar',
-    'doller': 'dollar',
-    'recomendation': 'recommendation',
-    'sugest': 'suggest',
-    'advice': 'advice',
-    'advise': 'advice'
+    'pric': 'price'
   };
 
   const scrollToBottom = () => {
@@ -125,18 +105,18 @@ ${context === 'global' ? '🌐 **Global Mode:** Available on all pages!' : ''}`,
     scrollToBottom();
   }, [messages]);
 
-  // Enhanced auto-suggestions based on input
   const handleInputChange = (value) => {
     setInputMessage(value);
-    setError(null); // Clear any previous errors
     
-    if (value.length > 1) {
-      const contextSuggestions = userId ? searchSuggestions.buyer : searchSuggestions.general;
-      const filtered = contextSuggestions.filter(suggestion =>
-        suggestion.toLowerCase().includes(value.toLowerCase()) ||
-        value.toLowerCase().split(' ').some(word => 
-          suggestion.toLowerCase().includes(word)
-        )
+    if (value.trim().length > 1) {
+      const allSuggestions = [
+        ...searchSuggestions.buyer,
+        ...searchSuggestions.seller,
+        ...searchSuggestions.general
+      ];
+      
+      const filtered = allSuggestions.filter(item => 
+        item.toLowerCase().includes(value.toLowerCase())
       ).slice(0, 5);
       
       setSuggestions(filtered);
@@ -146,39 +126,27 @@ ${context === 'global' ? '🌐 **Global Mode:** Available on all pages!' : ''}`,
     }
   };
 
-  // Enhanced autocorrect with better word boundary detection
-  const applyAutocorrect = (text) => {
-    let correctedText = text;
-    Object.keys(autocorrect).forEach(typo => {
-      const regex = new RegExp(`\\b${typo}\\b`, 'gi');
-      correctedText = correctedText.replace(regex, autocorrect[typo]);
-    });
-    return correctedText;
-  };
-
-  // Handle quick query buttons
   const handleQuickQuery = (query) => {
     setInputMessage(query);
     setShowSuggestions(false);
-    setError(null);
-    // Auto-send the query
     setTimeout(() => {
-      if (!isLoading) {
-        handleSendMessage(query);
-      }
+      handleSendMessage(query);
     }, 100);
   };
 
-  // Enhanced message sending with better error handling
-  const handleSendMessage = async (message = inputMessage) => {
-    if (!message.trim() || isLoading) return;
+  const handleSendMessage = async (textToSend = null) => {
+    const text = textToSend || inputMessage;
+    if (!text.trim() || isLoading) return;
 
-    // Apply autocorrect before sending
-    const correctedMessage = applyAutocorrect(message.trim());
-    
+    let processedText = text.trim();
+    Object.keys(autocorrect).forEach(key => {
+      const regex = new RegExp(`\\b${key}\\b`, 'gi');
+      processedText = processedText.replace(regex, autocorrect[key]);
+    });
+
     const userMessage = {
       id: Date.now(),
-      text: correctedMessage,
+      text: processedText,
       isAI: false,
       timestamp: new Date()
     };
@@ -186,57 +154,46 @@ ${context === 'global' ? '🌐 **Global Mode:** Available on all pages!' : ''}`,
     setMessages(prev => [...prev, userMessage]);
     setInputMessage('');
     setShowSuggestions(false);
-    setError(null);
     setIsLoading(true);
+    setError(null);
 
     try {
-      // Use configured AI provider
-      const response = await fetch(AI_CONFIG.getEndpoint(), {
+      const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: correctedMessage,
-          context: context,
-          userId: userId
-        }),
+          message: processedText,
+          userId,
+          context
+        })
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
       const data = await response.json();
-
-      if (!data.success && data.error) {
-        throw new Error(data.error);
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to get response');
       }
 
       const aiMessage = {
         id: Date.now() + 1,
-        text: data.message || 'Sorry, kuch problem hui. Dobara try kariye.',
+        text: data.reply || data.response || 'Main aap ki baat samajh nahi saka, barah-e-karam dobara koshish karein.',
         isAI: true,
         timestamp: new Date()
       };
-
       setMessages(prev => [...prev, aiMessage]);
-    } catch (error) {
-      console.error('Chat error:', error);
+    } catch (err) {
       const errorMessage = {
         id: Date.now() + 1,
-        text: `❌ **Error:** ${error.message || 'Connection problem hai. Internet check kar ke dobara try kariye.'}`,
+        text: '⚠️ Maaf kijiye, abhi response dene mein issue aa raha hai. Dobara try karein.',
         isAI: true,
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);
-      setError(error.message || 'Connection issue');
+      setError(err.message || 'Connection issue');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Update sendMessage to use the new function
   const sendMessage = () => handleSendMessage();
 
   const handleKeyPress = (e) => {
@@ -246,171 +203,139 @@ ${context === 'global' ? '🌐 **Global Mode:** Available on all pages!' : ''}`,
     }
   };
 
-  // Enhanced floating button with notification
   if (isFloating && !isOpen) {
-    console.log('Rendering floating button:', { isFloating, isOpen, error });
     return (
       <button
-        className={styles.floatingButton}
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-cyan-500 text-white text-2xl flex items-center justify-center shadow-xl shadow-indigo-500/30 hover:scale-105 active:scale-95 transition-all cursor-pointer border border-white/20"
         onClick={() => setIsOpen(true)}
-        title="AI Assistant se help lein"
-        style={{
-          position: 'fixed',
-          bottom: '20px',
-          right: '20px',
-          zIndex: 9999,
-          display: 'flex'
-        }}
+        title="AI Assistant"
       >
         🤖
-        {error && <span className={styles.errorBadge}>!</span>}
+        {error && <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 rounded-full text-[10px] font-bold flex items-center justify-center">!</span>}
       </button>
     );
   }
 
   return (
-    <div className={`${styles.chatContainer} ${isFloating ? styles.floating : styles.embedded}`}>
-      {isFloating && (
-        <div className={styles.chatHeader}>
-          <div className={styles.headerInfo}>
-            <span className={styles.headerIcon}>🤖</span>
-            <div>
-              <h4>AI Assistant</h4>
-              <span className={styles.status}>Online</span>
-            </div>
+    <div className={`${isFloating ? 'fixed bottom-6 right-6 z-50 w-96 max-w-[calc(100vw-2rem)] h-[520px]' : 'w-full h-full'} rounded-3xl backdrop-blur-2xl bg-slate-950/95 border border-white/15 flex flex-col shadow-2xl overflow-hidden`}>
+      {/* Header */}
+      <div className="p-4 bg-slate-900/90 border-b border-white/10 flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center text-lg">
+            🤖
           </div>
+          <div>
+            <h4 className="text-sm font-bold text-white leading-none">AI Assistant</h4>
+            <span className="text-[10px] text-emerald-400 font-medium">● Online</span>
+          </div>
+        </div>
+        {isFloating && (
           <button 
-            className={styles.closeButton}
             onClick={() => {
               setIsOpen(false);
               onClose && onClose();
             }}
+            className="w-7 h-7 rounded-full bg-white/5 hover:bg-white/15 text-slate-400 hover:text-white flex items-center justify-center text-xs transition-colors"
           >
             ✕
           </button>
-        </div>
-      )}
+        )}
+      </div>
 
-      <div className={styles.messagesContainer}>
+      {/* Messages Feed */}
+      <div className="flex-1 p-4 overflow-y-auto space-y-3 text-xs leading-relaxed">
         {messages.map((message) => (
           <div
             key={message.id}
-            className={`${styles.message} ${message.isAI ? styles.aiMessage : styles.userMessage}`}
+            className={`flex flex-col ${message.isAI ? 'items-start' : 'items-end'}`}
           >
-            <div className={styles.messageContent}>
-              <div className={styles.messageText}>{message.text}</div>
-              <div className={styles.messageTime}>
-                {message.timestamp.toLocaleTimeString('en-US', { 
-                  hour12: false, 
-                  hour: '2-digit', 
-                  minute: '2-digit' 
-                })}
-              </div>
+            <div
+              className={`max-w-[85%] p-3.5 rounded-2xl whitespace-pre-wrap ${
+                message.isAI 
+                  ? 'bg-slate-900 border border-white/10 text-slate-200' 
+                  : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
+              }`}
+            >
+              {message.text}
             </div>
+            <span className="text-[10px] text-slate-500 mt-1 px-1">
+              {message.timestamp.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+            </span>
           </div>
         ))}
+
         {isLoading && (
-          <div className={`${styles.message} ${styles.aiMessage}`}>
-            <div className={styles.messageContent}>
-              <div className={styles.typing}>
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
-              <div className={styles.typingText}>AI thinking...</div>
+          <div className="flex items-center gap-2 p-3 rounded-2xl bg-slate-900 border border-white/10 text-slate-400 text-xs w-max">
+            <div className="flex gap-1">
+              <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce"></span>
+              <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce [animation-delay:0.2s]"></span>
+              <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce [animation-delay:0.4s]"></span>
             </div>
+            <span>AI thinking...</span>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Error display */}
-      {error && (
-        <div className={styles.errorContainer}>
-          <span className={styles.errorIcon}>⚠️</span>
-          <span className={styles.errorText}>{error}</span>
-          <button 
-            className={styles.errorClose}
-            onClick={() => setError(null)}
-          >
-            ✕
-          </button>
+      {/* Quick Queries */}
+      {!isLoading && (
+        <div className="px-3 py-2 border-t border-white/5 flex gap-2 overflow-x-auto scrollbar-none">
+          {[
+            { label: '💰 Cheapest Car', query: 'Cheapest car kya hai?' },
+            { label: '📊 Market Status', query: 'Market status check karo' },
+            { label: '🏪 Selling Tips', query: 'Selling tips' },
+            { label: '🛒 Buying Tips', query: 'Buying tips' },
+          ].map((item, idx) => (
+            <button
+              key={idx}
+              onClick={() => handleQuickQuery(item.query)}
+              className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] text-slate-300 hover:text-white whitespace-nowrap transition-colors cursor-pointer"
+            >
+              {item.label}
+            </button>
+          ))}
         </div>
       )}
 
-      <div className={styles.inputContainer}>
-        <textarea
-          value={inputMessage}
-          onChange={(e) => handleInputChange(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder="Car ke baare mein kuch puchhiye..."
-          className={styles.messageInput}
-          rows="1"
-          disabled={isLoading}
-        />
+      {/* Input Form */}
+      <div className="p-3 border-t border-white/10 bg-slate-900/60 relative">
         {showSuggestions && (
-          <div className={styles.suggestionsContainer}>
+          <div className="absolute bottom-full left-3 right-3 mb-2 rounded-2xl bg-slate-900 border border-white/15 p-2 shadow-2xl space-y-1">
             {suggestions.map((suggestion, index) => (
               <div
                 key={index}
-                className={styles.suggestionItem}
                 onClick={() => {
                   setInputMessage(suggestion);
                   setShowSuggestions(false);
                 }}
+                className="p-2 rounded-xl text-xs text-slate-300 hover:bg-white/5 cursor-pointer truncate"
               >
                 {suggestion}
               </div>
             ))}
           </div>
         )}
-        <button
-          onClick={sendMessage}
-          disabled={!inputMessage.trim() || isLoading}
-          className={styles.sendButton}
-          title={isLoading ? 'Processing...' : 'Send message'}
-        >
-          {isLoading ? '⏳' : '➤'}
-        </button>
-      </div>
-      
-      {/* Enhanced Quick Access Buttons */}
-      {!isLoading && (
-        <div className={styles.quickButtonsContainer}>
-          <div className={styles.quickButtons}>
-            <button 
-              onClick={() => handleQuickQuery("Cheapest car kya hai?")}
-              className={styles.quickButton}
-              title="Find the cheapest car"
-            >
-              💰 Cheapest Car
-            </button>
-            <button 
-              onClick={() => handleQuickQuery("Market status check karo")}
-              className={styles.quickButton}
-              title="Check current market status"
-            >
-              📊 Market Status
-            </button>
-            <button 
-              onClick={() => handleQuickQuery("Selling tips")}
-              className={styles.quickButton}
-              title="Get selling advice"
-            >
-              🏪 Selling Tips
-            </button>
-            <button 
-              onClick={() => handleQuickQuery("Buying tips")}
-              className={styles.quickButton}
-              title="Get buying advice"
-            >
-              🛒 Buying Tips
-            </button>
-          </div>
-        </div>
-      )}
 
-      <div ref={messagesEndRef} />
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={inputMessage}
+            onChange={(e) => handleInputChange(e.target.value)}
+            onKeyDown={handleKeyPress}
+            placeholder="Ask about cars, prices, recommendations..."
+            className="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-950 border border-white/15 text-white placeholder-slate-500 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            disabled={isLoading}
+          />
+          <button
+            onClick={sendMessage}
+            disabled={!inputMessage.trim() || isLoading}
+            className="w-9 h-9 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center justify-center transition-all disabled:opacity-40 cursor-pointer shadow-md"
+            title="Send"
+          >
+            {isLoading ? '⏳' : '➤'}
+          </button>
+        </div>
+      </div>
     </div>
   );
-} 
+}

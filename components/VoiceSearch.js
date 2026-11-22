@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import styles from '../styles/VoiceSearch.module.css';
 
 export default function VoiceSearch({ onSearchChange }) {
   const [isListening, setIsListening] = useState(false);
@@ -7,7 +6,6 @@ export default function VoiceSearch({ onSearchChange }) {
   const [recognition, setRecognition] = useState(null);
 
   useEffect(() => {
-    // Check if browser supports speech recognition
     if (typeof window !== 'undefined') {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       
@@ -15,16 +13,13 @@ export default function VoiceSearch({ onSearchChange }) {
         setSpeechSupported(true);
         const recognitionInstance = new SpeechRecognition();
         
-        // Configure speech recognition
         recognitionInstance.continuous = false;
         recognitionInstance.interimResults = false;
-        recognitionInstance.lang = 'en-US'; // You can change this to support Urdu: 'ur-PK'
+        recognitionInstance.lang = 'en-US';
         
-        // Handle speech recognition results
         recognitionInstance.onresult = (event) => {
           let transcript = event.results[0][0].transcript;
           
-          // Common voice recognition corrections for car names
           const corrections = {
             'megor': 'wagon',
             'mego': 'wagon', 
@@ -61,7 +56,6 @@ export default function VoiceSearch({ onSearchChange }) {
             'chevy': 'chevrolet'
           };
           
-          // Apply corrections to the transcript
           const words = transcript.toLowerCase().split(' ');
           const correctedWords = words.map(word => {
             const cleanWord = word.replace(/[^\w]/g, '');
@@ -73,13 +67,11 @@ export default function VoiceSearch({ onSearchChange }) {
           setIsListening(false);
         };
         
-        // Handle errors
         recognitionInstance.onerror = (event) => {
           console.error('Speech recognition error:', event.error);
           setIsListening(false);
         };
         
-        // Handle end of recognition
         recognitionInstance.onend = () => {
           setIsListening(false);
         };
@@ -106,22 +98,26 @@ export default function VoiceSearch({ onSearchChange }) {
   };
 
   if (!speechSupported) {
-    return null; // Don't render if not supported
+    return null;
   }
 
   return (
     <button
       type="button"
-      className={`${styles.voiceButton} ${isListening ? styles.listening : ''}`}
+      className={`relative w-12 h-12 rounded-2xl flex items-center justify-center transition-all cursor-pointer shadow-md ${
+        isListening 
+          ? 'bg-rose-600 text-white animate-pulse' 
+          : 'bg-slate-900/80 hover:bg-white/10 border border-white/15 text-slate-300 hover:text-white'
+      }`}
       onClick={isListening ? stopListening : startListening}
       title={isListening ? 'Stop listening' : 'Search by voice'}
     >
-      {isListening ? (
-        <span className={styles.listeningIcon}>🎤</span>
-      ) : (
-        <span className={styles.micIcon}>🎙️</span>
+      <span className="text-lg">
+        {isListening ? '🎤' : '🎙️'}
+      </span>
+      {isListening && (
+        <span className="absolute -top-1 -right-1 w-3 h-3 bg-rose-400 rounded-full animate-ping"></span>
       )}
-      {isListening && <span className={styles.pulse}></span>}
     </button>
   );
-} 
+}
