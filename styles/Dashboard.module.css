@@ -545,7 +545,7 @@
   
   .carImageContainer {
     position: relative;
-    height: 220px;
+    height: 200px;
     border-radius: 12px;
     margin-bottom: 12px;
     z-index: 1;
@@ -553,21 +553,18 @@
     max-width: 100%;
     box-sizing: border-box;
     overflow: hidden;
-    background: #0f172a;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: transparent;
   }
   
   .carImageContainer > img:first-child {
     width: 100%;
     height: 100%;
-    max-height: 220px;
-    object-fit: contain;
+    max-height: 200px;
+    object-fit: cover;
     object-position: center;
     display: block;
     max-width: 100%;
-    border-radius: 8px;
+    border-radius: 12px;
   }
   
   .thumbnailsRow {
@@ -630,12 +627,12 @@
   .mainImage {
     width: 100%;
     height: 100%;
-    max-height: 220px;
-    object-fit: contain;
+    max-height: 200px;
+    object-fit: cover;
     object-position: center;
     display: block;
     max-width: 100%;
-    border-radius: 8px;
+    border-radius: 12px;
   }
   
   .carTitle {
@@ -1257,9 +1254,9 @@
   .carCard img {
     width: 100%;
     height: 100%;
-    max-height: 220px;
-    object-fit: contain;
-    border-radius: 8px;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 12px;
   }
   .carCard img.thumbnail {
     width: 60px;
@@ -3059,7 +3056,7 @@
   
   .carImageContainer {
     position: relative;
-    height: 220px;
+    height: 200px;
     border-radius: 12px;
     margin-bottom: 12px;
     z-index: 1;
@@ -3067,21 +3064,18 @@
     max-width: 100%;
     box-sizing: border-box;
     overflow: hidden;
-    background: #0f172a;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: transparent;
   }
   
   .carImageContainer > img:first-child {
     width: 100%;
     height: 100%;
-    max-height: 220px;
-    object-fit: contain;
+    max-height: 200px;
+    object-fit: cover;
     object-position: center;
     display: block;
     max-width: 100%;
-    border-radius: 8px;
+    border-radius: 12px;
   }
   
   .thumbnailsRow {
@@ -8068,18 +8062,15 @@
     cursor: not-allowed;
   }
 
-  /* Ensure car images fit the frame perfectly across all dashboards */
+  /* Ensure car images fit the card cleanly without extra color */
   .carImageContainer,
   .carImage {
     position: relative;
     width: 100%;
-    height: 220px;
+    height: 200px;
     border-radius: 12px;
     overflow: hidden;
-    background: #0f172a !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    background: transparent !important;
     margin-bottom: 12px;
   }
 
@@ -8089,11 +8080,12 @@
   .carCard img:not(.thumbnail) {
     width: 100% !important;
     height: 100% !important;
-    max-height: 220px !important;
-    object-fit: contain !important;
+    max-height: 200px !important;
+    object-fit: cover !important;
     object-position: center !important;
     display: block !important;
-    border-radius: 8px !important;
+    border-radius: 12px !important;
+    background: transparent !important;
   }
 
   .thumbnail,
@@ -8108,12 +8100,12 @@
   @media (max-width: 768px) {
     .carImageContainer,
     .carImage {
-      height: 190px !important;
+      height: 180px !important;
     }
     .carImageContainer img,
     .carImage img,
     .mainImage,
     .carCard img:not(.thumbnail) {
-      max-height: 190px !important;
+      max-height: 180px !important;
     }
   }

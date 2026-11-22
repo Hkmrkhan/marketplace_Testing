@@ -1658,7 +1658,7 @@ export default function BuyerDashboard() {
                 <img
                   src={checkoutCar.image_url || (checkoutCar.additional_images && checkoutCar.additional_images[0]) || '/carp2.png'}
                   alt={checkoutCar.title}
-                  className="w-16 h-14 rounded-xl object-contain bg-slate-900 border border-slate-200 flex-shrink-0"
+                  className="w-16 h-14 rounded-xl object-cover bg-slate-100 border border-slate-200 flex-shrink-0"
                   onError={(e) => { e.target.src = '/carp2.png'; }}
                 />
                 <div className="flex-1 min-w-0">
