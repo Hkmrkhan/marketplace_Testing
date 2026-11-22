@@ -788,42 +788,67 @@ export default function AdminDashboard() {
               
               <div className={styles.statsGrid}>
                 <div className={styles.statCard}>
-                  <div className={styles.statIcon}>🚗</div>
+                  <div className={`${styles.statIcon} bg-indigo-50 border border-indigo-100/80 text-indigo-600 shadow-sm`}>
+                    <svg className="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 17a2 2 0 100-4 2 2 0 000 4zm8 0a2 2 0 100-4 2 2 0 000 4z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 11l1.5-5A2 2 0 016.42 4.5h11.16a2 2 0 011.92 1.5L21 11m-18 0h18m-18 0v6a1 1 0 001 1h1m16-7v6a1 1 0 01-1 1h-1m-11 0h6" />
+                    </svg>
+                  </div>
                   <h3>Total Cars</h3>
                   <p className={styles.statNumber}>{availableCars.length + commissionData.length}</p>
                   <small>Approved cars (available + sold)</small>
                 </div>
                 
                 <div className={styles.statCard}>
-                  <div className={styles.statIcon}>⏳</div>
+                  <div className={`${styles.statIcon} bg-amber-50 border border-amber-100/80 text-amber-600 shadow-sm`}>
+                    <svg className="w-7 h-7 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
                   <h3>Pending Approval</h3>
                   <p className={styles.statNumber}>{pendingCars.length}</p>
                   <small>Awaiting admin review</small>
                 </div>
                 
                 <div className={styles.statCard}>
-                  <div className={styles.statIcon}>✅</div>
+                  <div className={`${styles.statIcon} bg-teal-50 border border-teal-100/80 text-teal-600 shadow-sm`}>
+                    <svg className="w-7 h-7 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
                   <h3>Available Cars</h3>
                   <p className={styles.statNumber}>{availableCars.length}</p>
                   <small>Approved & for sale</small>
                 </div>
                 
                 <div className={styles.statCard}>
-                  <div className={styles.statIcon}>💰</div>
+                  <div className={`${styles.statIcon} bg-emerald-50 border border-emerald-100/80 text-emerald-600 shadow-sm`}>
+                    <svg className="w-7 h-7 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                  </div>
                   <h3>Sold Cars</h3>
                   <p className={styles.statNumber}>{commissionData.length}</p>
                   <small>Completed sales</small>
                 </div>
                 
                 <div className={styles.statCard}>
-                  <div className={styles.statIcon}>👥</div>
+                  <div className={`${styles.statIcon} bg-purple-50 border border-purple-100/80 text-purple-600 shadow-sm`}>
+                    <svg className="w-7 h-7 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                  </div>
                   <h3>Total Users</h3>
                   <p className={styles.statNumber}>{allUsers.length}</p>
                   <small>Buyers & sellers</small>
                 </div>
                 
                 <div className={styles.statCard}>
-                  <div className={styles.statIcon}>💵</div>
+                  <div className={`${styles.statIcon} bg-cyan-50 border border-cyan-100/80 text-cyan-600 shadow-sm`}>
+                    <svg className="w-7 h-7 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
                   <h3>Total Commission</h3>
                   <p className={styles.statNumber}>${commissionData.reduce((total, comm) => total + parseFloat(comm.commission_amount || 0), 0).toFixed(2)}</p>
                   <small>10% on each sale</small>

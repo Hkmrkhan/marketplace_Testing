@@ -1107,21 +1107,34 @@ export default function BuyerDashboard() {
               <div className={styles.overviewStats}>
                 <div className={styles.statsGrid}>
                   <div className={styles.statCard}>
-                    <div className={styles.statIcon}>🚗</div>
+                    <div className={`${styles.statIcon} bg-indigo-50 border border-indigo-100/80 text-indigo-600 shadow-sm`}>
+                      <svg className="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M8 17a2 2 0 100-4 2 2 0 000 4zm8 0a2 2 0 100-4 2 2 0 000 4z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 11l1.5-5A2 2 0 016.42 4.5h11.16a2 2 0 011.92 1.5L21 11m-18 0h18m-18 0v6a1 1 0 001 1h1m16-7v6a1 1 0 01-1 1h-1m-11 0h6" />
+                      </svg>
+                    </div>
                     <h3>Available Cars</h3>
                     <p className={styles.statNumber}>{availableCars.length}</p>
                     <small>Cars ready for purchase</small>
                   </div>
                   
                   <div className={styles.statCard}>
-                    <div className={styles.statIcon}>💰</div>
+                    <div className={`${styles.statIcon} bg-emerald-50 border border-emerald-100/80 text-emerald-600 shadow-sm`}>
+                      <svg className="w-7 h-7 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                      </svg>
+                    </div>
                     <h3>Total Purchases</h3>
                     <p className={styles.statNumber}>{purchases.length}</p>
                     <small>Cars you've bought</small>
                   </div>
                   
                   <div className={styles.statCard}>
-                    <div className={styles.statIcon}>👤</div>
+                    <div className={`${styles.statIcon} bg-violet-50 border border-violet-100/80 text-violet-600 shadow-sm`}>
+                      <svg className="w-7 h-7 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                    </div>
                     <h3>Your Profile</h3>
                     <p className={styles.statNumber}>Active</p>
                     <small>Account status</small>

@@ -2206,14 +2206,30 @@ export default function SellerDashboard() {
             <div className={styles.overview}>
               <div className={styles.statsGrid}>
                 <div className={styles.statCard}>
+                  <div className={`${styles.statIcon} bg-indigo-50 border border-indigo-100/80 text-indigo-600 shadow-sm`}>
+                    <svg className="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 17a2 2 0 100-4 2 2 0 000 4zm8 0a2 2 0 100-4 2 2 0 000 4z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 11l1.5-5A2 2 0 016.42 4.5h11.16a2 2 0 011.92 1.5L21 11m-18 0h18m-18 0v6a1 1 0 001 1h1m16-7v6a1 1 0 01-1 1h-1m-11 0h6" />
+                    </svg>
+                  </div>
                   <h3>{myCars.length}</h3>
                   <p>Total Cars Listed</p>
                 </div>
                 <div className={styles.statCard}>
+                  <div className={`${styles.statIcon} bg-emerald-50 border border-emerald-100/80 text-emerald-600 shadow-sm`}>
+                    <svg className="w-7 h-7 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
                   <h3>{soldCars}</h3>
                   <p>Cars Sold</p>
                 </div>
                 <div className={styles.statCard}>
+                  <div className={`${styles.statIcon} bg-teal-50 border border-teal-100/80 text-teal-600 shadow-sm`}>
+                    <svg className="w-7 h-7 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
                   <h3>{availableCars}</h3>
                   <p>Cars Available & Approved</p>
                 </div>
