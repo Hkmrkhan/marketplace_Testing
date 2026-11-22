@@ -36,10 +36,12 @@
   
   .sidebar {
     width: 280px;
-    background: #fff;
-    border-right: 1px solid #e2e8f0;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-right: 1px solid rgba(226, 232, 240, 0.8);
     padding: 2rem;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    box-shadow: 4px 0 20px rgba(15, 23, 42, 0.04);
     position: sticky;
     top: 0;
     height: calc(100vh - 80px);

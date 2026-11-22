@@ -1,6 +1,9 @@
 .contactPage {
   min-height: 100vh;
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #6366f1 100%);
+  background: 
+    radial-gradient(circle at 15% 20%, rgba(99, 102, 241, 0.3) 0%, transparent 45%),
+    radial-gradient(circle at 85% 80%, rgba(6, 182, 212, 0.25) 0%, transparent 45%),
+    linear-gradient(135deg, #0b0f19 0%, #1e293b 50%, #0f172a 100%);
 }
 
 .mainContent {
@@ -70,11 +73,13 @@
 }
 
 .formSection {
-  background: white;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
   padding: 40px;
-  border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .formSection h2 {

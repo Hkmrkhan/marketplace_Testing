@@ -41,15 +41,11 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, 
-    rgba(59, 130, 246, 0.6) 0%, 
-    rgba(147, 51, 234, 0.4) 25%,
-    rgba(236, 72, 153, 0.3) 50%,
-    rgba(251, 146, 60, 0.4) 75%,
-    rgba(34, 197, 94, 0.6) 100%
-  );
+  background: 
+    radial-gradient(ellipse at 80% 20%, rgba(99, 102, 241, 0.45) 0%, transparent 55%),
+    radial-gradient(ellipse at 15% 75%, rgba(6, 182, 212, 0.3) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(11, 15, 25, 0.65) 0%, rgba(15, 23, 42, 0.85) 100%);
   z-index: 2;
-  animation: overlayShift 15s ease-in-out infinite;
 }
 
 .heroContent {
@@ -138,38 +134,41 @@
 .heroButtonPrimary {
   background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   color: white;
-  border: none;
-  padding: 1rem 2rem;
-  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 1rem 2.2rem;
+  border-radius: 14px;
   font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 .heroButtonPrimary:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.6);
+  box-shadow: 0 8px 30px rgba(99, 102, 241, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
 .heroButtonSecondary {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.08);
   color: white;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  padding: 1rem 2rem;
-  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 1rem 2.2rem;
+  border-radius: 14px;
   font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .heroButtonSecondary:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
   border-color: rgba(255, 255, 255, 0.5);
   transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 .heroCarShowcase {
@@ -181,18 +180,21 @@
 
 .carModel {
   position: relative;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 24px;
   padding: 2rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   animation: float 6s ease-in-out infinite;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .carModel:hover {
-  transform: scale(1.05) rotateY(5deg);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  transform: scale(1.03) rotateY(4deg);
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(99, 102, 241, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .carImage {
@@ -251,12 +253,16 @@
 
 /* Car Showcase Carousel */
 .carShowcaseSection {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 25%, #c084fc 50%, #f43f5e 75%, #38bdf8 100%);
-  padding: 2rem 2rem;
-  margin: 2rem 0;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(99, 102, 241, 0.22);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  padding: 3rem 2rem;
+  margin: 2.5rem 0;
   width: 100%;
   max-width: 1200px;
-  border-radius: 20px;
+  border-radius: 24px;
   color: white;
   position: relative;
   overflow: hidden;
@@ -270,7 +276,7 @@
   right: 0;
   bottom: 0;
   background: url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1200&h=400&fit=crop&crop=center') center/cover;
-  opacity: 0.1;
+  opacity: 0.08;
   z-index: 1;
   filter: blur(2px);
   animation: backgroundFloat 20s ease-in-out infinite;
@@ -283,15 +289,10 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, 
-    rgba(99, 102, 241, 0.8) 0%, 
-    rgba(139, 92, 246, 0.7) 25%, 
-    rgba(240, 147, 251, 0.6) 50%, 
-    rgba(245, 87, 108, 0.7) 75%, 
-    rgba(79, 172, 254, 0.8) 100%
-  );
+  background: radial-gradient(circle at 85% 15%, rgba(99, 102, 241, 0.3) 0%, transparent 50%),
+              radial-gradient(circle at 15% 85%, rgba(6, 182, 212, 0.2) 0%, transparent 50%);
   z-index: 2;
-  animation: gradientShift 15s ease-in-out infinite;
+  pointer-events: none;
 }
 
 .carShowcaseContent {
@@ -372,18 +373,21 @@
 .carSlide:nth-child(8) { animation-delay: 0.8s; }
 
 .carCard {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-radius: 20px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
 }
 
 .carCard:hover {
-  transform: translateY(-10px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  transform: translateY(-8px) scale(1.02);
+  border-color: rgba(99, 102, 241, 0.5);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4), 0 0 30px rgba(99, 102, 241, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .carSlideImage {
@@ -601,13 +605,16 @@
 
 /* Trusted by Millions Section */
 .trustedSection {
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
   padding: 4rem 2rem;
-  margin: 2rem 0;
+  margin: 2.5rem 0;
   width: 100%;
   max-width: 1200px;
-  border-radius: 20px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .trustedContent {
@@ -633,16 +640,20 @@
   align-items: center;
   gap: 0.5rem;
   padding: 1rem;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 16px;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
   min-width: 80px;
 }
 
 .browserLogo:hover {
   transform: translateY(-4px);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.15);
 }
 
 .browserLogo span {
@@ -689,12 +700,14 @@
 }
 
 .testimonialCard {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-  transition: all 0.3s ease;
-  border: 1px solid #e5e7eb;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  padding: 1.75rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(226, 232, 240, 0.8);
   min-width: 250px;
   max-width: 280px;
   width: 260px;
@@ -711,7 +724,7 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+  background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.15), transparent);
   transition: left 0.5s ease;
 }
 
@@ -720,8 +733,9 @@
 }
 
 .testimonialCard:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+  transform: translateY(-6px);
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 16px 40px rgba(99, 102, 241, 0.15), inset 0 1px 0 rgba(255, 255, 255, 1);
 }
 
 .testimonialTitle {
@@ -799,12 +813,16 @@
 
 /* Sell Car Section */
 .sellCarSection {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 25%, #c084fc 50%, #f43f5e 75%, #38bdf8 100%);
+  background: rgba(15, 23, 42, 0.82);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
   padding: 4rem 2rem;
-  margin: 2rem 0;
+  margin: 2.5rem 0;
   width: 100%;
   max-width: 1200px;
-  border-radius: 20px;
+  border-radius: 24px;
   color: white;
   position: relative;
   overflow: hidden;
@@ -821,7 +839,7 @@
   right: 0;
   bottom: 0;
   background: url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1200&h=400&fit=crop&crop=center') center/cover;
-  opacity: 0.1;
+  opacity: 0.08;
   z-index: 1;
   filter: blur(2px);
   animation: backgroundFloat 20s ease-in-out infinite;
@@ -834,15 +852,10 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, 
-    rgba(99, 102, 241, 0.8) 0%, 
-    rgba(139, 92, 246, 0.7) 25%, 
-    rgba(240, 147, 251, 0.6) 50%, 
-    rgba(245, 87, 108, 0.7) 75%, 
-    rgba(79, 172, 254, 0.8) 100%
-  );
+  background: radial-gradient(circle at 75% 30%, rgba(99, 102, 241, 0.25) 0%, transparent 50%),
+              radial-gradient(circle at 25% 70%, rgba(139, 92, 246, 0.2) 0%, transparent 50%);
   z-index: 2;
-  animation: gradientShift 15s ease-in-out infinite;
+  pointer-events: none;
 }
 
 .sellCarContent {
@@ -974,12 +987,16 @@
 
 /* Video Section */
 .videoSection {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #334155 50%, #475569 75%, #64748b 100%);
+  background: rgba(15, 23, 42, 0.82);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
   padding: 4rem 2rem;
-  margin: 2rem 0;
+  margin: 2.5rem 0;
   width: 100%;
   max-width: 1200px;
-  border-radius: 20px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
   color: white;
   position: relative;
   overflow: hidden;
@@ -1005,14 +1022,9 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, 
-    rgba(15, 23, 42, 0.95) 0%, 
-    rgba(30, 41, 59, 0.9) 25%, 
-    rgba(51, 65, 85, 0.85) 50%, 
-    rgba(71, 85, 105, 0.9) 75%, 
-    rgba(100, 116, 139, 0.95) 100%
-  );
+  background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.2) 0%, transparent 60%);
   z-index: 2;
+  pointer-events: none;
 }
 
 .videoContent {
@@ -1092,13 +1104,19 @@
 
 /* Features Section */
 .featuresSection {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  padding: 2rem 2rem;
-  margin: 2rem 0;
+  background: rgba(15, 23, 42, 0.82);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  padding: 3.5rem 2rem;
+  margin: 2.5rem 0;
   width: 100%;
   max-width: 1200px;
-  border-radius: 20px;
+  border-radius: 24px;
   color: white;
+  position: relative;
+  overflow: hidden;
 }
 
 .featuresContent {
@@ -1119,26 +1137,28 @@
 .featuresGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1rem;
+  gap: 1.25rem;
   width: 100%;
 }
 
 .featureCard {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  padding: 1rem;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 1.5rem;
+  border-radius: 18px;
   text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.4s ease;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   animation: slideInFromBottom 1s ease-out;
   position: relative;
   overflow: hidden;
   cursor: pointer;
-  height: 160px;
+  height: 170px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
 }
 
 .featureCard:nth-child(1) { animation-delay: 0.1s; }
@@ -1147,9 +1167,10 @@
 .featureCard:nth-child(4) { animation-delay: 0.4s; }
 
 .featureCard:hover {
-  transform: translateY(-8px) scale(1.05);
-  background: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+  transform: translateY(-8px) scale(1.03);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(99, 102, 241, 0.5);
+  box-shadow: 0 20px 40px rgba(99, 102, 241, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 .featureCard:hover .featureIcon,
@@ -1243,12 +1264,16 @@
 
 /* Stats Section */
 .statsSection {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 25%, #c084fc 50%, #f43f5e 75%, #38bdf8 100%);
+  background: rgba(15, 23, 42, 0.82);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
   padding: 4rem 2rem;
-  margin: 2rem 0;
+  margin: 2.5rem 0;
   width: 100%;
   max-width: 1200px;
-  border-radius: 20px;
+  border-radius: 24px;
   color: white;
   position: relative;
   overflow: hidden;
@@ -1262,7 +1287,7 @@
   right: 0;
   bottom: 0;
   background: url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1200&h=400&fit=crop&crop=center') center/cover;
-  opacity: 0.1;
+  opacity: 0.08;
   z-index: 1;
   filter: blur(2px);
   animation: backgroundFloat 20s ease-in-out infinite;
@@ -1275,15 +1300,10 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, 
-    rgba(99, 102, 241, 0.8) 0%, 
-    rgba(139, 92, 246, 0.7) 25%, 
-    rgba(240, 147, 251, 0.6) 50%, 
-    rgba(245, 87, 108, 0.7) 75%, 
-    rgba(79, 172, 254, 0.8) 100%
-  );
+  background: radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.25) 0%, transparent 50%),
+              radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.2) 0%, transparent 50%);
   z-index: 2;
-  animation: gradientShift 15s ease-in-out infinite;
+  pointer-events: none;
 }
 
 .statsContent {
@@ -1323,17 +1343,19 @@
 }
 
 .statCard {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   padding: 2rem;
-  border-radius: 16px;
+  border-radius: 20px;
   text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   overflow: hidden;
   min-width: 280px;
   flex-shrink: 0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 .statCard::before {
@@ -1357,8 +1379,9 @@
 .statCard:nth-child(4) { animation-delay: 0.4s; }
 
 .statCard:hover {
-  transform: scale(1.05);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  transform: translateY(-6px) scale(1.03);
+  border-color: rgba(139, 92, 246, 0.5);
+  box-shadow: 0 18px 40px rgba(139, 92, 246, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 .statNumber {
@@ -1408,12 +1431,16 @@
 
 /* Process Section */
 .processSection {
-  background: linear-gradient(135deg, #f472b6 0%, #fbbf24 100%);
+  background: rgba(15, 23, 42, 0.82);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
   padding: 4rem 2rem;
-  margin: 2rem 0;
+  margin: 2.5rem 0;
   width: 100%;
   max-width: 1200px;
-  border-radius: 20px;
+  border-radius: 24px;
   color: white;
   position: relative;
   overflow: hidden;
@@ -1427,7 +1454,7 @@
   right: 0;
   bottom: 0;
   background: url('https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=1200&h=400&fit=crop&crop=center') center/cover;
-  opacity: 0.1;
+  opacity: 0.08;
   z-index: 1;
 }
 
@@ -1438,11 +1465,10 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, 
-    rgba(244, 114, 182, 0.9) 0%, 
-    rgba(251, 191, 36, 0.9) 100%
-  );
+  background: radial-gradient(circle at 80% 20%, rgba(56, 189, 248, 0.2) 0%, transparent 50%),
+              radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.2) 0%, transparent 50%);
   z-index: 2;
+  pointer-events: none;
 }
 
 .processContent {
@@ -1474,12 +1500,14 @@
   display: flex;
   align-items: flex-start;
   gap: 1.5rem;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   padding: 2rem;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.3s ease;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   animation: slideInFromLeft 1s ease-out;
   position: relative;
   overflow: hidden;
@@ -1506,14 +1534,17 @@
 .processStep:nth-child(4) { animation-delay: 0.4s; }
 
 .processStep:hover {
-  transform: translateX(10px);
-  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-4px);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(56, 189, 248, 0.5);
+  box-shadow: 0 16px 40px rgba(56, 189, 248, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .stepNumber {
   width: 50px;
   height: 50px;
-  background: rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, #6366f1 0%, #38bdf8 100%);
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -1916,12 +1947,16 @@
 .section {
   width: 100%;
   max-width: 1200px;
-  background: #f0f6ff;
-  margin: 2rem 0;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  margin: 2.5rem 0;
   padding: 4rem 2rem;
   display: flex;
   justify-content: center;
-  border-radius: 20px;
+  border-radius: 24px;
   align-items: center;
   position: relative;
   overflow: hidden;
