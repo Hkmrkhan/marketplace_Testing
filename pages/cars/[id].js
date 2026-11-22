@@ -818,6 +818,7 @@ export default function CarDetails() {
                 setShowPaymentModal(false);
                 alert('Payment successful! Car marked as sold.');
               }}
+              onCancel={() => setShowPaymentModal(false)}
             />
           </div>
         </div>

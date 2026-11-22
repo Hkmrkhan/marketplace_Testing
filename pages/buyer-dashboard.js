@@ -1629,22 +1629,68 @@ export default function BuyerDashboard() {
       )}
 
       {checkoutCar && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-          background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
-        }}>
-          <div style={{ background: '#fff', padding: 32, borderRadius: 12, minWidth: 350 }}>
-            <h2>Pay for {checkoutCar.title}</h2>
-            <StripeCheckoutModal
-              car={checkoutCar}
-              userId={user.id}
-              onSuccess={async (paymentIntent) => {
-                await handlePurchase(checkoutCar); // Insert purchase from frontend (old working way)
-                setCheckoutCar(null);
-                alert('Payment successful! Car marked as sold.');
-              }}
-            />
-            <button onClick={() => setCheckoutCar(null)} style={{ marginTop: 16 }}>Cancel</button>
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-[9999] p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 text-slate-800 animate-in fade-in zoom-in-95 duration-200 my-8">
+            {/* Modal Header */}
+            <div className="relative px-6 pt-6 pb-4 border-b border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 text-lg shadow-sm">
+                  💳
+                </div>
+                <div>
+                  <h3 className="text-lg font-extrabold text-slate-900 m-0">Secure Checkout</h3>
+                  <p className="text-xs text-slate-500 m-0 font-medium">Encrypted & powered by Stripe</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCheckoutCar(null)}
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center text-base font-bold transition-colors cursor-pointer border-none"
+                aria-label="Close modal"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Vehicle Summary Snippet */}
+            <div className="px-6 pt-4 pb-2">
+              <div className="flex items-center gap-4 p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80">
+                <img
+                  src={checkoutCar.image_url || (checkoutCar.additional_images && checkoutCar.additional_images[0]) || '/carp2.png'}
+                  alt={checkoutCar.title}
+                  className="w-16 h-14 rounded-xl object-contain bg-slate-900 border border-slate-200 flex-shrink-0"
+                  onError={(e) => { e.target.src = '/carp2.png'; }}
+                />
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-sm font-bold text-slate-900 truncate m-0">
+                    {checkoutCar.title}
+                  </h4>
+                  <p className="text-xs text-slate-500 m-0 truncate">
+                    {checkoutCar.make || ''} {checkoutCar.model || ''} {checkoutCar.year ? `(${checkoutCar.year})` : ''}
+                  </p>
+                </div>
+                <div className="text-right flex-shrink-0">
+                  <span className="text-xs text-slate-400 block font-semibold">Total Price</span>
+                  <span className="text-base font-black text-indigo-600">
+                    ${Number(checkoutCar.price || 0).toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Stripe Checkout Form */}
+            <div className="px-6 py-4">
+              <StripeCheckoutModal
+                car={checkoutCar}
+                userId={user?.id}
+                onSuccess={async (paymentIntent) => {
+                  await handlePurchase(checkoutCar); // Insert purchase from frontend (old working way)
+                  setCheckoutCar(null);
+                  alert('Payment successful! Car marked as sold.');
+                }}
+                onCancel={() => setCheckoutCar(null)}
+              />
+            </div>
           </div>
         </div>
       )}
