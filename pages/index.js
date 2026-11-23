@@ -151,20 +151,30 @@ export default function HomePage() {
                 <div className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-indigo-500 via-purple-600 to-cyan-500 opacity-40 blur-xl group-hover:opacity-75 transition-opacity duration-500"></div>
                 
                 {/* Glass card container */}
-                <div className="relative backdrop-blur-2xl bg-slate-900/80 border border-white/20 rounded-3xl overflow-hidden p-3 shadow-2xl transition-all duration-500 group-hover:border-indigo-500/50">
-                  <div className="relative h-64 sm:h-72 w-full rounded-2xl overflow-hidden">
+                <div className="relative backdrop-blur-2xl bg-slate-900/85 border border-white/15 rounded-3xl overflow-hidden p-3.5 shadow-2xl transition-all duration-500 group-hover:border-indigo-500/50">
+                  {/* Clean, unobstructed car image */}
+                  <div className="relative h-60 sm:h-64 w-full rounded-2xl overflow-hidden bg-slate-950">
                     <img 
                       src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&h=600&fit=crop&crop=center" 
-                      alt="Lamborghini" 
+                      alt="Premium Selection" 
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent"></div>
-                    <div className="absolute bottom-4 left-4 right-4">
-                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/80 text-white backdrop-blur-md">
-                        Featured Highlight
+                    <div className="absolute top-3 left-3">
+                      <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold tracking-wide bg-slate-950/70 text-slate-200 backdrop-blur-md border border-white/10">
+                        Featured
                       </span>
-                      <h3 className="text-xl font-bold text-white mt-1">Premium Selection</h3>
-                      <p className="text-sm text-indigo-200">Luxury & Performance</p>
+                    </div>
+                  </div>
+
+                  {/* Minimalist text below image - clean and non-overlapping */}
+                  <div className="pt-3.5 pb-1 px-1.5 flex items-center justify-between">
+                    <div>
+                      <h3 className="text-base font-bold text-white tracking-tight">Premium Selection</h3>
+                      <p className="text-xs text-slate-400">Luxury & Performance</p>
+                    </div>
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-xs font-medium text-indigo-300">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                      <span>Verified</span>
                     </div>
                   </div>
                 </div>
