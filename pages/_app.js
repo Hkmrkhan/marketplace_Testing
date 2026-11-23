@@ -2,6 +2,7 @@ import '../styles/globals.css';
 import ErrorBoundary from '../components/ErrorBoundary';
 import AIChat from '../components/AIChat';
 import ComparisonSidebar from '../components/ComparisonSidebar';
+import CarPageLoader from '../components/CarPageLoader';
 import { ComparisonProvider } from '../utils/ComparisonContext';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
@@ -75,6 +76,9 @@ export default function App({ Component, pageProps }) {
   return (
     <ErrorBoundary>
       <ComparisonProvider>
+        {/* Global Page Load Car Animation */}
+        <CarPageLoader />
+
         <Component {...pageProps} />
         
         {/* Global AI Chat Assistant - Hidden on auth pages */}
@@ -91,4 +95,4 @@ export default function App({ Component, pageProps }) {
       </ComparisonProvider>
     </ErrorBoundary>
   );
-} 
+}
