@@ -61,6 +61,35 @@ a {
   text-decoration: none;
 }
 
+/* Universal input and textarea typography: crisp readable dark text on white/light surfaces */
+textarea,
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="file"]) {
+  color: #0f172a;
+}
+
+textarea::placeholder,
+input::placeholder {
+  color: #64748b;
+  opacity: 0.8;
+}
+
+/* Maintain light text for dark-themed inputs explicitly styled with Tailwind */
+input.text-white,
+textarea.text-white,
+input[class*="text-white"],
+textarea[class*="text-white"],
+input[class*="bg-slate-9"],
+textarea[class*="bg-slate-9"] {
+  color: #f8fafc !important;
+}
+
+input[class*="text-white"]::placeholder,
+textarea[class*="text-white"]::placeholder,
+input[class*="bg-slate-9"]::placeholder,
+textarea[class*="bg-slate-9"]::placeholder {
+  color: #94a3b8 !important;
+}
+
 * {
   box-sizing: border-box;
 }

@@ -603,7 +603,9 @@ function UnifiedSellerChat({ sellerId, myCars, buyersByCar }) {
               padding: '10px 12px',
               borderRadius: '6px',
               border: '1px solid #ddd',
-              fontSize: '14px'
+              fontSize: '14px',
+              color: '#0f172a',
+              backgroundColor: '#ffffff'
             }}
           />
           <button
@@ -3230,7 +3232,9 @@ export default function SellerDashboard() {
                   outline: 'none',
                   position: 'relative',
                   zIndex: 10,
-                  lineHeight: '1.4'
+                  lineHeight: '1.4',
+                  color: '#0f172a',
+                  backgroundColor: '#ffffff'
                 }}
                 onFocus={(e) => {
                   e.target.style.borderColor = '#6366f1';
@@ -3904,6 +3908,7 @@ export default function SellerDashboard() {
                         fontSize: '15px',
                         outline: 'none',
                         background: '#f1f5f9',
+                        color: '#0f172a',
                         transition: 'all 0.2s ease',
                         boxShadow: 'inset 0 1px 3px rgba(0, 0, 0, 0.1)'
                       }}
@@ -4154,7 +4159,9 @@ export default function SellerDashboard() {
                     border: '1px solid #e0e0e0',
                     borderRadius: '24px',
                     fontSize: '14px',
-                    outline: 'none'
+                    outline: 'none',
+                    color: '#0f172a',
+                    backgroundColor: '#ffffff'
                   }}
                 />
                 <button

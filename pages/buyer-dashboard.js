@@ -1444,7 +1444,8 @@ export default function BuyerDashboard() {
             display: 'flex',
             flexDirection: 'column',
             boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            color: '#0f172a'
           }}>
             <div style={{ 
               display: 'flex', 
@@ -1578,24 +1579,28 @@ export default function BuyerDashboard() {
                 placeholder="Type your message..."
                 style={{
                   flex: 1,
-                  padding: '12px',
-                  border: '1px solid #ddd',
-                  borderRadius: '8px',
+                  padding: '12px 14px',
+                  border: '1.5px solid #cbd5e1',
+                  borderRadius: '10px',
                   resize: 'none',
-                  minHeight: '50px',
+                  minHeight: '52px',
                   fontFamily: 'inherit',
-                  fontSize: '13px',
+                  fontSize: '14px',
+                  lineHeight: '1.4',
+                  color: '#0f172a',
+                  backgroundColor: '#ffffff',
                   transition: 'all 0.2s ease',
                   outline: 'none',
                   position: 'relative',
-                  zIndex: 10
+                  zIndex: 10,
+                  boxSizing: 'border-box'
                 }}
                 onFocus={(e) => {
                   e.target.style.borderColor = '#007bff';
-                  e.target.style.boxShadow = '0 0 0 2px rgba(0, 123, 255, 0.1)';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(0, 123, 255, 0.15)';
                 }}
                 onBlur={(e) => {
-                  e.target.style.borderColor = '#ddd';
+                  e.target.style.borderColor = '#cbd5e1';
                   e.target.style.boxShadow = 'none';
                 }}
                 rows="2"
