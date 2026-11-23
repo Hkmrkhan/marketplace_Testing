@@ -75,6 +75,13 @@ export default function BuyerDashboard() {
   const [sending, setSending] = useState(false);
   const [localMessages, setLocalMessages] = useState([]); // Local messages for modal
   const [imageIndexes, setImageIndexes] = useState({}); // carId: index
+  const [selectedCarDetails, setSelectedCarDetails] = useState(null);
+  const [modalImageIndex, setModalImageIndex] = useState(0);
+
+  const handleOpenDetails = (car) => {
+    setSelectedCarDetails(car);
+    setModalImageIndex(0);
+  };
 
 
 
