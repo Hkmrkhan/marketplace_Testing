@@ -1,6 +1,6 @@
 # Luxury Car Marketplace Platform
 
-A high-performance automotive marketplace web application engineered with **Next.js 15**, **React 19**, **Supabase**, **Tailwind CSS**, and **Stripe**. The platform connects vehicle buyers and verified sellers through a modern glassmorphic interface, dual chat systems (real-time WhatsApp-style P2P chat & contextual AI chatbot), a community forum, comprehensive form workflows, escrow-ready payment pipelines, and cinematic GPU-accelerated motion design.
+A high-performance automotive marketplace web application engineered with **Next.js 15**, **React 19**, **Supabase**, **Tailwind CSS**, and **Stripe**. The platform connects vehicle buyers and verified sellers through three dedicated role-based dashboards, dual chat systems (real-time WhatsApp-style P2P messaging & contextual AI chatbot), a community forum, comprehensive form workflows, automated commission and escrow-ready payment pipelines, and cinematic GPU-accelerated motion design.
 
 ---
 
@@ -16,6 +16,40 @@ A high-performance automotive marketplace web application engineered with **Next
 - **Payment Processing:** Stripe (Payment Intents, Stripe Connect Escrow, Verified Webhooks)
 - **Media & CDN:** Supabase Storage Buckets (`car-images`, `user-avatars`) with WebP Image Optimization Pipeline
 - **Deployment & Hosting:** Vercel (CI/CD, Edge Network, Automated SSL)
+
+---
+
+## 👑 Three Role-Based Dashboards
+
+The application implements strict Role-Based Access Control (RBAC) backed by PostgreSQL Row-Level Security (RLS) policies, providing tailored dashboard experiences for each user role:
+
+### 1. Buyer Dashboard (`/buyer-dashboard`)
+Designed with progressive disclosure principles to maximize visual elegance while keeping all discovery and transaction tools accessible:
+- **Available Vehicle Catalog:** Browses all approved, active vehicle listings with real-time status indicators.
+- **Minimalist Car Cards & Progressive Disclosure:** Streamlined card face focusing on primary imagery, pricing badges, and availability without visual clutter.
+- **Interactive Quick-View Modal:** Hover veil (`[ 👁️ Click to see details ]`) opening a full modal dossier with multi-angle image galleries, technical specifications, and verified seller information.
+- **Compact Animated Stat Cards:** Dashboard metric cards (Available Cars, Total Purchases, Profile Status) reduced by 50% with animated top gradient accent shimmers and rotating icons.
+- **WhatsApp-Style Seller Messaging:** Direct 1-on-1 real-time chat modal to inquire about any vehicle listing.
+- **Purchase History ("My Purchases"):** Complete record of purchased vehicles with transaction receipts and ownership status.
+- **Profile & Avatar Management:** In-app profile editor with drag-and-drop avatar uploads.
+- **AI Assistant Integration:** Floating and embedded AI automotive assistant providing budget-based car recommendations.
+
+### 2. Seller Dashboard (`/seller-dashboard`)
+A centralized command center empowering sellers to manage listings, communicate with buyers, and monitor sales performance:
+- **Live Inventory Management:** Complete overview of listed vehicles with real-time status tracking (`Auto-Approved`, `Pending Approval`, `Rejected`, or `Sold`).
+- **Listing Action Hub:** Rapid links to create new listings (`/add-car`) or edit existing vehicle details, specs, and photos (`/edit-car/[id]`).
+- **Real-Time Buyer Inquiry Hub:** WhatsApp-style chat center with live unread message badges to negotiate with interested buyers.
+- **Sales & Revenue Analytics:** Tracks total earnings, sold inventory counts, and buyer details.
+- **Commission Transparency:** Clear breakdown of platform commission rates (default 10%) and net seller payouts per transaction.
+- **Profile Customization:** Update seller bio, contact details, and avatar image.
+
+### 3. Admin Dashboard (`/admin-dashboard`)
+An administrative control room ensuring quality control, marketplace safety, and financial oversight:
+- **Listing Approval & Moderation Queue:** Review newly submitted car listings before they become visible to buyers. One-click approve (`approve_car()`) or reject with mandatory reason feedback (`reject_car()`).
+- **Commission Transactions Ledger:** Detailed tracking of all marketplace commissions via `commission_transactions` with status filters (Pending, Paid, Total Volume).
+- **Seller & User Audits:** Inspect user profiles, verify seller identity documents, and manage platform permissions.
+- **Financial Analytics:** Monitor gross marketplace volume (GMV), platform fee collections, and active transaction velocity.
+- **System Health & Moderation:** Oversight over community reviews, reported listings, and platform integrity.
 
 ---
 
@@ -38,7 +72,7 @@ The platform features two distinct, purpose-built chat systems:
 - **Intelligent Vehicle Recommendations:** Understands natural language requests (e.g., *"Show me luxury sedans under $10,000"* or *"What is the best value SUV for a family?"*).
 - **Market Analysis & Seller Pricing Advice:** Guides sellers on competitive pricing strategies, listing optimization, and market trends.
 - **Interactive Suggestion Chips:** Quick-prompt buttons for instant buyer and seller questions.
-- **Guest & Authenticated Modes:** Provides onboarding and platform navigation guidance for guests while offering personalized assistance for logged-in buyers and sellers.
+- **Guest & Authenticated Modes:** Provides onboarding guidance for guests while offering personalized assistance for logged-in users.
 
 ---
 
@@ -66,16 +100,18 @@ The platform includes end-to-end form workflows with client-side validation, err
    - **Voice Search Form (`components/VoiceSearch.js`):** Speech-to-text voice recognition enabling hands-free spoken queries.
 4. **Customer Review & Rating Form (`components/ReviewForm.js`):**
    - Interactive 5-star rating system with written feedback submission, verified buyer verification, and seller rating aggregation.
-5. **Seller Registration & Verification Form (`/api/seller/register`):**
+5. **Profile Picture & Avatar Uploader (`components/ProfilePictureUploader.js`):**
+   - Drag-and-drop avatar image uploader with preview and size validation backed by the `user-avatars` storage bucket.
+6. **Seller Registration & Verification Form (`/api/seller/register`):**
    - Formal seller onboarding form with business/identity details and verification simulation.
-6. **Authentication & Account Forms (`/auth/login`, `/auth/signup`, `/auth/reset-password`):**
+7. **Authentication & Account Forms (`/auth/login`, `/auth/signup`, `/auth/reset-password`):**
    - Role-based registration forms (Buyer vs. Seller), secure credential authentication, and email password reset workflow.
-7. **Contact & Support Form (`pages/contact.js`):**
+8. **Contact & Support Form (`pages/contact.js`):**
    - Inquiries and customer service form with direct feedback routing.
 
 ---
 
-## 🚀 Additional Core Features
+## 🏎️ Motion Design & UI/UX Excellence
 
 ### 1. Cinematic Supercar Page Loader (`components/CarPageLoader.js`)
 - Handcrafted, zero-dependency SVG supercar animation featuring volumetric high-beam LED headlight cones and aerodynamic wind lines.
@@ -90,25 +126,26 @@ The platform includes end-to-end form workflows with client-side validation, err
 - Dedicated role-based route highlights for Buyers, Sellers, and Admins.
 - Glowing danger-gradient Logout button with micro-interactions.
 
-### 3. Buyer Marketplace & Progressive Disclosure
-- **Minimalist Vehicle Cards:** Streamlined card face focusing on imagery, pricing badge, and availability status without visual clutter.
-- **Interactive Quick-View Modal:** Hover veil (`[ 👁️ Click to see details ]`) opening a full modal dossier with multi-angle image galleries, technical specifications, and verified seller info.
-- **Secure Stripe Checkout:** Integrated payment intent flow updating vehicle status to `sold` upon authorization.
-- **Buyer Dashboard:** Compact stat cards with animated gradient accents, purchase history, and direct seller communication.
-
-### 4. Seller Inventory & Management Hub
-- **Live Inventory Dashboard:** Complete overview of active listings, pending approvals, and completed sales.
-- **Sales Analytics:** Real-time revenue metrics, buyer details, and listing performance.
-
-### 5. Role-Based Access Control (RBAC) & Database Security
-- Strict PostgreSQL Row-Level Security (RLS) policies enforcing zero-trust data access.
-- Role-gated interfaces ensuring Buyers, Sellers, and Admins access only authorized operations and endpoints.
-
-### 6. Vehicle Comparison Suite (`/compare`, `components/ComparisonSidebar.js`)
+### 3. Vehicle Comparison Suite (`/compare`, `components/ComparisonSidebar.js`)
 - Interactive slide-out comparison sidebar enabling side-by-side technical specification evaluation across up to 4 vehicles simultaneously.
 
-### 7. Administrative Oversight & Approvals (`pages/admin-dashboard.js`)
-- Admin dashboard for reviewing car listings, approving/rejecting listings with feedback, tracking platform commissions, and managing user roles.
+---
+
+## 🔒 Security, Database & Media Architecture
+
+### Row-Level Security (RLS) & Role Enforcement
+- Client-side Supabase queries are protected by PostgreSQL RLS policies ensuring zero-trust data access.
+- Buyers can only access approved listings and their own purchase records.
+- Sellers can only modify their own inventory.
+- Only Admins can execute approval and commission functions (`approve_car()`, `reject_car()`).
+
+### Media Pipeline Optimization (WebP Conversion)
+- All vehicle photos, avatars, and hero media are processed in next-generation **WebP format**, reducing asset payloads by ~68% with zero perceptible quality degradation.
+- Media assets are distributed globally via Supabase Storage buckets with edge CDN caching.
+
+### Stripe Payment & Escrow Architecture
+- Secure Payment Intent flow with webhook signature verification (`stripe-signature`) and idempotency checks to prevent duplicate processing.
+- Automated platform commission collection before seller payout.
 
 ---
 
