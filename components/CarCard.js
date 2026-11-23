@@ -10,7 +10,7 @@ export default function CarCard({ car, userProfile }) {
   
   // Combine primary image with additional images
   const allImages = getAllCarImages(car);
-  const imageSrc = allImages[currentImageIndex] || allImages[0] || '/carp2.png';
+  const imageSrc = allImages[currentImageIndex] || allImages[0] || '/carp2.webp';
 
   const handleCarClick = () => {
     router.push(`/cars/${car.car_id || car.id}`);

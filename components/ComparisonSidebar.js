@@ -45,7 +45,7 @@ export default function ComparisonSidebar() {
         {comparisonCars.map(car => (
           <div key={car.id} className="flex items-center gap-3 p-2 rounded-2xl bg-white/5 border border-white/5 hover:border-white/10 transition-all">
             <img 
-              src={car.image_url || car.image || '/carp2.png'} 
+              src={car.image_url || car.image || '/carp2.webp'} 
               alt={car.title} 
               className="w-14 h-12 rounded-xl object-cover"
             />

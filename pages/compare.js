@@ -203,7 +203,7 @@ export default function ComparePage() {
                     <th key={car.id} className="p-4 sm:p-6 text-center">
                       <div className="relative h-32 w-full max-w-[200px] mx-auto rounded-2xl overflow-hidden mb-3 border border-white/10">
                         <img 
-                          src={car.image_url || car.image || '/carp2.png'} 
+                          src={car.image_url || car.image || '/carp2.webp'} 
                           alt={car.title} 
                           className="w-full h-full object-cover"
                         />

@@ -339,7 +339,7 @@ export default function LoginPage() {
         <div className="lg:col-span-5 relative bg-gradient-to-br from-indigo-900/60 via-purple-900/40 to-slate-950 p-8 sm:p-12 flex flex-col justify-between border-t lg:border-t-0 lg:border-l border-white/10">
           <div>
             <div className="relative rounded-2xl overflow-hidden mb-8 border border-white/10 shadow-xl">
-              <img src="/carp5.png" alt="Car Marketplace" className="w-full h-48 object-cover" />
+              <img src="/carp5.webp" alt="Car Marketplace" className="w-full h-48 object-cover" />
             </div>
             
             <h2 className="text-2xl font-bold text-white mb-3">Welcome Back!</h2>

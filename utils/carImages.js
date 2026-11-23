@@ -9,28 +9,28 @@ export function getFallbackCarImage(title = '') {
   const t = (title || '').toLowerCase().trim();
   
   if (t.includes('v8') || t.includes('land cruiser') || t.includes('cruiser')) {
-    return '/v8.png';
+    return '/v8.webp';
   }
   if (t.includes('xli') || t.includes('corolla') || t.includes('gli') || t.includes('toyota')) {
-    return '/xli.png';
+    return '/xli.webp';
   }
   if (t.includes('ferrari')) {
-    return '/ferrari.png';
+    return '/ferrari.webp';
   }
   if (t.includes('prado') || t.includes('parado')) {
-    return '/carp4.png';
+    return '/carp4.webp';
   }
   if (t.includes('lamb') || t.includes('lambergini') || t.includes('lamborghini')) {
-    return '/carp5.png';
+    return '/carp5.webp';
   }
   if (t.includes('sonata') || t.includes('audi') || t.includes('camry')) {
-    return '/carp3.png';
+    return '/carp3.webp';
   }
-  return '/carp2.png';
+  return '/carp2.webp';
 }
 
 export function getAllCarImages(car) {
-  if (!car) return ['/carp2.png'];
+  if (!car) return ['/carp2.webp'];
   
   const fallback = getFallbackCarImage(car.title || car.cars?.title);
   const images = [];

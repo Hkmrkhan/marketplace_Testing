@@ -94,7 +94,7 @@ export default function HomePage() {
           {/* Hero Background with Glow Gradients */}
           <div className="absolute inset-0 z-0">
             <img 
-              src="/hero.png" 
+              src="/hero.webp" 
               alt="Car Marketplace" 
               className="w-full h-full object-cover object-center filter brightness-40 contrast-125 scale-105 transform motion-safe:animate-pulse-glow" 
             />

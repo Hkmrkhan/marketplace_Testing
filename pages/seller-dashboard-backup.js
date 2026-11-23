@@ -735,7 +735,7 @@ export default function SellerDashboard() {
     const images = [];
     if (car.image_url && car.image_url.trim() !== '') images.push(car.image_url);
     if (car.additional_images && Array.isArray(car.additional_images)) images.push(...car.additional_images.filter(img => img && img.trim() !== ''));
-    return images.length > 0 ? images : ['/carp2.png'];
+    return images.length > 0 ? images : ['/carp2.webp'];
   };
 
   useEffect(() => {

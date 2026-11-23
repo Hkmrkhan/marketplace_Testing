@@ -37,8 +37,8 @@ export default function DashboardPage() {
       
       // Mock user's cars for demonstration
       const mockCars = [
-        { id: 'car-1', user_id: mockUser.id, title: 'Mock Car 1', price: 10000, image_url: '/hero.png' },
-        { id: 'car-2', user_id: mockUser.id, title: 'Mock Car 2', price: 20000, image_url: '/hero.png' },
+        { id: 'car-1', user_id: mockUser.id, title: 'Mock Car 1', price: 10000, image_url: '/hero.webp' },
+        { id: 'car-2', user_id: mockUser.id, title: 'Mock Car 2', price: 20000, image_url: '/hero.webp' },
       ];
       setUserCars(mockCars);
     };
@@ -126,7 +126,7 @@ export default function DashboardPage() {
                 <div className={styles.carsGrid}>
                   {userCars.map(car => (
                     <div key={car.id} className={styles.carCard}>
-                      <img src={car.image_url || '/hero.png'} alt={car.title} />
+                      <img src={car.image_url || '/hero.webp'} alt={car.title} />
                       <h3>{car.title}</h3>
                       <p>${car.price}</p>
                     </div>

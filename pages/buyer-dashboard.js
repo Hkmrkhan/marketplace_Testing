@@ -1152,7 +1152,7 @@ export default function BuyerDashboard() {
                         <div className={styles.carImageContainer}>
                           {/* Main image */}
                           <img
-                            src={carImages[currentImageIndex] || '/carp2.png'}
+                            src={carImages[currentImageIndex] || '/carp2.webp'}
                             alt={car.title}
                             className={styles.mainImage}
                             onError={(e) => onImageErrorFallback(e, car.title)}
@@ -1325,7 +1325,7 @@ export default function BuyerDashboard() {
                         <div className={styles.carImageContainer}>
                           {/* Main image */}
                           <img
-                            src={purchaseImages[currentImageIndex] || '/carp2.png'}
+                            src={purchaseImages[currentImageIndex] || '/carp2.webp'}
                             alt={purchase.title || purchase.cars?.title || "Car"}
                             className={styles.mainImage}
                             onError={(e) => onImageErrorFallback(e, purchase.title || purchase.cars?.title)}
@@ -1674,10 +1674,10 @@ export default function BuyerDashboard() {
             <div className="px-6 pt-4 pb-2">
               <div className="flex items-center gap-4 p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80">
                 <img
-                  src={checkoutCar.image_url || (checkoutCar.additional_images && checkoutCar.additional_images[0]) || '/carp2.png'}
+                  src={checkoutCar.image_url || (checkoutCar.additional_images && checkoutCar.additional_images[0]) || '/carp2.webp'}
                   alt={checkoutCar.title}
                   className="w-16 h-14 rounded-xl object-cover bg-slate-100 border border-slate-200 flex-shrink-0"
-                  onError={(e) => { e.target.src = '/carp2.png'; }}
+                  onError={(e) => { e.target.src = '/carp2.webp'; }}
                 />
                 <div className="flex-1 min-w-0">
                   <h4 className="text-sm font-bold text-slate-900 truncate m-0">

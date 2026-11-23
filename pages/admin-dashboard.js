@@ -873,7 +873,7 @@ export default function AdminDashboard() {
                     <div key={car.id} className={styles.carCard}>
                       <div className={styles.carImageContainer}>
                         <img
-                          src={car.image_url || '/carp2.png'}
+                          src={car.image_url || '/carp2.webp'}
                           alt={car.title}
                           className={styles.mainImage}
                           onError={(e) => onImageErrorFallback(e, car.title)}
@@ -1016,7 +1016,7 @@ export default function AdminDashboard() {
                     <div key={car.id} className={styles.carCard}>
                       <div className={styles.carImageContainer}>
                         <img
-                          src={car.image_url || '/carp2.png'}
+                          src={car.image_url || '/carp2.webp'}
                           alt={car.title}
                           className={styles.mainImage}
                           onError={(e) => onImageErrorFallback(e, car.title)}
@@ -1107,7 +1107,7 @@ export default function AdminDashboard() {
                     <div key={commission.id} className={styles.carCard}>
                       <div className={styles.carImageContainer}>
                         <img
-                          src={commission.car_image_url || '/carp2.png'}
+                          src={commission.car_image_url || '/carp2.webp'}
                           alt={commission.car_title}
                           className={styles.mainImage}
                           onError={(e) => onImageErrorFallback(e, commission.car_title)}
@@ -1275,10 +1275,10 @@ export default function AdminDashboard() {
                       <div key={commission.id} className={styles.commissionCard}>
                         <div className={styles.carImage}>
                           <img 
-                            src={commission.car_image_url || '/carp2.png'} 
+                            src={commission.car_image_url || '/carp2.webp'} 
                             alt={commission.car_title}
                             onError={(e) => {
-                              e.target.src = '/carp2.png';
+                              e.target.src = '/carp2.webp';
                             }}
                           />
                         </div>

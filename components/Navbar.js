@@ -69,7 +69,7 @@ export default function Navbar({ logoText }) {
           <Link href="/" className="flex items-center gap-3 group">
             <div className="relative w-10 h-10 rounded-xl overflow-hidden bg-gradient-to-tr from-indigo-600 to-violet-500 p-[1px] shadow-lg shadow-indigo-500/25 transition-transform duration-300 group-hover:scale-105">
               <div className="w-full h-full bg-slate-950 rounded-[11px] flex items-center justify-center p-1">
-                <img src="/logo.png" alt="Car Marketplace Logo" className="w-full h-full object-contain" />
+                <img src="/logo.webp" alt="Car Marketplace Logo" className="w-full h-full object-contain" />
               </div>
             </div>
             <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-100 to-indigo-300 bg-clip-text text-transparent group-hover:to-cyan-300 transition-colors">

@@ -206,7 +206,7 @@ export default function CarsPage() {
             </div>
 
             <div className="w-full max-w-sm rounded-2xl overflow-hidden border border-white/10 shadow-lg">
-              <img src="/carp.png" alt="Cars for Sale" className="w-full h-auto object-cover" />
+              <img src="/carp.webp" alt="Cars for Sale" className="w-full h-auto object-cover" />
             </div>
           </div>
         </div>
@@ -243,7 +243,7 @@ export default function CarsPage() {
           </div>
         ) : filteredCars.length === 0 ? (
           <div className="py-20 text-center rounded-3xl backdrop-blur-xl bg-slate-900/50 border border-white/10 p-8 max-w-md mx-auto">
-            <img src="/carp2.png" alt="No Cars" className="w-40 h-auto mx-auto mb-4 opacity-75" />
+            <img src="/carp2.webp" alt="No Cars" className="w-40 h-auto mx-auto mb-4 opacity-75" />
             <h3 className="text-xl font-bold text-white mb-2">No cars found</h3>
             <p className="text-xs text-slate-400">
               {searchTerm ? 'Try adjusting your search terms or filters' : 'Be the first to add a car!'}
