@@ -37,7 +37,6 @@ export default function Reviews({ carId, currentUserId, currentUserType, carSell
       console.log('👤 Current User ID:', currentUserId);
       console.log('🌐 API URL:', `/api/reviews/get?car_id=${carId}`);
       
-      // Add timeout to prevent infinite loading
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 seconds timeout
       
@@ -62,7 +61,6 @@ export default function Reviews({ carId, currentUserId, currentUserType, carSell
         const errorText = await response.text();
         console.error('❌ Error Response Body:', errorText);
         
-        // Try to parse error details
         let errorDetails = 'Unknown error';
         try {
           const errorData = JSON.parse(errorText);
@@ -86,7 +84,6 @@ export default function Reviews({ carId, currentUserId, currentUserType, carSell
         setReviews(data.reviews || []);
         setStats(data.stats || {});
         
-        // Find if current user has already reviewed this car
         if (currentUserId) {
           const userReview = data.reviews?.find(review => review.reviewer_id === currentUserId);
           console.log('👤 User Review Found:', userReview);
@@ -111,7 +108,6 @@ export default function Reviews({ carId, currentUserId, currentUserType, carSell
         console.error('⏰ Request timed out');
         setError('Request timed out. Please try again.');
       } else {
-        // Provide more helpful error messages
         let errorMessage = error.message;
         if (error.message.includes('Database connection failed')) {
           errorMessage = 'Database connection issue. Please try again later.';
@@ -136,13 +132,11 @@ export default function Reviews({ carId, currentUserId, currentUserType, carSell
 
   const handleSubmitReview = async (reviewData) => {
     try {
-      // Get the current session token
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         throw new Error('No active session. Please login again.');
       }
 
-      // If editing existing review, use PUT method
       if (editingReview) {
         const response = await fetch('/api/reviews/update', {
           method: 'PUT',
@@ -167,7 +161,6 @@ export default function Reviews({ carId, currentUserId, currentUserType, carSell
           throw new Error(data.error || 'Failed to update review');
         }
       } else {
-        // Create new review
         const response = await fetch('/api/reviews/create', {
           method: 'POST',
           headers: {
@@ -207,13 +200,11 @@ export default function Reviews({ carId, currentUserId, currentUserType, carSell
     }
 
     try {
-      // Get the current session token
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         throw new Error('No active session. Please login again.');
       }
 
-      // Debug logging
       console.log('Delete Review Frontend Debug:', {
         currentUserId,
         currentUserType,
@@ -285,10 +276,10 @@ export default function Reviews({ carId, currentUserId, currentUserType, carSell
 
   return (
     <div className={styles.reviewsContainer}>
-      {/* Reviews Header */}
+      
       <div className={styles.reviewsHeader}>
         <h2>Customer Reviews</h2>
-        {/* Show Write Review button only for buyers who haven't reviewed and aren't the seller */}
+        
         {currentUserId && 
          currentUserType === 'buyer' && 
          currentUserId !== carSellerId && 
@@ -302,7 +293,6 @@ export default function Reviews({ carId, currentUserId, currentUserType, carSell
         )}
       </div>
 
-      {/* Review Form */}
       {showForm && (
         <div className={styles.reviewFormWrapper}>
           <ReviewForm
@@ -314,7 +304,6 @@ export default function Reviews({ carId, currentUserId, currentUserType, carSell
         </div>
       )}
 
-      {/* Reviews List */}
       <ReviewList
         reviews={reviews}
         stats={stats}
@@ -324,11 +313,10 @@ export default function Reviews({ carId, currentUserId, currentUserType, carSell
         onDeleteReview={handleDeleteReview}
       />
 
-      {/* No Reviews Message */}
       {!loading && reviews.length === 0 && (
         <div className={styles.noReviewsMessage}>
           <p>No reviews yet for this car.</p>
-          {/* Show button only for buyers who aren't the seller */}
+          
           {currentUserId && 
            currentUserType === 'buyer' && 
            currentUserId !== carSellerId && (

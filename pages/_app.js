@@ -16,13 +16,11 @@ export default function App({ Component, pageProps }) {
   const router = useRouter();
 
   useEffect(() => {
-    // Log environment status in development
     if (process.env.NODE_ENV === 'development') {
       const envInfo = checkEnvironment();
       console.log('🔍 Environment Status:', envInfo);
     }
 
-    // Check if current page is an auth page
     const checkAuthPage = () => {
       const path = router.pathname;
       const authPaths = [
@@ -44,13 +42,10 @@ export default function App({ Component, pageProps }) {
       console.log('🔍 Route check:', { path, isAuth, showAI: !isAuth });
     };
 
-    // Initial check
     checkAuthPage();
 
-    // Listen for route changes
     router.events.on('routeChangeComplete', checkAuthPage);
 
-    // Get user profile for AI chatbot
     const getUserProfile = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
@@ -67,7 +62,6 @@ export default function App({ Component, pageProps }) {
 
     getUserProfile();
 
-    // Cleanup
     return () => {
       router.events.off('routeChangeComplete', checkAuthPage);
     };
@@ -76,12 +70,11 @@ export default function App({ Component, pageProps }) {
   return (
     <ErrorBoundary>
       <ComparisonProvider>
-        {/* Global Page Load Car Animation */}
+        
         <CarPageLoader />
 
         <Component {...pageProps} />
-        
-        {/* Global AI Chat Assistant - Hidden on auth pages */}
+
         {!loading && !isAuthPage && (
           <AIChat 
             context="global" 
@@ -89,8 +82,7 @@ export default function App({ Component, pageProps }) {
             userId={userProfile?.id}
           />
         )}
-        
-        {/* Global Comparison Sidebar */}
+
         <ComparisonSidebar />
       </ComparisonProvider>
     </ErrorBoundary>

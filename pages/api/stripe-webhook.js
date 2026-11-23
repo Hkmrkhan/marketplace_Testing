@@ -3,7 +3,6 @@ import { createClient } from '@supabase/supabase-js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// Create admin client with service role key
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -66,10 +65,8 @@ async function handlePaymentSucceeded(paymentIntent) {
   const { carId, userId, sellerId, adminCommission, sellerAmount } = paymentIntent.metadata;
 
   try {
-    // 1. Create purchase record
     console.log('Creating purchase record...');
     
-    // Check if purchase already exists to prevent duplicates
     const { data: existingPurchase } = await supabaseAdmin
       .from('purchases')
       .select('id')
@@ -80,7 +77,6 @@ async function handlePaymentSucceeded(paymentIntent) {
       console.log('Purchase already exists for this car, skipping purchase creation');
       console.log('Existing purchase ID:', existingPurchase.id);
     } else {
-      // Get car details to fetch seller_id
       const { data: carDetails, error: carError } = await supabaseAdmin
         .from('cars')
         .select('seller_id')
@@ -113,7 +109,6 @@ async function handlePaymentSucceeded(paymentIntent) {
       console.log('✅ Purchase record created:', purchaseData);
     }
 
-    // 2. Update car status to sold
     console.log('Updating car status to sold...');
     const { error: carUpdateError } = await supabaseAdmin
       .from('cars')
@@ -131,7 +126,6 @@ async function handlePaymentSucceeded(paymentIntent) {
 
     console.log('✅ Car status updated to sold');
 
-    // 3. Create admin commission record
     console.log('Creating admin commission record...');
     const { data: commissionData, error: commissionError } = await supabaseAdmin
       .from('admin_commissions')
@@ -172,7 +166,6 @@ async function handleTransferCreated(transfer) {
   console.log('Amount:', transfer.amount);
   console.log('Destination:', transfer.destination);
   
-  // Log transfer details for monitoring
   console.log('✅ Transfer logged successfully');
 }
 
@@ -181,7 +174,6 @@ async function handleAccountUpdated(account) {
   console.log('Account ID:', account.id);
   console.log('Status:', account.charges_enabled);
   
-  // You can update profile status here if needed
   if (account.charges_enabled) {
     console.log('✅ Account is now ready to receive payments');
   }

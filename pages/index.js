@@ -7,7 +7,6 @@ export default function HomePage() {
   const router = useRouter();
   const carCarouselRef = useRef(null);
 
-  // Carousel scroll function
   const scrollCarousel = (direction) => {
     if (carCarouselRef.current) {
       const scrollAmount = 320;
@@ -19,7 +18,6 @@ export default function HomePage() {
     }
   };
 
-  // Parallax effect on scroll
   useEffect(() => {
     const handleScroll = () => {
       const scrolled = window.pageYOffset;
@@ -36,7 +34,6 @@ export default function HomePage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Counting animation for stats
   useEffect(() => {
     const animateCount = (element, target, duration = 2000) => {
       let start = 0;
@@ -88,29 +85,25 @@ export default function HomePage() {
       <Navbar />
 
       <main className="flex-1 w-full overflow-x-hidden">
-        
-        {/* Hero Section */}
+
         <div className="relative min-h-[90vh] flex items-center justify-center overflow-hidden py-16 px-4 sm:px-6 lg:px-8">
-          {/* Hero Background with Glow Gradients */}
+          
           <div className="absolute inset-0 z-0">
             <img 
               src="/hero.webp" 
               alt="Car Marketplace" 
               className="w-full h-full object-cover object-center filter brightness-40 contrast-125 scale-105 transform motion-safe:animate-pulse-glow" 
             />
-            {/* Dark & Aurora Radial Overlays */}
+            
             <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-950/60 to-[#070b14]"></div>
             <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
             <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-600/15 rounded-full blur-3xl pointer-events-none"></div>
           </div>
 
-          {/* Hero Content */}
           <div className="relative z-10 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            
-            {/* Left Column: Text & CTAs */}
+
             <div className="lg:col-span-7 flex flex-col items-start text-left space-y-6">
 
-              {/* Title */}
               <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] text-white">
                 Welcome to <br />
                 <span className="bg-gradient-to-r from-white via-indigo-200 to-cyan-400 bg-clip-text text-transparent drop-shadow-sm">
@@ -118,7 +111,6 @@ export default function HomePage() {
                 </span>
               </h1>
 
-              {/* Description */}
               <p className="text-base sm:text-lg text-slate-300 max-w-2xl leading-relaxed">
                 Discover the easiest way to buy and sell cars online. Our platform connects buyers and sellers with a seamless experience, offering the best deals and trusted transactions.
               </p>
@@ -127,7 +119,6 @@ export default function HomePage() {
                 Buy and sell cars easily!
               </p>
 
-              {/* Action Buttons */}
               <div className="flex flex-wrap items-center gap-4 pt-2">
                 <button 
                   onClick={() => router.push('/cars')}
@@ -144,15 +135,13 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right Column: Hero Car Showcase Card */}
             <div className="lg:col-span-5 flex justify-center">
               <div className="relative group w-full max-w-md">
-                {/* Ambient glow behind card */}
-                <div className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-indigo-500 via-purple-600 to-cyan-500 opacity-40 blur-xl group-hover:opacity-75 transition-opacity duration-500"></div>
                 
-                {/* Glass card container */}
+                <div className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-indigo-500 via-purple-600 to-cyan-500 opacity-40 blur-xl group-hover:opacity-75 transition-opacity duration-500"></div>
+
                 <div className="relative backdrop-blur-2xl bg-slate-900/85 border border-white/15 rounded-3xl overflow-hidden p-3.5 shadow-2xl transition-all duration-500 group-hover:border-indigo-500/50">
-                  {/* Clean, unobstructed car image */}
+                  
                   <div className="relative h-60 sm:h-64 w-full rounded-2xl overflow-hidden bg-slate-950">
                     <img 
                       src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&h=600&fit=crop&crop=center" 
@@ -166,7 +155,6 @@ export default function HomePage() {
                     </div>
                   </div>
 
-                  {/* Minimalist text below image - clean and non-overlapping */}
                   <div className="pt-3.5 pb-1 px-1.5 flex items-center justify-between">
                     <div>
                       <h3 className="text-base font-bold text-white tracking-tight">Premium Selection</h3>
@@ -184,11 +172,9 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Trusted by Millions Section */}
         <section className="relative py-20 px-4 sm:px-6 lg:px-8 border-t border-white/10 backdrop-blur-md bg-slate-950/50">
           <div className="max-w-7xl mx-auto text-center">
-            
-            {/* Browser Logos */}
+
             <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 mb-12">
               <div className="flex items-center gap-2 px-4 py-2 rounded-xl backdrop-blur-md bg-white/[0.04] border border-white/10 text-slate-300 text-sm font-medium">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
@@ -230,12 +216,10 @@ export default function HomePage() {
             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-12 bg-gradient-to-r from-white via-indigo-200 to-cyan-300 bg-clip-text text-transparent">
               Trusted by Millions
             </h2>
-            
-            {/* Testimonials Carousel */}
+
             <div className="relative overflow-hidden w-full py-4 [mask-image:linear-gradient(to_right,transparent,white_15%,white_85%,transparent)]">
               <div className="flex gap-6 animate-[scrollLeft_35s_linear_infinite] w-max hover:[animation-play-state:paused]">
-                
-                {/* Testimonial Card 1 */}
+
                 <div className="w-[340px] sm:w-[380px] p-6 rounded-2xl backdrop-blur-xl bg-slate-900/70 border border-white/10 text-left shadow-xl hover:border-indigo-500/40 transition-all flex flex-col justify-between">
                   <div>
                     <div className="flex text-amber-400 text-lg mb-2">★★★★★</div>
@@ -253,7 +237,6 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Testimonial Card 2 */}
                 <div className="w-[340px] sm:w-[380px] p-6 rounded-2xl backdrop-blur-xl bg-slate-900/70 border border-white/10 text-left shadow-xl hover:border-indigo-500/40 transition-all flex flex-col justify-between">
                   <div>
                     <div className="flex text-amber-400 text-lg mb-2">★★★★★</div>
@@ -271,7 +254,6 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Testimonial Card 3 */}
                 <div className="w-[340px] sm:w-[380px] p-6 rounded-2xl backdrop-blur-xl bg-slate-900/70 border border-white/10 text-left shadow-xl hover:border-indigo-500/40 transition-all flex flex-col justify-between">
                   <div>
                     <div className="flex text-amber-400 text-lg mb-2">★★★★★</div>
@@ -289,7 +271,6 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Testimonial Card 4 */}
                 <div className="w-[340px] sm:w-[380px] p-6 rounded-2xl backdrop-blur-xl bg-slate-900/70 border border-white/10 text-left shadow-xl hover:border-indigo-500/40 transition-all flex flex-col justify-between">
                   <div>
                     <div className="flex text-amber-400 text-lg mb-2">★★★★★</div>
@@ -307,7 +288,6 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Testimonial Card 5 */}
                 <div className="w-[340px] sm:w-[380px] p-6 rounded-2xl backdrop-blur-xl bg-slate-900/70 border border-white/10 text-left shadow-xl hover:border-indigo-500/40 transition-all flex flex-col justify-between">
                   <div>
                     <div className="flex text-amber-400 text-lg mb-2">★★★★★</div>
@@ -325,7 +305,6 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Testimonial Card 6 */}
                 <div className="w-[340px] sm:w-[380px] p-6 rounded-2xl backdrop-blur-xl bg-slate-900/70 border border-white/10 text-left shadow-xl hover:border-indigo-500/40 transition-all flex flex-col justify-between">
                   <div>
                     <div className="flex text-amber-400 text-lg mb-2">★★★★★</div>
@@ -343,7 +322,6 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Duplicate cards for seamless infinite animation */}
                 <div className="w-[340px] sm:w-[380px] p-6 rounded-2xl backdrop-blur-xl bg-slate-900/70 border border-white/10 text-left shadow-xl hover:border-indigo-500/40 transition-all flex flex-col justify-between">
                   <div>
                     <div className="flex text-amber-400 text-lg mb-2">★★★★★</div>
@@ -383,7 +361,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Interactive Car Showcase Carousel */}
         <section className="relative py-24 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
             
@@ -392,8 +369,7 @@ export default function HomePage() {
                 <span className="text-xs uppercase tracking-wider font-semibold text-indigo-400">Inventory</span>
                 <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-1">Featured Cars</h2>
               </div>
-              
-              {/* Carousel Controls */}
+
               <div className="flex items-center gap-3">
                 <button 
                   onClick={() => scrollCarousel('left')}
@@ -412,7 +388,6 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Scrollable Cars Container */}
             <div 
               ref={carCarouselRef}
               className="flex gap-6 overflow-x-auto pb-6 scrollbar-none snap-x snap-mandatory scroll-smooth"
@@ -461,7 +436,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Video Section */}
         <section className="relative py-20 px-4 sm:px-6 lg:px-8 border-t border-b border-white/10 bg-slate-950/70 backdrop-blur-md">
           <div className="max-w-5xl mx-auto text-center">
             <span className="text-xs uppercase tracking-wider font-semibold text-cyan-400">Overview</span>
@@ -489,7 +463,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Features Section */}
         <section className="relative py-24 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto text-center">
             <span className="text-xs uppercase tracking-wider font-semibold text-indigo-400">Platform Benefits</span>
@@ -524,7 +497,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Stats Section */}
         <section id="stats-section" className="relative py-20 px-4 sm:px-6 lg:px-8 bg-slate-950/80 border-t border-b border-white/10 backdrop-blur-md">
           <div className="max-w-7xl mx-auto text-center">
             <span className="text-xs uppercase tracking-wider font-semibold text-cyan-400">Metrics</span>
@@ -532,7 +504,6 @@ export default function HomePage() {
               Our Impact
             </h2>
 
-            {/* Marquee stats track */}
             <div className="relative overflow-hidden w-full py-4 [mask-image:linear-gradient(to_right,transparent,white_15%,white_85%,transparent)]">
               <div className="flex gap-6 animate-[scrollLeft_30s_linear_infinite] w-max hover:[animation-play-state:paused]">
                 {[
@@ -544,7 +515,6 @@ export default function HomePage() {
                   { num: '15+', label: 'Car Brands' },
                   { num: '98%', label: 'Customer Satisfaction' },
                   { num: '5★', label: 'Average Rating' },
-                  // Duplicates for seamless infinite marquee
                   { num: '10,000+', label: 'Cars Sold' },
                   { num: '50,000+', label: 'Happy Customers' },
                   { num: '99.9%', label: 'Success Rate' },
@@ -565,7 +535,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Process Section */}
         <section className="relative py-24 px-4 sm:px-6 lg:px-8">
           <div className="max-w-6xl mx-auto text-center">
             <span className="text-xs uppercase tracking-wider font-semibold text-indigo-400">Simple Workflow</span>
@@ -595,7 +564,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Parallax Section */}
         <section id="parallax-section" className="relative py-28 px-4 sm:px-6 lg:px-8 overflow-hidden bg-slate-950/80 border-t border-b border-white/10">
           <div className="absolute inset-0 pointer-events-none opacity-40">
             <div className="parallax-layer absolute top-0 left-10 w-96 h-96 rounded-full bg-indigo-500/10 blur-3xl"></div>
@@ -633,7 +601,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Find Your Dream Car Section */}
         <section className="relative py-24 px-4 sm:px-6 lg:px-8">
           <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="relative rounded-3xl overflow-hidden backdrop-blur-xl bg-white/5 border border-white/10 p-4 shadow-2xl">
@@ -661,7 +628,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Sell Your Car Fast Section */}
         <section className="relative py-24 px-4 sm:px-6 lg:px-8 border-t border-white/10 bg-slate-950/60 backdrop-blur-md">
           <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="order-2 lg:order-1 space-y-6">

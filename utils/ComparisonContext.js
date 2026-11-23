@@ -6,7 +6,6 @@ export function ComparisonProvider({ children }) {
   const [comparisonCars, setComparisonCars] = useState([]);
   const [showComparisonSidebar, setShowComparisonSidebar] = useState(false);
 
-  // Load comparison cars from localStorage on mount
   useEffect(() => {
     const currentPath = window.location.pathname;
     if (currentPath === '/cars') {
@@ -25,7 +24,6 @@ export function ComparisonProvider({ children }) {
     }
   }, []);
 
-  // Save to localStorage whenever comparison cars change
   useEffect(() => {
     if (comparisonCars.length > 0) {
       localStorage.setItem('comparisonCars', JSON.stringify(comparisonCars));
@@ -34,7 +32,6 @@ export function ComparisonProvider({ children }) {
     }
   }, [comparisonCars]);
 
-  // Listen for storage changes (when cleared from other tabs/windows)
   useEffect(() => {
     const handleStorageChange = (e) => {
       if (e.key === 'comparisonCars') {
@@ -55,7 +52,6 @@ export function ComparisonProvider({ children }) {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  // Listen for route changes and clear comparison on cars page
   useEffect(() => {
     const handleRouteChange = () => {
       const currentPath = window.location.pathname;
@@ -65,9 +61,8 @@ export function ComparisonProvider({ children }) {
         localStorage.removeItem('comparisonCars');
       }
     };
-    handleRouteChange(); // Check on mount
+    handleRouteChange();
     window.addEventListener('popstate', handleRouteChange); // Listen for back/forward
-    // Listen for pushstate/replacestate (programmatic navigation)
     const originalPushState = history.pushState;
     const originalReplaceState = history.replaceState;
     history.pushState = function(...args) {
@@ -86,12 +81,10 @@ export function ComparisonProvider({ children }) {
   }, []);
 
   const addToComparison = (car) => {
-    // Check if car is already in comparison
     if (comparisonCars.some(c => c.id === car.id)) {
       return;
     }
     
-    // Limit to 4 cars
     if (comparisonCars.length >= 4) {
       alert('You can compare up to 4 cars at a time. Please remove a car first.');
       return;

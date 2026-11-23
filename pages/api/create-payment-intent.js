@@ -3,7 +3,6 @@ import { createClient } from '@supabase/supabase-js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// Create admin client with service role key
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -20,7 +19,6 @@ export default async function handler(req, res) {
     console.log('=== PAYMENT INTENT CREATION STARTED ===');
     console.log('Request data:', { carId, userId });
 
-    // Fetch car details including seller information
     const { data: car, error: carError } = await supabaseAdmin
       .from('cars')
       .select(`
@@ -43,19 +41,16 @@ export default async function handler(req, res) {
       sellerStripeId: car.profiles?.stripe_account_id 
     });
 
-    // Validate car price
     if (!car.price || car.price <= 0) {
       console.error('Invalid car price:', car.price);
       return res.status(400).json({ error: 'Invalid car price' });
     }
 
-    // Check if seller has Stripe account
     if (!car.profiles?.stripe_account_id) {
       console.error('Seller has no Stripe account');
       return res.status(400).json({ error: 'Seller payment setup incomplete' });
     }
 
-    // Verify seller account capabilities
     try {
       const sellerAccount = await stripe.accounts.retrieve(car.profiles.stripe_account_id);
       console.log('Seller account details:', {
@@ -92,7 +87,6 @@ export default async function handler(req, res) {
       total: priceInCents / 100
     });
 
-    // Create payment intent with admin commission and transfer to seller
     const paymentIntent = await stripe.paymentIntents.create({
       amount: priceInCents,
       currency: 'usd',
@@ -104,8 +98,8 @@ export default async function handler(req, res) {
         carId: carId,
         userId: userId,
         sellerId: car.seller_id,
-        adminCommission: adminCommission / 100, // Store in dollars
-        sellerAmount: sellerAmount / 100 // Store in dollars
+        adminCommission: adminCommission / 100,
+        sellerAmount: sellerAmount / 100
       }
     });
 
@@ -122,9 +116,4 @@ export default async function handler(req, res) {
     res.status(500).json({ error: error.message });
   }
 } 
-
-
-
-
-
 

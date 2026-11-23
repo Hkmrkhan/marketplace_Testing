@@ -1,6 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Create admin client with service role key
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -14,7 +13,6 @@ export default async function handler(req, res) {
   try {
     console.log('=== CLEANUP DUPLICATE PURCHASES STARTED ===');
 
-    // 1. Find duplicate purchases by car_id
     console.log('Finding duplicate purchases...');
     const { data: duplicates, error: duplicatesError } = await supabaseAdmin
       .from('purchases')
@@ -26,7 +24,6 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Failed to fetch purchases' });
     }
 
-    // Group by car_id to find duplicates
     const groupedByCar = {};
     duplicates.forEach(purchase => {
       if (!groupedByCar[purchase.car_id]) {
@@ -35,7 +32,6 @@ export default async function handler(req, res) {
       groupedByCar[purchase.car_id].push(purchase);
     });
 
-    // Find cars with multiple purchases
     const carsWithDuplicates = Object.entries(groupedByCar)
       .filter(([carId, purchases]) => purchases.length > 1)
       .map(([carId, purchases]) => ({ carId, purchases }));
@@ -46,22 +42,18 @@ export default async function handler(req, res) {
     let keptCount = 0;
     const results = [];
 
-    // 2. Clean up duplicates
     for (const { carId, purchases } of carsWithDuplicates) {
       console.log(`Processing car ${carId} with ${purchases.length} purchases`);
 
-      // Sort by creation date and keep the most recent one with seller_id
       const sortedPurchases = purchases.sort((a, b) => 
         new Date(b.created_at) - new Date(a.created_at)
       );
 
-      // Find the best purchase to keep (has seller_id and is most recent)
       const purchaseToKeep = sortedPurchases.find(p => p.seller_id) || sortedPurchases[0];
       const purchasesToDelete = sortedPurchases.filter(p => p.id !== purchaseToKeep.id);
 
       console.log(`Keeping purchase ${purchaseToKeep.id}, deleting ${purchasesToDelete.length} duplicates`);
 
-      // Delete duplicate purchases
       for (const duplicate of purchasesToDelete) {
         const { error: deleteError } = await supabaseAdmin
           .from('purchases')

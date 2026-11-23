@@ -7,18 +7,15 @@ export default async function handler(req, res) {
 
   const { carId, userId, amount, stripe_payment_id, status } = req.body;
 
-  // 1. Insert payment record
   const { error: paymentError } = await supabase
     .from('payments')
     .insert([{ car_id: carId, user_id: userId, amount, stripe_payment_id, status }]);
 
-  // 2. Mark car as sold
   const { error: carError } = await supabase
     .from('cars')
     .update({ status: 'sold' })
     .eq('id', carId);
 
-  // 3. Add purchase record
   const { error: purchaseError } = await supabase
     .from('purchases')
     .insert([{ car_id: carId, buyer_id: userId }]);

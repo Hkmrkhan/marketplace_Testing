@@ -81,7 +81,7 @@ export default function ReviewForm({ carId, onSubmit, onCancel, existingReview }
       )}
 
       <form onSubmit={handleSubmit} className={styles.reviewForm}>
-        {/* Rating Selection */}
+        
         <div className={styles.formGroup}>
           <label className={styles.label}>Rating:</label>
           <div className={styles.starsContainer}>
@@ -92,7 +92,6 @@ export default function ReviewForm({ carId, onSubmit, onCancel, existingReview }
           </div>
         </div>
 
-        {/* Review Title */}
         <div className={styles.formGroup}>
           <label htmlFor="title" className={styles.label}>
             Review Title:
@@ -114,7 +113,6 @@ export default function ReviewForm({ carId, onSubmit, onCancel, existingReview }
           </small>
         </div>
 
-        {/* Review Comment */}
         <div className={styles.formGroup}>
           <label htmlFor="comment" className={styles.label}>
             Review Comment:
@@ -132,7 +130,6 @@ export default function ReviewForm({ carId, onSubmit, onCancel, existingReview }
           />
         </div>
 
-        {/* Form Actions */}
         <div className={styles.formActions}>
           <button
             type="button"

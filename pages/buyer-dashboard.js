@@ -10,42 +10,25 @@ import authStyles from '../styles/Auth.module.css';
 import dynamic from 'next/dynamic';
 const StripeCheckoutModal = dynamic(() => import('../components/StripeCheckout'), { ssr: false });
 
-// WhatsApp number formatting function
 const formatWhatsAppNumber = (number) => {
   if (!number) return null;
 
-  // Remove non-digit characters
   let cleaned = number.replace(/\D/g, '');
 
-  // Convert 03XX... to 92XX... (Pakistan format)
   if (cleaned.startsWith('0')) {
     cleaned = '92' + cleaned.slice(1);
   }
 
-  // If already starts with 92, return as is
   if (cleaned.startsWith('92')) {
     return cleaned;
   }
 
-  // If it's a 10-digit number, assume it's Pakistan and add 92
   if (cleaned.length === 10) {
     return '92' + cleaned;
   }
 
   return cleaned;
 };
-
-
-
-
-
-
-
-
-
-
-
-
 
 export default function BuyerDashboard() {
   const [user, setUser] = useState(null);
@@ -65,16 +48,15 @@ export default function BuyerDashboard() {
   const [showChat, setShowChat] = useState(false);
   const [chatCarId, setChatCarId] = useState(null);
   const [chatSellerId, setChatSellerId] = useState(null);
-  const [chatSellerInfo, setChatSellerInfo] = useState(null); // Store seller info
+  const [chatSellerInfo, setChatSellerInfo] = useState(null);
   const [chatData, setChatData] = useState(null);
   const [buyerId, setBuyerId] = useState(null);
-  const [unreadCounts, setUnreadCounts] = useState({}); // Track unread counts per car
+  const [unreadCounts, setUnreadCounts] = useState({});
 
-  // Local chat state for modal
   const [localMessage, setLocalMessage] = useState('');
   const [sending, setSending] = useState(false);
-  const [localMessages, setLocalMessages] = useState([]); // Local messages for modal
-  const [imageIndexes, setImageIndexes] = useState({}); // carId: index
+  const [localMessages, setLocalMessages] = useState([]);
+  const [imageIndexes, setImageIndexes] = useState({});
   const [selectedCarDetails, setSelectedCarDetails] = useState(null);
   const [modalImageIndex, setModalImageIndex] = useState(0);
 
@@ -83,14 +65,10 @@ export default function BuyerDashboard() {
     setModalImageIndex(0);
   };
 
-
-
-  // Fetch existing messages for buyer dashboard
   const fetchExistingMessages = async (carId, sellerId, buyerId) => {
     try {
       console.log('🔍 Buyer Dashboard: Fetching existing messages for car:', carId, 'seller:', sellerId, 'buyer:', buyerId);
 
-      // Try messages_with_names first - get messages for this specific car AND between this buyer and seller
       let { data, error } = await supabase
         .from('messages_with_names')
         .select('*')
@@ -98,7 +76,6 @@ export default function BuyerDashboard() {
         .or(`and(sender_id.eq.${buyerId},receiver_id.eq.${sellerId}),and(sender_id.eq.${sellerId},receiver_id.eq.${buyerId})`)
         .order('created_at', { ascending: true });
 
-      // If messages_with_names fails, try basic messages table
       if (error || !data) {
         console.log('⚠️ Buyer Dashboard: messages_with_names failed, trying basic messages table...');
         const result = await supabase
@@ -136,7 +113,6 @@ export default function BuyerDashboard() {
         console.log('⚠️ Buyer Dashboard: No messages found for this car');
       }
 
-      // Format messages with proper names
       const formattedMessages = data?.map(msg => ({
         ...msg,
         sender_name: msg.sender_name || (msg.sender_id === buyerId ? 'You' : 'Seller'),
@@ -150,7 +126,6 @@ export default function BuyerDashboard() {
     }
   };
 
-  // Chat functions
   const onOpenChat = async (carId, sellerId, messages, setMessages, newMessage, setNewMessage, sending, sendMessage) => {
     console.log('🚀 onOpenChat function called!');
     console.log('📊 Parameters received:', { carId, sellerId, messages, setMessages, newMessage, setNewMessage, sending, sendMessage });
@@ -168,9 +143,7 @@ export default function BuyerDashboard() {
     console.log('   - chatSellerId set to:', sellerId);
     console.log('   - showChat set to:', true);
 
-    // Store seller information for persistence
     if (sellerId) {
-      // Find seller info from available cars
       const carWithSeller = availableCars.find(car => car.id === carId);
       if (carWithSeller && carWithSeller.seller) {
         setChatSellerInfo(carWithSeller.seller);
@@ -178,19 +151,16 @@ export default function BuyerDashboard() {
       }
     }
 
-    // Fetch existing messages from database
     if (carId && sellerId && user?.id) {
       console.log('📡 Fetching existing messages...');
       const existingMessages = await fetchExistingMessages(carId, sellerId, user.id);
       setLocalMessages(existingMessages);
       console.log('✅ Existing messages loaded:', existingMessages.length);
     } else {
-      // Fallback to passed messages if available
       setLocalMessages(messages || []);
       console.log('⚠️ Using fallback messages:', messages?.length || 0);
     }
 
-    // Store chat data for modal
     setChatData({
       messages,
       setMessages,
@@ -200,7 +170,6 @@ export default function BuyerDashboard() {
       sendMessage
     });
 
-    // Mark messages as read for this specific car
     if (carId && user?.id) {
       markMessagesAsRead(carId, user.id);
     }
@@ -209,7 +178,6 @@ export default function BuyerDashboard() {
     console.log('🔍 Final state check - chatCarId:', chatCarId, 'chatSellerId:', chatSellerId);
   };
 
-  // Fetch unread message counts for all cars
   const fetchUnreadCounts = async () => {
     if (!user?.id) {
       console.log('❌ Buyer: No user ID available for fetchUnreadCounts');
@@ -248,7 +216,6 @@ export default function BuyerDashboard() {
     }
   };
 
-  // Handle sending message from modal
   const handleSendMessage = async () => {
     console.log('🚀 handleSendMessage called!');
     console.log('📊 Message data:', {
@@ -272,9 +239,8 @@ export default function BuyerDashboard() {
       console.log('✅ Starting to send message...');
       setSending(true);
 
-      // Create new message object
       const newMessageObj = {
-        id: Date.now(), // Temporary ID for local display
+        id: Date.now(),
         car_id: chatCarId,
         sender_id: user.id,
         receiver_id: chatSellerId,
@@ -286,11 +252,9 @@ export default function BuyerDashboard() {
 
       console.log('📝 New message object:', newMessageObj);
 
-      // Add message to local messages immediately (optimistic update)
       setLocalMessages(prev => [...prev, newMessageObj]);
       console.log('✅ Message added to local state');
 
-      // Send message to database
       console.log('📡 Sending to database...');
       const { error } = await supabase
         .from('messages')
@@ -303,18 +267,15 @@ export default function BuyerDashboard() {
 
       if (error) {
         console.error('❌ Database error:', error);
-        // Remove message from local state if database save failed
         setLocalMessages(prev => prev.filter(msg => msg.id !== newMessageObj.id));
         return;
       }
 
       console.log('✅ Message saved to database successfully!');
 
-      // Clear input
       setLocalMessage('');
       console.log('✅ Input cleared');
 
-      // Refresh messages in CarChat component
       if (chatData?.setMessages) {
         chatData.setMessages(prev => [...prev, newMessageObj]);
         console.log('✅ CarChat messages updated');
@@ -334,7 +295,6 @@ export default function BuyerDashboard() {
     setChatCarId(null);
     setChatSellerId(null);
     setChatData(null);
-    // Don't reset local messages and seller info - keep them for persistence
     setLocalMessage('');
     setSending(false);
     console.log('✅ Chat closed, messages and seller info preserved');
@@ -355,7 +315,6 @@ export default function BuyerDashboard() {
         console.error('❌ Buyer: Error marking messages as read:', error);
       } else {
         console.log('✅ Buyer: Messages marked as read for car:', carId);
-        // Reset unread count for this car
         setUnreadCounts(prev => ({
           ...prev,
           [carId]: 0
@@ -366,9 +325,6 @@ export default function BuyerDashboard() {
     }
   };
 
-
-
-  // Helper to get all images for a car
   const getAllImages = (car) => {
     return getAllCarImages(car);
   };
@@ -376,7 +332,6 @@ export default function BuyerDashboard() {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      // Get current user
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         router.push('/auth/login');
@@ -385,18 +340,15 @@ export default function BuyerDashboard() {
       setUser(user);
       console.log('Buyer user:', user);
 
-      // Fetch profile
       const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
       setUserProfile(profile);
       console.log('Buyer profile:', profile);
 
-      // Check if user is a buyer
       if (profile?.user_type !== 'buyer') {
         router.push('/seller-dashboard');
         return;
       }
 
-      // Fetch purchases for this buyer with car and seller details
       const { data: buyerPurchases, error: purchasesError } = await supabase
         .from('purchases_with_details')
         .select('*')
@@ -404,7 +356,6 @@ export default function BuyerDashboard() {
 
       if (purchasesError) {
         console.error('Error fetching purchases:', purchasesError);
-        // Fallback to manual joins
         const { data: fallbackPurchases, error: fallbackError } = await supabase
           .from('purchases')
           .select(`
@@ -428,7 +379,6 @@ export default function BuyerDashboard() {
           console.error('Fallback also failed:', fallbackError);
           setPurchases([]);
         } else {
-          // Transform fallback data
           const transformedPurchases = fallbackPurchases?.map(purchase => ({
             id: purchase.id,
             car_id: purchase.car_id,
@@ -454,7 +404,6 @@ export default function BuyerDashboard() {
         setPurchases(buyerPurchases || []);
       }
 
-      // Fetch available cars with seller details and approval status
       const { data: cars, error: carsError } = await supabase
         .from('cars')
         .select(`
@@ -471,7 +420,6 @@ export default function BuyerDashboard() {
       console.log('❌ Cars error:', carsError);
       console.log('📊 Sample car data:', cars?.[0]);
 
-      // Now fetch seller details for each car
       if (cars && cars.length > 0) {
         const carsWithSellerDetails = await Promise.all(
           cars.map(async (car) => {
@@ -495,16 +443,13 @@ export default function BuyerDashboard() {
 
         console.log('Cars with seller details:', carsWithSellerDetails);
 
-        // Filter approved cars for buyer
         const approvedCars = carsWithSellerDetails.filter(car => {
           console.log('Car:', car.title, 'Admin approvals:', car.admin_approvals);
 
-          // Check if car has approval record
           if (car.admin_approvals && car.admin_approvals.length > 0) {
             const latestApproval = car.admin_approvals[car.admin_approvals.length - 1];
             console.log('Latest approval for', car.title, ':', latestApproval);
 
-            // Only show if latest approval is 'approved'
             if (latestApproval.approval_status === 'approved') {
               console.log('Car approved:', car.title);
               return true;
@@ -514,7 +459,6 @@ export default function BuyerDashboard() {
             }
           }
 
-          // If no approval record, don't show it (new cars need approval)
           console.log('No approval record for', car.title, '- not showing');
           return false;
         });
@@ -540,7 +484,6 @@ export default function BuyerDashboard() {
     fetchBuyer();
   }, []);
 
-  // Fetch unread counts when user changes
   useEffect(() => {
     if (user?.id) {
       console.log('🔍 Buyer: fetchUnreadCounts useEffect triggered, user.id:', user.id);
@@ -548,7 +491,6 @@ export default function BuyerDashboard() {
     }
   }, [user?.id]);
 
-  // Set up real-time subscription for unread messages
   useEffect(() => {
     if (!user?.id) return;
 
@@ -568,7 +510,6 @@ export default function BuyerDashboard() {
           [payload.new.car_id]: (prev[payload.new.car_id] || 0) + 1
         }));
 
-        // If chat is open for this car, refresh messages
         if (showChat && chatCarId === payload.new.car_id) {
           console.log('🔄 Buyer: Chat is open for this car, refreshing messages...');
           fetchExistingMessages(payload.new.car_id, chatSellerId, user.id).then(newMessages => {
@@ -582,7 +523,6 @@ export default function BuyerDashboard() {
         table: 'messages',
         filter: `receiver_id=eq.${user.id}`
       }, (payload) => {
-        // If message is marked as read, decrease unread count for that car
         if (payload.new.is_read === true && payload.old.is_read === false) {
           console.log('✅ Buyer: Message marked as read, decreasing unread count for car:', payload.new.car_id);
           setUnreadCounts(prev => ({
@@ -606,12 +546,10 @@ export default function BuyerDashboard() {
     router.push('/');
   };
 
-  // Function to manually fix sold cars in database
   const fixSoldCars = async () => {
     try {
       console.log('Fixing sold cars in database...');
 
-      // First, let's check the purchases table structure
       const { data: allPurchases, error: allPurchasesError } = await supabase
         .from('purchases')
         .select('*');
@@ -626,21 +564,17 @@ export default function BuyerDashboard() {
         return;
       }
 
-      // Check if car_id column exists
       if (allPurchases && allPurchases.length > 0) {
         const firstPurchase = allPurchases[0];
         console.log('First purchase record:', firstPurchase);
         console.log('Available columns:', Object.keys(firstPurchase));
 
-        // Check if car_id exists
         if (!firstPurchase.car_id) {
           console.log('car_id column does not exist in purchases table!');
           alert('❌ car_id column missing in purchases table. Please check database schema.');
 
-          // Alternative approach: Try to find cars by buyer/seller relationship
           console.log('Trying alternative approach using buyer/seller relationship...');
 
-          // Get all unique buyer-seller pairs from purchases
           const buyerSellerPairs = allPurchases.map(p => ({
             buyer_id: p.buyer_id,
             seller_id: p.seller_id
@@ -648,13 +582,11 @@ export default function BuyerDashboard() {
 
           console.log('Buyer-seller pairs from purchases:', buyerSellerPairs);
 
-          // For now, just show the data and ask user to check database
           alert('Please check your database schema. Purchases table should have car_id column.');
           return;
         }
       }
 
-      // Get all cars that should be sold (have purchase records)
       const { data: purchases, error: purchasesError } = await supabase
         .from('purchases')
         .select('car_id');
@@ -668,7 +600,6 @@ export default function BuyerDashboard() {
       console.log('Cars with purchase records:', purchases);
       console.log('Number of purchase records:', purchases?.length || 0);
 
-      // Check if any car_id values are null or invalid
       if (purchases && purchases.length > 0) {
         const validCarIds = purchases.filter(p => p.car_id && p.car_id !== null);
         const nullCarIds = purchases.filter(p => !p.car_id || p.car_id === null);
@@ -686,7 +617,6 @@ export default function BuyerDashboard() {
         const soldCarIds = validCarIds.map(p => p.car_id);
         console.log('Car IDs that should be sold:', soldCarIds);
 
-        // First, let's check current status of these cars
         const { data: currentCars, error: currentError } = await supabase
           .from('cars')
           .select('id, title, status')
@@ -700,7 +630,6 @@ export default function BuyerDashboard() {
           return;
         }
 
-        // Update these cars to sold status
         const { data: updateResult, error: updateError } = await supabase
           .from('cars')
           .update({ status: 'sold' })
@@ -714,7 +643,6 @@ export default function BuyerDashboard() {
           console.error('Error updating car status:', updateError);
           alert('❌ Error updating car status: ' + updateError.message);
 
-          // Try alternative approach - update one by one
           console.log('Trying alternative approach...');
           let successCount = 0;
           for (const carId of soldCarIds) {
@@ -735,7 +663,6 @@ export default function BuyerDashboard() {
           alert(`✅ Successfully updated ${updateResult?.length || 0} cars to sold status!`);
         }
 
-        // Refresh the page to show updated data
         setTimeout(() => {
           window.location.reload();
         }, 1000);
@@ -749,7 +676,6 @@ export default function BuyerDashboard() {
     }
   };
 
-  // Refactor handlePurchase to accept car object directly
   const handlePurchase = async (car) => {
     try {
       console.log('carToPurchase:', car);
@@ -758,7 +684,6 @@ export default function BuyerDashboard() {
         alert('Car not found!');
         return;
       }
-      // Insert purchase record with all required fields
       const purchaseData = {
         car_id: car.id,
         buyer_id: user.id,
@@ -775,7 +700,6 @@ export default function BuyerDashboard() {
         alert('Error making purchase: ' + purchaseError.message);
         return;
       }
-      // Update car status to sold
       const { data: updateResult, error: carError } = await supabase
         .from('cars')
         .update({ status: 'sold' })
@@ -787,7 +711,6 @@ export default function BuyerDashboard() {
       }
       alert('✅ Car purchased successfully! Check My Purchases tab.');
       setAvailableCars(prevCars => prevCars.filter(c => c.id !== car.id));
-      // Refresh purchases list
       const { data: updatedPurchases, error: purchasesRefreshError } = await supabase
         .from('purchases')
         .select(`
@@ -824,13 +747,11 @@ export default function BuyerDashboard() {
   const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validate file type
       if (!file.type.startsWith('image/')) {
         setProfileMsg('❌ Please select an image file (PNG, JPG, JPEG, GIF)');
         return;
       }
 
-      // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         setProfileMsg('❌ File size must be less than 5MB');
         return;
@@ -839,12 +760,10 @@ export default function BuyerDashboard() {
       try {
         setProfileMsg('📸 Uploading profile picture...');
 
-        // Create unique filename
         const fileExt = file.name.split('.').pop();
         const fileName = `${user.id}-${Date.now()}.${fileExt}`;
         const filePath = `${user.id}/${fileName}`;
 
-        // Upload to Supabase storage
         const { data, error } = await supabase.storage
           .from('user-avatars')
           .upload(filePath, file, {
@@ -856,13 +775,10 @@ export default function BuyerDashboard() {
           throw error;
         }
 
-        // Get public URL manually (Supabase storage issue fix)
-        // Extract project ref from Supabase URL
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://fdddzfnawuykljrdrlrp.supabase.co';
         const projectRef = supabaseUrl.split('//')[1]?.split('.')[0] || 'fdddzfnawuykljrdrlrp';
         const publicUrl = `https://${projectRef}.supabase.co/storage/v1/object/public/user-avatars/${filePath}`;
 
-        // Update profile with new avatar URL
         const { error: updateError } = await supabase
           .from('profiles')
           .update({ avatar_url: publicUrl })
@@ -872,7 +788,6 @@ export default function BuyerDashboard() {
           throw updateError;
         }
 
-        // Update local state
         setUserProfile(prev => ({
           ...prev,
           avatar_url: publicUrl
@@ -880,7 +795,6 @@ export default function BuyerDashboard() {
 
         setProfileMsg('✅ Profile picture updated successfully!');
 
-        // Clear the file input
         e.target.value = '';
 
       } catch (error) {
@@ -894,7 +808,6 @@ export default function BuyerDashboard() {
     try {
       setProfileMsg('🗑️ Removing profile picture...');
 
-      // Remove avatar_url from profile
       const { error } = await supabase
         .from('profiles')
         .update({ avatar_url: null })
@@ -904,7 +817,6 @@ export default function BuyerDashboard() {
         throw error;
       }
 
-      // Update local state
       setUserProfile(prev => ({
         ...prev,
         avatar_url: null
@@ -925,7 +837,6 @@ export default function BuyerDashboard() {
       setProfileMsg('❌ Name and email are required.');
       return;
     }
-    // Update profile in Supabase
     const { error: profileError } = await supabase
       .from('profiles')
       .update({
@@ -936,7 +847,6 @@ export default function BuyerDashboard() {
       setProfileMsg('❌ ' + profileError.message);
       return;
     }
-    // Update email in auth
     const { error: emailError } = await supabase.auth.updateUser({ email: editEmail });
     if (profileError) {
       setProfileMsg('❌ ' + profileError.message);
@@ -948,16 +858,13 @@ export default function BuyerDashboard() {
       full_name: editName
     });
     setShowEditProfileModal(false);
-    // Optionally, refresh user info
     const { data: { user: refreshedUser } } = await supabase.auth.getUser();
     setUser(refreshedUser);
   };
 
-  // Place this useEffect at the top level of the component, not inside any other function or block
   useEffect(() => {
     const fetchPurchases = async () => {
       try {
-        // Use purchases_with_details view for better data
         const { data, error } = await supabase
           .from('purchases_with_details')
           .select('*')
@@ -966,7 +873,6 @@ export default function BuyerDashboard() {
         if (error) {
           console.error('Error fetching from purchases_with_details:', error);
 
-          // Fallback: fetch with manual joins
           console.log('Trying fallback approach...');
           const { data: fallbackData, error: fallbackError } = await supabase
             .from('purchases')
@@ -995,7 +901,6 @@ export default function BuyerDashboard() {
             return;
           }
 
-          // Transform fallback data to match view format
           const transformedData = fallbackData?.map(purchase => ({
             id: purchase.id,
             car_id: purchase.car_id,
@@ -1068,7 +973,6 @@ export default function BuyerDashboard() {
 
           </div>
 
-
           <nav className={styles.sidebarNav}>
             <button
               className={`${styles.navItem} ${activeTab === 'browse' ? styles.active : ''}`}
@@ -1100,7 +1004,7 @@ export default function BuyerDashboard() {
         <div className={styles.mainContent}>
           {activeTab === 'browse' && (
             <div className={styles.browseCars}>
-              {/* Overview Stats Section */}
+              
               <div className={styles.overviewStats}>
                 <div className={styles.statsGrid}>
                   <div className={styles.statCard}>
@@ -1149,20 +1053,20 @@ export default function BuyerDashboard() {
                     const carImages = getAllImages(car);
                     const currentImageIndex = imageIndexes[car.id] || 0;
 
-                    console.log('🚗 Car in map:', car.title, 'ID:', car.id); // Debug: Check car details
-                    console.log('🖼️ Car images:', carImages, 'Count:', carImages.length); // Debug: Check images array
-                    console.log('📍 Current image index:', currentImageIndex, 'Total images:', carImages.length); // Debug: Check current index
+                    console.log('🚗 Car in map:', car.title, 'ID:', car.id);
+                    console.log('🖼️ Car images:', carImages, 'Count:', carImages.length);
+                    console.log('📍 Current image index:', currentImageIndex, 'Total images:', carImages.length);
 
                     return (
                       <div key={car.id} className={styles.carCard}>
-                        {/* Gallery block - at top */}
+                        
                         <div 
                           className={styles.carImageContainer}
                           onClick={() => handleOpenDetails(car)}
                           style={{ cursor: 'pointer' }}
                           title="Click to see details"
                         >
-                          {/* Main image */}
+                          
                           <img
                             src={carImages[currentImageIndex] || '/carp2.webp'}
                             alt={car.title}
@@ -1180,7 +1084,6 @@ export default function BuyerDashboard() {
                             )}
                           </div>
 
-                          {/* Hover Overlay: Click to see details */}
                           <div className={styles.hoverDetailsOverlay}>
                             <span className={styles.hoverDetailsPill}>
                               <svg className="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1193,7 +1096,7 @@ export default function BuyerDashboard() {
                         </div>
                         
                         <div className={styles.carDetails}>
-                          {/* Car Title & Price Header */}
+                          
                           <div 
                             className={styles.carCardHeader}
                             onClick={() => handleOpenDetails(car)}
@@ -1216,7 +1119,6 @@ export default function BuyerDashboard() {
                             </div>
                           </div>
 
-                          {/* Action Buttons - Professional Layout */}
                           <div className={styles.actionButtons}>
                             {car.status === 'available' ? (
                               <button 
@@ -1233,8 +1135,7 @@ export default function BuyerDashboard() {
                                 Sold
                               </div>
                             )}
-                            
-                            {/* Message Button - Integrated */}
+
                             <button 
                               className={styles.messageBtn}
                               onClick={() => {
@@ -1281,14 +1182,14 @@ export default function BuyerDashboard() {
 
                     return (
                       <div key={purchase.id} className={styles.carCard}>
-                        {/* Gallery block for purchased cars */}
+                        
                         <div 
                           className={styles.carImageContainer}
                           onClick={() => handleOpenDetails(purchase)}
                           style={{ cursor: 'pointer' }}
                           title="Click to see details"
                         >
-                          {/* Main image */}
+                          
                           <img
                             src={purchaseImages[currentImageIndex] || '/carp2.webp'}
                             alt={purchase.title || purchase.cars?.title || "Car"}
@@ -1306,7 +1207,6 @@ export default function BuyerDashboard() {
                             )}
                           </div>
 
-                          {/* Hover Overlay: Click to see details */}
                           <div className={styles.hoverDetailsOverlay}>
                             <span className={styles.hoverDetailsPill}>
                               <svg className="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1376,7 +1276,7 @@ export default function BuyerDashboard() {
           )}
         </div>
       </div>
-      {/* Chat Modal */}
+      
       {console.log('🔍 Rendering chat modal. showChat:', showChat)}
       {showChat && (
         <div style={{
@@ -1452,7 +1352,6 @@ export default function BuyerDashboard() {
               </button>
             </div>
 
-            {/* Chat Interface */}
             <div style={{
               flex: 1,
               overflowY: 'auto',
@@ -1506,7 +1405,6 @@ export default function BuyerDashboard() {
               )}
             </div>
 
-            {/* Chat Input */}
             <div style={{
               display: 'flex',
               gap: 12,
@@ -1601,7 +1499,6 @@ export default function BuyerDashboard() {
         </div>
       )}
 
-            {/* Vehicle Details & Specs Popup Modal */}
       {selectedCarDetails && (() => {
         const item = selectedCarDetails;
         const carImages = getAllImages(item);
@@ -1627,7 +1524,7 @@ export default function BuyerDashboard() {
         return (
           <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-[9998] p-4 overflow-y-auto">
             <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden border border-slate-200 text-slate-800 animate-in fade-in zoom-in-95 duration-200 my-8 flex flex-col max-h-[92vh]">
-              {/* Modal Header */}
+              
               <div className="relative px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
                 <div className="flex items-center gap-3 min-w-0 pr-4">
                   <span className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
@@ -1654,9 +1551,8 @@ export default function BuyerDashboard() {
                 </div>
               </div>
 
-              {/* Modal Scrollable Body */}
               <div className="p-6 overflow-y-auto space-y-6">
-                {/* Gallery Section */}
+                
                 <div className="space-y-3">
                   <div className="relative w-full h-72 sm:h-80 rounded-2xl overflow-hidden bg-slate-900 flex items-center justify-center border border-slate-200">
                     <img
@@ -1672,7 +1568,6 @@ export default function BuyerDashboard() {
                     )}
                   </div>
 
-                  {/* Interactive Thumbnails Row in Modal */}
                   {carImages.length > 1 && (
                     <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-1">
                       {carImages.map((img, idx) => (
@@ -1699,7 +1594,6 @@ export default function BuyerDashboard() {
                   )}
                 </div>
 
-                {/* Quick Specs Pills */}
                 <div className="grid grid-cols-3 gap-3 p-3.5 bg-slate-50 rounded-2xl border border-slate-100 text-center">
                   <div>
                     <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Make</span>
@@ -1715,7 +1609,6 @@ export default function BuyerDashboard() {
                   </div>
                 </div>
 
-                {/* Description Section */}
                 <div className="space-y-1.5">
                   <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 m-0">
                     About This Vehicle
@@ -1725,7 +1618,6 @@ export default function BuyerDashboard() {
                   </div>
                 </div>
 
-                {/* Verified Seller Section */}
                 <div className="space-y-1.5">
                   <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 m-0">
                     Verified Seller Information
@@ -1774,7 +1666,6 @@ export default function BuyerDashboard() {
                 </div>
               </div>
 
-              {/* Modal Footer Actions */}
               <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3">
                 <button
                   type="button"
@@ -1822,11 +1713,10 @@ export default function BuyerDashboard() {
         );
       })()}
 
-
       {checkoutCar && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-[9999] p-4 overflow-y-auto">
           <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 text-slate-800 animate-in fade-in zoom-in-95 duration-200 my-8">
-            {/* Modal Header */}
+            
             <div className="relative px-6 pt-6 pb-4 border-b border-slate-100 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 text-lg shadow-sm">
@@ -1847,7 +1737,6 @@ export default function BuyerDashboard() {
               </button>
             </div>
 
-            {/* Vehicle Summary Snippet */}
             <div className="px-6 pt-4 pb-2">
               <div className="flex items-center gap-4 p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80">
                 <img
@@ -1873,7 +1762,6 @@ export default function BuyerDashboard() {
               </div>
             </div>
 
-            {/* Stripe Checkout Form */}
             <div className="px-6 py-4">
               <StripeCheckoutModal
                 car={checkoutCar}
@@ -1890,7 +1778,6 @@ export default function BuyerDashboard() {
         </div>
       )}
 
-      {/* Edit Profile Modal */}
       {showEditProfileModal && (
         <div style={{
           position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
@@ -1909,7 +1796,7 @@ export default function BuyerDashboard() {
             boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
             overflow: 'hidden'
           }}>
-            {/* Modal Header */}
+            
             <div style={{
               display: 'flex',
               justifyContent: 'space-between',
@@ -1948,10 +1835,9 @@ export default function BuyerDashboard() {
               </button>
             </div>
 
-            {/* Modal Body */}
             <div style={{ padding: '32px', overflowY: 'auto' }}>
               <form onSubmit={handleProfileUpdate} className={authStyles.authForm} style={{ margin: 0 }}>
-                {/* Profile Picture Upload - Professional Style */}
+                
                 <div style={{
                   textAlign: 'center',
                   marginBottom: '24px',

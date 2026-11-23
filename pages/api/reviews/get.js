@@ -13,10 +13,8 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'car_id is required' });
     }
 
-    // First, check if the views exist by testing a simple query
     console.log('📊 Testing database connection...');
     
-    // Test basic connection
     const { data: testData, error: testError } = await supabase
       .from('car_reviews')
       .select('id')
@@ -32,7 +30,6 @@ export default async function handler(req, res) {
     
     console.log('✅ Database connection successful');
 
-    // Get reviews for the car
     console.log('📖 Fetching reviews for car_id:', car_id);
     const { data: reviews, error: reviewsError } = await supabase
       .from('car_reviews_with_users')
@@ -50,7 +47,6 @@ export default async function handler(req, res) {
 
     console.log('✅ Reviews fetched successfully:', reviews?.length || 0, 'reviews');
 
-    // Get review statistics for the car
     console.log('📊 Fetching review stats for car_id:', car_id);
     const { data: stats, error: statsError } = await supabase
       .from('car_review_stats')
@@ -73,7 +69,6 @@ export default async function handler(req, res) {
       one_star_count: 0
     };
 
-    // Calculate stats manually if view fails
     if (stats) {
       console.log('✅ Review stats fetched successfully');
     } else {
@@ -83,7 +78,6 @@ export default async function handler(req, res) {
         defaultStats.average_rating = totalRating / reviews.length;
         defaultStats.total_reviews = reviews.length;
         
-        // Count ratings
         reviews.forEach(review => {
           if (review.rating === 5) defaultStats.five_star_count++;
           else if (review.rating === 4) defaultStats.four_star_count++;

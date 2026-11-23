@@ -18,7 +18,6 @@ export default async function handler(req, res) {
       });
     }
 
-    // Check if user_filters table exists
     console.log('📊 Checking if user_filters table exists...');
     
     try {
@@ -31,7 +30,6 @@ export default async function handler(req, res) {
       if (error) {
         console.error('❌ Supabase error loading filters:', error);
         
-        // If table doesn't exist, return empty filters instead of error
         if (error.code === '42P01') { // Table doesn't exist
           console.log('⚠️ user_filters table does not exist, returning empty filters');
           return res.status(200).json({ 
@@ -53,7 +51,6 @@ export default async function handler(req, res) {
     } catch (tableError) {
       console.error('❌ Error accessing user_filters table:', tableError);
       
-      // Return empty filters instead of error
       console.log('⚠️ Returning empty filters due to table access error');
       res.status(200).json({ 
         success: true, 

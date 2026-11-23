@@ -21,7 +21,7 @@ function NavItem({ href, label, active, onClick, extraClass = '' }) {
       <span className="relative z-10 transition-colors duration-200 group-hover:text-white">
         {label}
       </span>
-      {/* Animated glowing bottom bar */}
+      
       <span 
         className={`absolute bottom-1 left-3 right-3 h-[2px] rounded-full transition-all duration-300 ease-out origin-center pointer-events-none ${
           active 
@@ -82,8 +82,7 @@ export default function Navbar({ logoText }) {
     <>
       <nav className="sticky top-0 z-50 backdrop-blur-xl bg-slate-950/80 border-b border-white/10 shadow-2xl transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          
-          {/* Brand Logo */}
+
           <Link href="/" className="flex items-center gap-3 group">
             <div className="relative w-10 h-10 rounded-xl overflow-hidden bg-gradient-to-tr from-indigo-600 to-violet-500 p-[1px] shadow-lg shadow-indigo-500/25 transition-transform duration-300 group-hover:scale-105 group-hover:rotate-1">
               <div className="w-full h-full bg-slate-950 rounded-[11px] flex items-center justify-center p-1">
@@ -94,8 +93,7 @@ export default function Navbar({ logoText }) {
               {logoText || 'Car Marketplace'}
             </span>
           </Link>
-          
-          {/* Desktop Navigation */}
+
           {!loading && (
             <div className="hidden md:flex items-center gap-2">
               <ul className="flex items-center gap-1.5 list-none m-0 p-0">
@@ -191,14 +189,12 @@ export default function Navbar({ logoText }) {
             </div>
           )}
 
-          {/* Loading Indicator */}
           {loading && (
             <div className="flex items-center gap-2">
               <div className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
           )}
 
-          {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center">
             <button 
               className="p-2.5 rounded-xl bg-slate-900/80 border border-white/10 text-slate-200 hover:text-white hover:bg-white/10 hover:scale-105 active:scale-95 transition-all duration-200"
@@ -210,7 +206,6 @@ export default function Navbar({ logoText }) {
           </div>
         </div>
 
-        {/* Mobile Menu Overlay */}
         {mobileMenuOpen && (
           <div className="md:hidden fixed inset-0 top-20 z-50 bg-slate-950/95 backdrop-blur-2xl border-t border-white/10 p-6 overflow-y-auto animate-in fade-in duration-200">
             <div className="flex flex-col gap-2">

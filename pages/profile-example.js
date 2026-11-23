@@ -19,7 +19,6 @@ export default function ProfileExample() {
       if (user) {
         setUser(user);
         
-        // Fetch user profile
         const { data: profile } = await supabase
           .from('profiles')
           .select('*')
@@ -75,7 +74,7 @@ export default function ProfileExample() {
         </h1>
         
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-          {/* Profile Picture Uploader */}
+          
           <div>
             <h2 style={{ marginBottom: '1rem', color: '#374151' }}>Upload Profile Picture</h2>
             <ProfilePictureUploader
@@ -85,7 +84,6 @@ export default function ProfileExample() {
             />
           </div>
 
-          {/* Profile Information */}
           <div>
             <h2 style={{ marginBottom: '1rem', color: '#374151' }}>Profile Information</h2>
             <div style={{ 
@@ -114,7 +112,6 @@ export default function ProfileExample() {
           </div>
         </div>
 
-        {/* Instructions */}
         <div style={{ 
           marginTop: '2rem', 
           padding: '1.5rem', 

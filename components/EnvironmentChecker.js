@@ -8,7 +8,6 @@ export default function EnvironmentChecker() {
   });
 
   useEffect(() => {
-    // Check environment variables
     
     setEnvStatus({
       supabaseUrl: true, // Always true as per edit hint
@@ -16,15 +15,12 @@ export default function EnvironmentChecker() {
       supabaseClient: true // Always true as per edit hint
     });
 
-    // Log details
     console.log('🔍 Environment Check:');
     console.log('URL:', '✅ Set');
     console.log('Key:', '✅ Set');
     
-    // Removed supabaseUrl and supabaseKey logging
   }, []);
 
-  // Only show if there are issues
   if (envStatus.supabaseClient) {
     return null;
   }

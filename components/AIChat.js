@@ -218,7 +218,7 @@ ${context === 'global' ? '🌐 **Global Mode:** Available on all pages!' : ''}`,
 
   return (
     <div className={`${isFloating ? 'fixed bottom-6 right-6 z-50 w-96 max-w-[calc(100vw-2rem)] h-[520px]' : 'w-full h-full'} rounded-3xl backdrop-blur-2xl bg-slate-950/95 border border-white/15 flex flex-col shadow-2xl overflow-hidden`}>
-      {/* Header */}
+      
       <div className="p-4 bg-slate-900/90 border-b border-white/10 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center text-lg">
@@ -242,7 +242,6 @@ ${context === 'global' ? '🌐 **Global Mode:** Available on all pages!' : ''}`,
         )}
       </div>
 
-      {/* Messages Feed */}
       <div className="flex-1 p-4 overflow-y-auto space-y-3 text-xs leading-relaxed">
         {messages.map((message) => (
           <div
@@ -277,7 +276,6 @@ ${context === 'global' ? '🌐 **Global Mode:** Available on all pages!' : ''}`,
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Quick Queries */}
       {!isLoading && (
         <div className="px-3 py-2 border-t border-white/5 flex gap-2 overflow-x-auto scrollbar-none">
           {[
@@ -297,7 +295,6 @@ ${context === 'global' ? '🌐 **Global Mode:** Available on all pages!' : ''}`,
         </div>
       )}
 
-      {/* Input Form */}
       <div className="p-3 border-t border-white/10 bg-slate-900/60 relative">
         {showSuggestions && (
           <div className="absolute bottom-full left-3 right-3 mb-2 rounded-2xl bg-slate-900 border border-white/15 p-2 shadow-2xl space-y-1">

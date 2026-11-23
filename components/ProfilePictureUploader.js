@@ -29,26 +29,22 @@ export default function ProfilePictureUploader({ currentAvatarUrl, onAvatarUpdat
   };
 
   const handleFile = (file) => {
-    // Validate file type
     if (!file.type.startsWith('image/')) {
       alert('Please select an image file (PNG, JPG, JPEG, GIF)');
       return;
     }
 
-    // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       alert('File size must be less than 5MB');
       return;
     }
 
-    // Create preview
     const reader = new FileReader();
     reader.onload = (e) => {
       setPreviewUrl(e.target.result);
     };
     reader.readAsDataURL(file);
 
-    // Upload file
     uploadAvatar(file);
   };
 
@@ -56,12 +52,10 @@ export default function ProfilePictureUploader({ currentAvatarUrl, onAvatarUpdat
     try {
       setUploading(true);
 
-      // Create unique filename
       const fileExt = file.name.split('.').pop();
       const fileName = `${userId}-${Date.now()}.${fileExt}`;
       const filePath = `${userId}/${fileName}`;
 
-      // Upload to Supabase storage
       const { data, error } = await supabase.storage
         .from('user-avatars')
         .upload(filePath, file, {
@@ -73,13 +67,10 @@ export default function ProfilePictureUploader({ currentAvatarUrl, onAvatarUpdat
         throw error;
       }
 
-      // Get public URL manually (Supabase storage issue fix)
-      // Extract project ref from Supabase URL
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://fdddzfnawuykljrdrlrp.supabase.co';
       const projectRef = supabaseUrl.split('//')[1]?.split('.')[0] || 'fdddzfnawuykljrdrlrp';
       const publicUrl = `https://${projectRef}.supabase.co/storage/v1/object/public/user-avatars/${filePath}`;
 
-      // Update profile with new avatar URL
       const { error: updateError } = await supabase
         .from('profiles')
         .update({ avatar_url: publicUrl })
@@ -89,12 +80,10 @@ export default function ProfilePictureUploader({ currentAvatarUrl, onAvatarUpdat
         throw updateError;
       }
 
-      // Call parent callback
       if (onAvatarUpdate) {
         onAvatarUpdate(publicUrl);
       }
 
-      // Clear preview
       setPreviewUrl(null);
 
       alert('Profile picture updated successfully!');
@@ -119,7 +108,6 @@ export default function ProfilePictureUploader({ currentAvatarUrl, onAvatarUpdat
     try {
       setUploading(true);
 
-      // Remove avatar_url from profile
       const { error } = await supabase
         .from('profiles')
         .update({ avatar_url: null })
@@ -129,7 +117,6 @@ export default function ProfilePictureUploader({ currentAvatarUrl, onAvatarUpdat
         throw error;
       }
 
-      // Call parent callback
       if (onAvatarUpdate) {
         onAvatarUpdate(null);
       }
@@ -148,7 +135,7 @@ export default function ProfilePictureUploader({ currentAvatarUrl, onAvatarUpdat
 
   return (
     <div className={styles.uploaderContainer}>
-      {/* Current Avatar Display */}
+      
       <div className={styles.avatarDisplay}>
         {displayImage ? (
           <img 
@@ -163,7 +150,6 @@ export default function ProfilePictureUploader({ currentAvatarUrl, onAvatarUpdat
         )}
       </div>
 
-      {/* Upload Area */}
       <div 
         className={`${styles.uploadArea} ${dragActive ? styles.dragActive : ''}`}
         onDragEnter={handleDrag}
@@ -183,7 +169,6 @@ export default function ProfilePictureUploader({ currentAvatarUrl, onAvatarUpdat
         </div>
       </div>
 
-      {/* Hidden File Input */}
       <input
         ref={fileInputRef}
         type="file"
@@ -192,7 +177,6 @@ export default function ProfilePictureUploader({ currentAvatarUrl, onAvatarUpdat
         style={{ display: 'none' }}
       />
 
-      {/* Action Buttons */}
       <div className={styles.actionButtons}>
         <button
           className={styles.uploadButton}
@@ -213,7 +197,6 @@ export default function ProfilePictureUploader({ currentAvatarUrl, onAvatarUpdat
         )}
       </div>
 
-      {/* Upload Status */}
       {uploading && (
         <div className={styles.uploadStatus}>
           <div className={styles.spinner}></div>

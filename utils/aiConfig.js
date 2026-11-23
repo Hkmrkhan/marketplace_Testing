@@ -1,6 +1,4 @@
-// AI Provider Configuration
 export const AI_CONFIG = {
-  // Switch between providers easily
   CURRENT_PROVIDER: 'marketplace', // 'openai' | 'huggingface' | 'marketplace' | 'fallback'
   
   PROVIDERS: {
@@ -31,18 +29,15 @@ export const AI_CONFIG = {
     }
   },
   
-  // Get current provider config
   getCurrentProvider() {
     return this.PROVIDERS[this.CURRENT_PROVIDER];
   },
   
-  // Get API endpoint
   getEndpoint() {
     return this.getCurrentProvider().endpoint;
   }
 };
 
-// Enhanced fallback responses for offline/fallback mode
 export const FALLBACK_RESPONSES = {
   'buyer-dashboard': [
     '🛒 **Car buying ke liye tips:** Budget set karo, financing options check karo, test drive zaroori hai! Market research karo aur negotiate karne se na sharmao!',

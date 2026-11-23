@@ -1,7 +1,6 @@
 import Link from 'next/link';
 
 export default function Footer({ userType }) {
-  // Professional messages for buyer/seller/generic
   let infoTitle = 'Car Marketplace';
   let infoDesc = 'Buy & Sell Cars Easily. Secure, fast, and trusted by thousands.';
   if (userType === 'buyer') {
@@ -14,13 +13,12 @@ export default function Footer({ userType }) {
 
   return (
     <footer className="relative mt-24 backdrop-blur-2xl bg-slate-950/90 border-t border-white/10 text-slate-300">
-      {/* Laser Gradient Accent Line */}
+      
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-indigo-500/80 to-transparent"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
-          
-          {/* Useful Links */}
+
           <div>
             <h4 className="text-white font-semibold text-lg mb-4 flex items-center gap-2">
               <span className="w-1.5 h-4 bg-indigo-500 rounded-full"></span>
@@ -45,7 +43,6 @@ export default function Footer({ userType }) {
             </ul>
           </div>
 
-          {/* Social Links */}
           <div>
             <h4 className="text-white font-semibold text-lg mb-4 flex items-center gap-2">
               <span className="w-1.5 h-4 bg-violet-500 rounded-full"></span>
@@ -79,7 +76,6 @@ export default function Footer({ userType }) {
             </div>
           </div>
 
-          {/* Contact Info */}
           <div>
             <h4 className="text-white font-semibold text-lg mb-4 flex items-center gap-2">
               <span className="w-1.5 h-4 bg-cyan-500 rounded-full"></span>
@@ -95,7 +91,6 @@ export default function Footer({ userType }) {
             </div>
           </div>
 
-          {/* Dynamic Info Section */}
           <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-md">
             <h4 className="text-white font-semibold text-base mb-2">
               {infoTitle}
@@ -106,7 +101,6 @@ export default function Footer({ userType }) {
           </div>
         </div>
 
-        {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <p className="m-0">
             Car Marketplace &copy; {new Date().getFullYear()} | All rights reserved

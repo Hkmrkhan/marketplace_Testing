@@ -13,16 +13,13 @@ export default async function handler(req, res) {
     console.log('=== SIMULATING STRIPE VERIFICATION ===');
     console.log('Account ID:', accountId);
 
-    // In test mode, we can simulate account verification
     const updatedAccount = await stripe.accounts.update(accountId, {
-      // Simulate business verification
       business_profile: {
         url: 'https://testseller.com',
         mcc: '5734', // Computer Software Stores
         product_description: 'Car marketplace seller'
       },
       
-      // Simulate external account (bank account)
       external_accounts: {
         object: 'bank_account',
         country: 'US',
@@ -33,7 +30,6 @@ export default async function handler(req, res) {
         account_number: '000123456789'
       },
       
-      // Simulate representative verification
       individual: {
         first_name: 'Test',
         last_name: 'Seller',
@@ -59,7 +55,6 @@ export default async function handler(req, res) {
         }
       },
       
-      // Enable capabilities
       capabilities: {
         transfers: { requested: true },
         card_payments: { requested: true }

@@ -145,8 +145,7 @@ export default function AddCarPage() {
       <Navbar />
 
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        
-        {/* Header Banner */}
+
         <div className="relative rounded-3xl overflow-hidden backdrop-blur-2xl bg-slate-900/80 border border-white/10 p-8 mb-10 shadow-2xl flex flex-col md:flex-row items-center gap-6 justify-between">
           <div className="space-y-2">
             <span className="text-xs uppercase tracking-wider font-semibold text-indigo-400">Seller Studio</span>
@@ -158,7 +157,6 @@ export default function AddCarPage() {
           </div>
         </div>
 
-        {/* Form Container */}
         <div className="mb-12">
           <CarForm 
             onSubmit={handleAddCar} 
@@ -171,7 +169,6 @@ export default function AddCarPage() {
           )}
         </div>
 
-        {/* Highlight Badges */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <div className="p-6 rounded-3xl backdrop-blur-xl bg-slate-900/60 border border-white/10 flex items-center gap-4">
             <div className="w-12 h-12 rounded-2xl overflow-hidden">

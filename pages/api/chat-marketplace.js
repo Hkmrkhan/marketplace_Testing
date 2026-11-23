@@ -12,7 +12,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Get user profile for personalized responses
     let userProfile = null;
     if (userId) {
       const { data: profile } = await supabase
@@ -23,7 +22,6 @@ export default async function handler(req, res) {
       userProfile = profile;
     }
 
-    // Simple fallback for buying/selling tips - ALWAYS WORKS
     const lowerMessage = message.toLowerCase();
     
     if (lowerMessage.includes('buying') || lowerMessage.includes('buyer')) {
@@ -113,14 +111,12 @@ export default async function handler(req, res) {
       });
     }
 
-    // Fetch real marketplace data using corrected AI view
     let availableCars = [];
     let minPrice = 0;
     let maxPrice = 0;
     let avgPrice = 0;
 
     try {
-      // Try to get cars with city information
       let { data: cars } = await supabase
         .from('ai_marketplace_data')
         .select('*')
@@ -128,7 +124,6 @@ export default async function handler(req, res) {
         .order('created_at', { ascending: false })
         .limit(50);
 
-      // If no data from AI view, try cars_with_seller_enhanced
       if (!cars || cars.length === 0) {
         console.log('No data from ai_marketplace_data, trying fallback view...');
         const { data: fallbackCars } = await supabase
@@ -140,7 +135,6 @@ export default async function handler(req, res) {
         
         if (fallbackCars) {
           console.log('Using fallback view, transforming data...');
-          // Transform fallback data to match AI view format
           cars = fallbackCars.map(car => ({
             ...car,
             numeric_price: parseFloat(car.price) || 0,
@@ -153,7 +147,6 @@ export default async function handler(req, res) {
                            car.price < 10000 ? 'Premium' : 'Luxury',
             is_available: car.status === 'available',
             days_since_listed: Math.floor((Date.now() - new Date(car.created_at).getTime()) / (1000 * 60 * 60 * 24)),
-            // Map city fields properly
             reg_district: car.reg_district || car.registration_district || car.city || 'Unknown'
           }));
         }
@@ -161,7 +154,6 @@ export default async function handler(req, res) {
 
       availableCars = cars || [];
       
-      // Debug: Log city information
       const cityFields = availableCars.map(car => ({
         id: car.id || car.car_id,
         reg_district: car.reg_district,
@@ -173,7 +165,6 @@ export default async function handler(req, res) {
       console.log('City field debugging (first 5 cars):', cityFields);
       console.log('Available city fields:', Object.keys(availableCars[0] || {}).filter(key => key.toLowerCase().includes('city') || key.toLowerCase().includes('district')));
       
-      // Better price calculation
       const prices = availableCars
         .map(car => car.numeric_price || parseFloat(car.price) || 0)
         .filter(price => price > 0 && !isNaN(price));
@@ -183,7 +174,6 @@ export default async function handler(req, res) {
         maxPrice = Math.max(...prices);
         avgPrice = Math.round(prices.reduce((a, b) => a + b, 0) / prices.length);
       } else {
-        // Fallback prices if no valid prices found
         minPrice = 100;
         maxPrice = 15000;
         avgPrice = 5000;
@@ -195,18 +185,14 @@ export default async function handler(req, res) {
       
     } catch (dbError) {
       console.error('Database fetch error:', dbError);
-      // Use fallback data if database fails
       availableCars = [];
       minPrice = 100;
       maxPrice = 15000;
       avgPrice = 5000;
     }
 
-    // Process message for marketplace-specific responses
-    // Continue with existing complex logic for other queries...
     let response = '';
 
-    // Check if user needs login/signup guidance
     const isLoggedIn = userProfile && userProfile.user_type;
     const needsAuthGuidance = !isLoggedIn && (
       lowerMessage.includes('buy') || lowerMessage.includes('sell') || 
@@ -217,7 +203,6 @@ export default async function handler(req, res) {
       lowerMessage.includes('dashboard') || lowerMessage.includes('profile')
     );
 
-    // Provide login/signup guidance for non-authenticated users
     if (needsAuthGuidance) {
       if (lowerMessage.includes('sell') || lowerMessage.includes('seller')) {
         response = `🏪 **Seller ke liye Login/Signup Required!**
@@ -306,7 +291,6 @@ export default async function handler(req, res) {
       return res.status(200).json({ response });
     }
 
-    // Greeting responses for non-logged in users
     if (!isLoggedIn && (lowerMessage.includes('hello') || lowerMessage.includes('hi') || 
         lowerMessage.includes('assalam') || lowerMessage.includes('salam') ||
         lowerMessage.includes('hey') || lowerMessage.includes('start'))) {
@@ -342,20 +326,17 @@ export default async function handler(req, res) {
       return res.status(200).json({ response });
     }
 
-    // Dynamic responses based on real data
     if (lowerMessage.includes('budget') || lowerMessage.includes('price range') || lowerMessage.includes('afford') ||
         lowerMessage.includes('dolar') || lowerMessage.includes('dollar') || 
         /\$?\d+\s*(dolar|dollar|price|wali|mein|under)/i.test(message) ||
         /\d+\s*dollar/i.test(message) || /\d+\s*dolar/i.test(message) ||
         /\d+\s*price/i.test(message) || /\d+\s*wali/i.test(message)) {
-      // Enhanced price extraction to handle various formats
       const budgetMatch = message.match(/\$?(\d+)/);
       const budget = budgetMatch ? parseInt(budgetMatch[1]) : null;
       
       console.log('Price search detected:', { message, budgetMatch, budget });
       
             if (budget) {
-        // Find cars at exact price or within ±15% range (corrected logic)
         const exactPriceCars = availableCars.filter(car => {
           const price = car.numeric_price || parseFloat(car.price) || 0;
           return price === budget;
@@ -377,17 +358,14 @@ export default async function handler(req, res) {
             let details = `**🚗 ${car.title}** - **${car.formatted_price}**
 💰 **Seller:** ${car.seller_name || 'Unknown'}`;
             
-            // Add miles info if available
             if (car.miles && car.miles > 0) {
               details += `\n📏 **Miles:** ${car.miles.toLocaleString()}`;
             }
             
-            // Add year info if available
             if (car.year) {
               details += `\n📅 **Year:** ${car.year}`;
             }
             
-            // Add city info if available
             if (car.reg_district) {
               details += `\n📍 **City:** ${car.reg_district}`;
             }
@@ -407,17 +385,14 @@ ${carDetails}
             let details = `**🚗 ${car.title}** - **${car.formatted_price}**
 💰 **Seller:** ${car.seller_name || 'Unknown'}`;
             
-            // Add miles info if available
             if (car.miles && car.miles > 0) {
               details += `\n📏 **Miles:** ${car.miles.toLocaleString()}`;
             }
             
-            // Add year info if available
             if (car.year) {
               details += `\n📅 **Year:** ${car.year}`;
             }
             
-            // Add city info if available
             if (car.reg_district) {
               details += `\n📍 **City:** ${car.reg_district}`;
             }
@@ -443,17 +418,14 @@ ${carDetails}
 💰 **Aap ke budget mein best option:** "${cheapestAffordable.title}" - **${cheapestAffordable.formatted_price}**
 📊 **Category:** ${cheapestAffordable.price_category}`;
             
-            // Add miles info if available
             if (cheapestAffordable.miles && cheapestAffordable.miles > 0) {
               details += `\n📏 **Miles:** ${cheapestAffordable.miles.toLocaleString()}`;
             }
             
-            // Add year info if available
             if (cheapestAffordable.year) {
               details += `\n📅 **Year:** ${cheapestAffordable.year}`;
             }
             
-            // Add city info if available
             if (cheapestAffordable.reg_district) {
               details += `\n📍 **City:** ${cheapestAffordable.reg_district}`;
             }
@@ -487,17 +459,14 @@ ${carDetails}
 💰 **Seller:** ${cheapestCar.seller_name || 'Unknown Seller'}
 📊 **Category:** ${cheapestCar.price_category} (${cheapestCar.ai_price_range})`;
         
-        // Add miles info if available
         if (cheapestCar.miles && cheapestCar.miles > 0) {
           details += `\n📏 **Miles:** ${cheapestCar.miles.toLocaleString()}`;
         }
         
-        // Add year info if available
         if (cheapestCar.year) {
           details += `\n📅 **Year:** ${cheapestCar.year}`;
         }
         
-                    // Add city info if available
             if (cheapestCar.reg_district) {
               details += `\n📍 **City:** ${cheapestCar.reg_district}`;
             }
@@ -523,17 +492,14 @@ ${carDetails}
 🏆 **Category:** ${expensiveCar.price_category} (${expensiveCar.ai_price_range})
 💰 **Seller:** ${expensiveCar.seller_name || 'Premium Seller'}`;
         
-        // Add miles info if available
         if (expensiveCar.miles && expensiveCar.miles > 0) {
           details += `\n📏 **Miles:** ${expensiveCar.miles.toLocaleString()}`;
         }
         
-        // Add year info if available
         if (expensiveCar.year) {
           details += `\n📅 **Year:** ${expensiveCar.year}`;
         }
         
-                    // Add city info if available
             if (expensiveCar.reg_district) {
               details += `\n📍 **City:** ${expensiveCar.reg_district}`;
             }
@@ -563,17 +529,14 @@ ${carDetails}
 📊 **${car.price_category} category** 
 💰 **Seller:** ${car.seller_name || 'Verified Seller'}`;
             
-            // Add miles info if available
             if (car.miles && car.miles > 0) {
               details += `\n📏 **Miles:** ${car.miles.toLocaleString()}`;
             }
             
-            // Add year info if available
             if (car.year) {
               details += `\n📅 **Year:** ${car.year}`;
             }
             
-            // Add city info if available
             if (car.reg_district) {
               details += `\n📍 **City:** ${car.reg_district}`;
             }
@@ -605,7 +568,6 @@ Koi specific price range ya features chahiye?`;
       }
     }
     
-    // Handle all types of tips queries with simple conditions
     else if (lowerMessage.includes('buying') || lowerMessage.includes('buyer')) {
       response = `🛒 **Buyer Tips for Smart Purchase:**
 
@@ -683,7 +645,6 @@ ${!userId ? '\n🚀 **For detailed seller analytics:** Signup as seller!' : ''}`
     else if (lowerMessage.includes('total') || lowerMessage.includes('kitni cars') || lowerMessage.includes('marketplace status') ||
              lowerMessage.includes('market status') || lowerMessage.includes('status')) {
       
-      // Enhanced market status with detailed price breakdowns
       const categoryStats = {
         budget: availableCars.filter(car => {
           const price = car.numeric_price || parseFloat(car.price) || 0;
@@ -703,7 +664,6 @@ ${!userId ? '\n🚀 **For detailed seller analytics:** Signup as seller!' : ''}`
         }).length
       };
       
-      // Detailed price breakdowns
       const priceBreakdowns = {
         under1k: availableCars.filter(car => {
           const price = car.numeric_price || parseFloat(car.price) || 0;
@@ -737,13 +697,11 @@ ${!userId ? '\n🚀 **For detailed seller analytics:** Signup as seller!' : ''}`
         return days <= 7;
       }).length;
       
-      // Calculate price distribution
       const totalCarsWithPrices = availableCars.filter(car => {
         const price = car.numeric_price || parseFloat(car.price) || 0;
         return price > 0;
       }).length;
       
-      // City-based breakdown
       const cityStats = {};
       availableCars.forEach(car => {
         const city = car.reg_district || 'Unknown';
@@ -759,14 +717,12 @@ ${!userId ? '\n🚀 **For detailed seller analytics:** Signup as seller!' : ''}`
         cityStats[city].totalPrice += price;
       });
       
-      // Calculate average prices for cities
       Object.keys(cityStats).forEach(city => {
         if (cityStats[city].count > 0) {
           cityStats[city].avgPrice = Math.round(cityStats[city].totalPrice / cityStats[city].count);
         }
       });
       
-      // Sort cities by car count
       const sortedCities = Object.entries(cityStats)
         .sort(([,a], [,b]) => b.count - a.count)
         .slice(0, 5); // Top 5 cities
@@ -844,7 +800,6 @@ ${sortedCities.map(([city, stats]) =>
 💡 Pro tip: Cars page se direct seller contact kar sakte hain!`;
     }
     
-    // City-based filtering queries - COMPLETELY REWRITTEN
     else if (lowerMessage.includes('city') || lowerMessage.includes('shahar') || lowerMessage.includes('city mein') ||
              lowerMessage.includes('karachi') || lowerMessage.includes('lahore') || lowerMessage.includes('islamabad') ||
              lowerMessage.includes('rawalpindi') || lowerMessage.includes('peshawar') || lowerMessage.includes('quetta') ||
@@ -857,12 +812,10 @@ ${sortedCities.map(([city, stats]) =>
       
       console.log('🚀 City query detected:', message);
       
-      // Helper function to get city from car data
       const getCarCity = (car) => {
         return car.reg_district || car.registration_district || car.city || car.reg_city || 'Unknown';
       };
       
-      // Get all unique cities from available cars
       const allCities = [...new Set(availableCars.map(car => getCarCity(car)).filter(city => 
         city && city !== 'Other' && city !== 'Unknown' && city !== 'null' && city !== ''
       ))];
@@ -876,7 +829,6 @@ ${sortedCities.map(([city, stats]) =>
         district: car.district
       })));
       
-      // Extract city name from message with multiple patterns
       const cities = [
         'karachi', 'lahore', 'islamabad', 'rawalpindi', 'peshawar', 'quetta', 
         'multan', 'faisalabad', 'sialkot', 'gujranwala', 'bahawalpur', 'sargodha'
@@ -884,7 +836,6 @@ ${sortedCities.map(([city, stats]) =>
       
       let cityMatch = null;
       
-      // Pattern 1: "cars in [city]"
       const cityInPattern = message.match(/cars?\s+in\s+(\w+)/i);
       if (cityInPattern) {
         const potentialCity = cityInPattern[1].toLowerCase();
@@ -892,7 +843,6 @@ ${sortedCities.map(([city, stats]) =>
         console.log('Pattern 1 match:', potentialCity, '→', cityMatch);
       }
       
-      // Pattern 2: "[city] mein cars"
       if (!cityMatch) {
         const cityMeinPattern = message.match(/(\w+)\s+mein\s+cars?/i);
         if (cityMeinPattern) {
@@ -902,7 +852,6 @@ ${sortedCities.map(([city, stats]) =>
         }
       }
       
-      // Pattern 3: "[city] ke cars"
       if (!cityMatch) {
         const cityKePattern = message.match(/(\w+)\s+ke\s+cars?/i);
         if (cityKePattern) {
@@ -912,7 +861,6 @@ ${sortedCities.map(([city, stats]) =>
         }
       }
       
-      // Pattern 4: "[city] mein kya hai"
       if (!cityMatch) {
         const cityKyaPattern = message.match(/(\w+)\s+mein\s+kya\s+hai/i);
         if (cityKyaPattern) {
@@ -922,7 +870,6 @@ ${sortedCities.map(([city, stats]) =>
         }
       }
       
-      // Pattern 5: Direct city mention
       if (!cityMatch) {
         cityMatch = cities.find(city => lowerMessage.includes(city));
         console.log('Pattern 5 (direct) match:', cityMatch);
@@ -930,7 +877,6 @@ ${sortedCities.map(([city, stats]) =>
       
       console.log('🎯 Final city match:', cityMatch);
       
-      // If user just asks for cities without specifying one
       if (!cityMatch && (lowerMessage.includes('cities') || lowerMessage.includes('shahar') || lowerMessage.includes('district'))) {
         const cityStats = allCities.map(city => {
           const cityCars = availableCars.filter(car => getCarCity(car) === city);
@@ -967,7 +913,6 @@ ${cityStats.map(stat =>
       }
       
       if (cityMatch) {
-        // Find cars in the specified city
         const cityCars = availableCars.filter(car => {
           const carCity = getCarCity(car);
           return carCity.toLowerCase().includes(cityMatch) || cityMatch.includes(carCity.toLowerCase());
@@ -976,7 +921,6 @@ ${cityStats.map(stat =>
         console.log(`🏙️ Found ${cityCars.length} cars in ${cityMatch}`);
         
         if (cityCars.length > 0) {
-          // Calculate city statistics
           const cityAvgPrice = Math.round(
             cityCars.reduce((sum, car) => {
               const price = car.numeric_price || parseFloat(car.price) || 0;
@@ -1003,7 +947,6 @@ ${cityStats.map(stat =>
             }).length
           };
           
-          // Get top 3 cars from the city
           const topCityCars = cityCars.slice(0, 3);
           const carDetails = topCityCars.map(car => {
             let details = `**${car.title || car.car_title || 'Car'}** - **$${car.formatted_price || car.price}**`;
@@ -1066,7 +1009,6 @@ ${carDetails}
           });
         }
       } else {
-        // Show all available cities
         const cityStats = allCities.map(city => {
           const cityCars = availableCars.filter(car => getCarCity(car) === city);
           const avgPrice = Math.round(
@@ -1102,7 +1044,6 @@ ${cityStats.map(stat =>
       }
     }
     
-    // Premium cars ($5000+) specific queries
     else if (lowerMessage.includes('5000') || lowerMessage.includes('5000+') || lowerMessage.includes('5k') || 
              lowerMessage.includes('5k+') || lowerMessage.includes('premium cars') || lowerMessage.includes('premium segment')) {
       
@@ -1213,7 +1154,6 @@ ${carDetails}
       }
     }
     
-    // Test query for debugging
     else if (lowerMessage.includes('test city') || lowerMessage.includes('city test')) {
       const allCities = [...new Set(availableCars.map(car => car.reg_district).filter(city => city && city !== 'Other' && city !== 'Unknown'))];
       const cityStats = allCities.map(city => {
@@ -1243,7 +1183,6 @@ ${cityStats.map(stat =>
     }
     
     else {
-      // Enhanced context-specific responses with real marketplace insights
       if (userProfile?.user_type === 'buyer') {
         const budgetCars = availableCars.filter(car => car.price_category === 'budget').length;
         const midRangeCars = availableCars.filter(car => car.price_category === 'mid-range').length;
@@ -1289,7 +1228,6 @@ ${cityStats.map(stat =>
 
 🎯 **Market insight:** ${avgPrice < 2000 ? 'Budget cars in high demand' : 'Premium market is active'}`;
       } else {
-        // Non-logged in users - Enhanced signup guidance
         const categoryBreakdown = {
           budget: availableCars.filter(car => car.price_category === 'budget').length,
           midRange: availableCars.filter(car => car.price_category === 'mid-range').length,
@@ -1327,7 +1265,6 @@ Ask: "buyer signup", "seller registration", or "account banao"
       }
     }
 
-    // Final safety check - ensure response is set
     if (!response && (lowerMessage.includes('sell') || lowerMessage.includes('buy') || lowerMessage.includes('tips'))) {
       response = `🤖 **Marketplace Assistant:**
 

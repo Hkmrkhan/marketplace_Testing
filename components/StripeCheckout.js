@@ -54,7 +54,6 @@ function CheckoutForm({ car, userId, onSuccess, onCancel }) {
       console.log('Cardholder:', cardholderName);
       console.log('=== END PAYMENT DEBUG ===');
 
-      // 1. Create payment intent from API
       const res = await fetch('/api/create-payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -77,7 +76,6 @@ function CheckoutForm({ car, userId, onSuccess, onCancel }) {
         sellerAmount,
       });
 
-      // 2. Confirm card payment with CardNumberElement (Stripe auto-combines Expiry and CVC)
       const cardNumberElement = elements.getElement(CardNumberElement);
       const { paymentIntent, error: stripeError } = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
@@ -95,7 +93,6 @@ function CheckoutForm({ car, userId, onSuccess, onCancel }) {
       }
 
       if (paymentIntent.status === 'succeeded') {
-        // 3. Payment successful - now confirm in backend
         console.log('=== PAYMENT SUCCESS DEBUG ===');
         console.log('Payment Intent:', paymentIntent);
         console.log('Amount charged:', paymentIntent.amount / 100);
@@ -146,7 +143,7 @@ function CheckoutForm({ car, userId, onSuccess, onCancel }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 text-slate-800 text-left">
-      {/* Cardholder Name */}
+      
       <div>
         <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
           Cardholder Name
@@ -161,7 +158,6 @@ function CheckoutForm({ car, userId, onSuccess, onCancel }) {
         />
       </div>
 
-      {/* Card Number */}
       <div>
         <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
           Card Number
@@ -171,7 +167,6 @@ function CheckoutForm({ car, userId, onSuccess, onCancel }) {
         </div>
       </div>
 
-      {/* Expiry Date and CVC Row */}
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
@@ -191,7 +186,6 @@ function CheckoutForm({ car, userId, onSuccess, onCancel }) {
         </div>
       </div>
 
-      {/* Error Banner */}
       {error && (
         <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 text-red-700 text-xs font-semibold rounded-xl animate-in fade-in">
           <span>⚠️</span>
@@ -199,7 +193,6 @@ function CheckoutForm({ car, userId, onSuccess, onCancel }) {
         </div>
       )}
 
-      {/* Submit Button */}
       <div className="pt-2">
         <button
           type="submit"
@@ -222,7 +215,6 @@ function CheckoutForm({ car, userId, onSuccess, onCancel }) {
         </button>
       </div>
 
-      {/* Cancel Button */}
       {onCancel && (
         <button
           type="button"
@@ -234,7 +226,6 @@ function CheckoutForm({ car, userId, onSuccess, onCancel }) {
         </button>
       )}
 
-      {/* Security Trust Badges Footer */}
       <div className="pt-1 flex items-center justify-center gap-2 text-[11px] text-slate-500 font-medium text-center">
         <span>🛡️ 256-Bit SSL Encrypted</span>
         <span>•</span>

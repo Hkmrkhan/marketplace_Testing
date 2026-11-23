@@ -190,7 +190,6 @@ export default function ComparePage() {
           <p className="text-sm text-slate-400 mt-2">Compare {cars.length} vehicles side by side</p>
         </div>
 
-        {/* Comparison Table */}
         <div className="rounded-3xl backdrop-blur-2xl bg-slate-900/80 border border-white/10 overflow-hidden shadow-2xl mb-10">
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left text-sm">
@@ -232,7 +231,6 @@ export default function ComparePage() {
           </div>
         </div>
 
-        {/* Recommendations Section */}
         {recommendations && recommendations.length > 0 && (
           <div className="rounded-3xl backdrop-blur-xl bg-slate-900/70 border border-white/10 p-6 sm:p-8 mb-10 shadow-xl">
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
@@ -254,7 +252,6 @@ export default function ComparePage() {
           </div>
         )}
 
-        {/* Actions Bar */}
         <div className="flex flex-wrap items-center justify-between gap-4">
           <button 
             onClick={() => router.push('/cars')}

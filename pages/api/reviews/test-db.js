@@ -8,7 +8,6 @@ export default async function handler(req, res) {
   try {
     console.log('🧪 Testing database connection...');
 
-    // Test 1: Check if car_reviews table exists
     const { data: tableCheck, error: tableError } = await supabase
       .from('car_reviews')
       .select('id')
@@ -24,7 +23,6 @@ export default async function handler(req, res) {
 
     console.log('✅ car_reviews table exists');
 
-    // Test 2: Check if views exist
     const { data: viewCheck, error: viewError } = await supabase
       .from('car_reviews_with_users')
       .select('id')
@@ -40,7 +38,6 @@ export default async function handler(req, res) {
 
     console.log('✅ car_reviews_with_users view exists');
 
-    // Test 3: Check if stats view exists
     const { data: statsCheck, error: statsError } = await supabase
       .from('car_review_stats')
       .select('car_id')
@@ -56,7 +53,6 @@ export default async function handler(req, res) {
 
     console.log('✅ car_review_stats view exists');
 
-    // Test 4: Check total reviews count
     const { count: totalReviews, error: countError } = await supabase
       .from('car_reviews')
       .select('*', { count: 'exact', head: true });

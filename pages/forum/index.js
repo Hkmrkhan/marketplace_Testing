@@ -20,7 +20,6 @@ export default function ForumHome() {
     fetchDiscussions();
   }, []);
 
-  // Refresh discussions when page becomes visible (returning from discussion page)
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (!document.hidden) {
@@ -51,7 +50,6 @@ export default function ForumHome() {
     
     if (user) {
       console.log('🔍 Fetching user profile...');
-      // Fetch user profile to get user_type
       const { data: profile, error } = await supabase
         .from('profiles')
         .select('user_type')
@@ -70,7 +68,6 @@ export default function ForumHome() {
     try {
       console.log('🚀 Fetching discussions from Supabase...');
       
-      // First, get basic discussions without joins
       const { data: discussionsData, error: discussionsError } = await supabase
         .from('car_discussions')
         .select('*')
@@ -84,17 +81,14 @@ export default function ForumHome() {
       console.log('✅ Basic discussions fetched:', discussionsData);
 
       if (discussionsData && discussionsData.length > 0) {
-        // Now get user profiles and car details separately
         const discussionsWithDetails = await Promise.all(
           discussionsData.map(async (discussion) => {
-            // Get user profile
             const { data: profileData } = await supabase
               .from('profiles')
               .select('full_name')
               .eq('id', discussion.user_id)
               .single();
 
-            // Get car details
             const { data: carData } = await supabase
               .from('cars')
               .select('title, image_url')
@@ -111,18 +105,15 @@ export default function ForumHome() {
 
         console.log('✅ Discussions with details:', discussionsWithDetails);
         
-        // Get reply counts and view counts for each discussion
         const discussionsWithReplies = await Promise.all(
           discussionsWithDetails.map(async (discussion) => {
             console.log('🔍 Processing discussion:', discussion.id, discussion.title);
             
-            // Get reply count
             const { count: replyCount } = await supabase
               .from('discussion_replies')
               .select('*', { count: 'exact', head: true })
               .eq('discussion_id', discussion.id);
             
-            // Get view count from discussion_views table
             const { data: viewData, error: viewError } = await supabase
               .from('discussion_views')
               .select('id')
@@ -160,12 +151,10 @@ export default function ForumHome() {
     
     const date = new Date(timestamp);
     
-    // Check if date is valid
     if (isNaN(date.getTime())) {
       return 'Invalid date';
     }
     
-    // Since Supabase now has Asia timezone, show relative time
     const now = new Date();
     const diffInSeconds = Math.floor((now - date) / 1000);
     const diffInMinutes = Math.floor(diffInSeconds / 60);
@@ -178,7 +167,6 @@ export default function ForumHome() {
     if (diffInHours < 24) return `${diffInHours}h ago`;
     if (diffInDays < 7) return `${diffInDays}d ago`;
     
-    // For older dates, show full date
     return date.toLocaleDateString('en-PK', {
       year: 'numeric',
       month: 'short',
@@ -191,12 +179,10 @@ export default function ForumHome() {
   };
 
   const handleDiscussionClick = async (discussionId) => {
-    // Update view count when title is clicked
     if (user) {
       try {
         console.log('👁️ Title clicked, updating view count for discussion:', discussionId);
         
-        // Check if user already viewed this discussion
         const { data: existingView, error: viewCheckError } = await supabase
           .from('discussion_views')
           .select('id')
@@ -207,7 +193,6 @@ export default function ForumHome() {
         if (viewCheckError && viewCheckError.code !== 'PGRST116') {
           console.error('❌ Error checking existing view:', viewCheckError);
         } else if (!existingView) {
-          // Insert view record into discussion_views table
           const { error: insertError } = await supabase
             .from('discussion_views')
             .insert({
@@ -221,7 +206,6 @@ export default function ForumHome() {
           } else {
             console.log('✅ View record inserted for discussion:', discussionId);
             
-            // Update local discussion views count
             setDiscussions(prev => prev.map(discussion => {
               if (discussion.id === discussionId) {
                 return { ...discussion, views: (discussion.views || 0) + 1 };
@@ -235,7 +219,6 @@ export default function ForumHome() {
       }
     }
     
-    // Navigate to discussion page
     router.push(`/forum/discussion/${discussionId}`);
   };
 
@@ -244,7 +227,6 @@ export default function ForumHome() {
     console.log('🔍 User:', user);
     console.log('🔍 UserProfile:', userProfile);
     
-    // If userProfile is not loaded, try to fetch it
     if (user && !userProfile) {
       console.log('🔍 UserProfile not loaded, fetching...');
       try {
@@ -257,7 +239,6 @@ export default function ForumHome() {
         console.log('🔍 Profile fetched on demand:', profile, 'Error:', error);
         
         if (profile) {
-          // Redirect based on user type with force refresh
           if (profile.user_type === 'admin') {
             console.log('🔍 Redirecting to admin dashboard');
             window.location.href = '/admin-dashboard';
@@ -280,7 +261,6 @@ export default function ForumHome() {
     
     if (user && userProfile) {
       console.log('🔍 User type:', userProfile.user_type);
-      // Redirect based on user type with force refresh
       if (userProfile.user_type === 'admin') {
         console.log('🔍 Redirecting to admin dashboard');
         window.location.href = '/admin-dashboard';
@@ -307,7 +287,6 @@ export default function ForumHome() {
     }
 
     try {
-      // Check if user already liked this discussion
       const { data: existingLike } = await supabase
         .from('forum_likes')
         .select('*')
@@ -316,13 +295,11 @@ export default function ForumHome() {
         .single();
 
       if (existingLike) {
-        // Unlike - remove the like
         await supabase
           .from('forum_likes')
           .delete()
           .eq('id', existingLike.id);
 
-        // Decrease likes count
         await supabase
           .from('car_discussions')
           .update({ likes: Math.max((existingLike.likes || 1) - 1, 0) })
@@ -330,7 +307,6 @@ export default function ForumHome() {
 
         alert('Discussion unliked!');
       } else {
-        // Like - add the like
         await supabase
           .from('forum_likes')
           .insert({
@@ -338,7 +314,6 @@ export default function ForumHome() {
             user_id: user.id
           });
 
-        // Increase likes count
         await supabase
           .from('car_discussions')
           .update({ likes: (existingLike?.likes || 0) + 1 })
@@ -347,7 +322,6 @@ export default function ForumHome() {
         alert('Discussion liked!');
       }
 
-      // Refresh discussions to show updated counts
       fetchDiscussions();
     } catch (error) {
       console.error('Error handling like:', error);
@@ -393,7 +367,6 @@ export default function ForumHome() {
       setReplyContent('');
       setSelectedDiscussion(null);
       
-      // Refresh discussions to show updated reply count
       fetchDiscussions();
     } catch (error) {
       console.error('Error submitting reply:', error);
@@ -410,38 +383,30 @@ export default function ForumHome() {
   };
 
   const handleViewReplies = async (discussionId) => {
-    // Navigate to discussion detail page
     router.push(`/forum/discussion/${discussionId}`);
   };
 
-  // Function to organize replies into nested structure
   const organizeReplies = (replies) => {
     const replyMap = new Map();
     const topLevelReplies = [];
 
-    // First pass: create a map of all replies
     replies.forEach(reply => {
       replyMap.set(reply.id, { ...reply, children: [] });
     });
 
-    // Second pass: organize into nested structure
     replies.forEach(reply => {
       if (reply.parent_reply_id) {
-        // This is a nested reply
         const parentReply = replyMap.get(reply.parent_reply_id);
         if (parentReply) {
           parentReply.children.push(replyMap.get(reply.id));
         }
       } else {
-        // This is a top-level reply
         topLevelReplies.push(replyMap.get(reply.id));
       }
     });
 
-    // Sort top-level replies by created_at (recent first)
     topLevelReplies.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     
-    // Sort nested replies by created_at (recent first)
     topLevelReplies.forEach(reply => {
       if (reply.children && reply.children.length > 0) {
         reply.children.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
@@ -450,14 +415,6 @@ export default function ForumHome() {
 
     return topLevelReplies;
   };
-
-
-
-
-
-
-
-
 
   if (loading) {
     return (
@@ -564,7 +521,6 @@ export default function ForumHome() {
                  </div>
        )}
 
-       {/* Reply Form Popup */}
        {showReplyForm && selectedDiscussion && (
          <div className={styles.replyPopup}>
            <div className={styles.replyPopupContent}>
@@ -606,8 +562,6 @@ export default function ForumHome() {
            </div>
          </div>
        )}
-
-       
 
      </div>
    );

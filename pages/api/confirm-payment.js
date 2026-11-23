@@ -13,7 +13,6 @@ export default async function handler(req, res) {
     
     console.log('Extracted data:', { paymentIntentId, carId, userId, amount });
     
-    // Validate required fields
     if (!paymentIntentId || !carId || !userId || !amount) {
       console.error('Missing required fields:', { paymentIntentId, carId, userId, amount });
       return res.status(400).json({ error: 'Missing required fields' });
@@ -21,7 +20,6 @@ export default async function handler(req, res) {
     
     console.log('All required fields present, proceeding with database operations...');
     
-    // Create payment record first
     console.log('Creating payment record in payments table...');
     const paymentData = {
       user_id: userId,
@@ -50,11 +48,7 @@ export default async function handler(req, res) {
     }
 
     console.log('Payment record created successfully');
-    
-    // Note: Purchase record is now created ONLY by Stripe webhook
-    // We only need to update car status here to avoid duplicates
-    
-    // Update car status to sold
+
     console.log('Updating car status to sold...');
     const { error: carUpdateError } = await supabase
       .from('cars')
@@ -73,7 +67,6 @@ export default async function handler(req, res) {
         hint: carUpdateError.hint,
         code: carUpdateError.code
       });
-      // Don't fail the whole operation, just log the error
       console.log('Car status update failed, but payment record created successfully');
     } else {
       console.log('Car status updated to sold successfully');
@@ -81,7 +74,6 @@ export default async function handler(req, res) {
 
     console.log('=== ALL DATABASE OPERATIONS COMPLETED SUCCESSFULLY ===');
     
-    // Send success response
     const responseData = {
       success: true, 
       message: 'Purchase confirmed successfully!',

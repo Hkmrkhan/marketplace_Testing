@@ -1,6 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Create admin client with service role key
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -14,7 +13,6 @@ export default async function handler(req, res) {
   try {
     console.log('=== BACKFILL COMMISSIONS STARTED ===');
 
-    // 1. Get all existing purchases without commission records
     console.log('Fetching all purchases...');
     const { data: purchases, error: purchasesError } = await supabaseAdmin
       .from('purchases')
@@ -38,7 +36,6 @@ export default async function handler(req, res) {
 
     console.log(`Found ${purchases.length} purchases to process`);
 
-    // 2. Process each purchase and create commission records
     let successCount = 0;
     let errorCount = 0;
     const results = [];
@@ -55,7 +52,6 @@ export default async function handler(req, res) {
           imagesLength: purchase.cars?.images?.length || 0
         });
 
-        // Check if commission already exists
         const { data: existingCommission } = await supabaseAdmin
           .from('admin_commissions')
           .select('id')
@@ -67,26 +63,21 @@ export default async function handler(req, res) {
           continue;
         }
 
-        // Calculate commission (10%)
         const commissionAmount = Math.round(purchase.amount * 0.10 * 100) / 100; // Round to 2 decimal places
 
-        // Get the best available image URL
         let carImageUrl = null;
         if (purchase.cars?.image_url) {
           carImageUrl = purchase.cars.image_url;
         } else if (purchase.cars?.images && purchase.cars.images.length > 0) {
-          // If images is an array, get the first one
           if (Array.isArray(purchase.cars.images)) {
             carImageUrl = purchase.cars.images[0];
           } else if (typeof purchase.cars.images === 'string') {
-            // If images is a string, try to parse it as JSON
             try {
               const parsedImages = JSON.parse(purchase.cars.images);
               if (Array.isArray(parsedImages) && parsedImages.length > 0) {
                 carImageUrl = parsedImages[0];
               }
             } catch (e) {
-              // If parsing fails, use the string as is
               carImageUrl = purchase.cars.images;
             }
           }
@@ -94,7 +85,6 @@ export default async function handler(req, res) {
 
         console.log('Final image URL:', carImageUrl);
 
-        // Create commission record
         const { data: commissionData, error: commissionError } = await supabaseAdmin
           .from('admin_commissions')
           .insert([{
@@ -133,7 +123,6 @@ export default async function handler(req, res) {
           });
         }
 
-        // Small delay to avoid overwhelming the database
         await new Promise(resolve => setTimeout(resolve, 100));
 
       } catch (error) {

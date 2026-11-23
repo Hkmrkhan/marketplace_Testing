@@ -8,21 +8,18 @@ export default async function handler(req, res) {
   try {
     const { car_id, rating, title, comment } = req.body;
 
-    // Validate required fields
     if (!car_id || !rating || !title || !comment) {
       return res.status(400).json({ 
         error: 'Missing required fields: car_id, rating, title, comment' 
       });
     }
 
-    // Validate rating range
     if (rating < 1 || rating > 5) {
       return res.status(400).json({ 
         error: 'Rating must be between 1 and 5' 
       });
     }
 
-    // Get authenticated user from Authorization header
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({ error: 'No authorization token provided' });
@@ -34,7 +31,6 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: 'Invalid or expired token' });
     }
 
-    // Check if user already reviewed this car
     const { data: existingReview } = await supabase
       .from('car_reviews')
       .select('id')
@@ -48,7 +44,6 @@ export default async function handler(req, res) {
       });
     }
 
-    // Check if user has purchased this car (for verified purchase badge)
     const { data: purchase } = await supabase
       .from('purchases')
       .select('id')
@@ -56,7 +51,6 @@ export default async function handler(req, res) {
       .eq('buyer_id', user.id)
       .single();
 
-    // Create the review
     const { data: review, error: insertError } = await supabase
       .from('car_reviews')
       .insert({
@@ -75,7 +69,6 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Failed to create review' });
     }
 
-    // Get the complete review with user info
     const { data: completeReview } = await supabase
       .from('car_reviews_with_users')
       .select('*')

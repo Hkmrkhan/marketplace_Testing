@@ -3,7 +3,6 @@ import { createClient } from '@supabase/supabase-js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// Create admin client with service role key
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -20,12 +19,10 @@ export default async function handler(req, res) {
     console.log('=== SELLER ACCOUNT CREATION STARTED ===');
     console.log('Request data:', { userId, email, country });
 
-    // 1. Create Express account
     console.log('Creating Stripe Connect Express account...');
     let account;
     
     try {
-      // Try Express account first
       account = await stripe.accounts.create({
         type: "express",
         country: country,
@@ -48,7 +45,6 @@ export default async function handler(req, res) {
       console.log('⚠️ Express account creation failed, trying Custom account...');
       console.log('Express error:', expressError.message);
       
-      // Fallback to Custom account
       account = await stripe.accounts.create({
         type: "custom",
         country: country,
@@ -67,7 +63,6 @@ export default async function handler(req, res) {
       console.log('✅ Stripe Connect Custom account created:', account.id);
     }
 
-    // 2. Save stripe_account_id in profiles using admin client
     console.log('Updating profile with stripe_account_id...');
     const { data: updateData, error: updateError } = await supabaseAdmin
       .from("profiles")
@@ -88,7 +83,6 @@ export default async function handler(req, res) {
 
     console.log('✅ Profile updated successfully:', updateData);
 
-    // 3. Create onboarding link
     console.log('Generating onboarding link...');
     const accountLink = await stripe.accountLinks.create({
       account: account.id,

@@ -14,7 +14,6 @@ export default async function handler(req, res) {
     console.log('=== SELLER REGISTRATION STARTED ===');
     console.log('Request data:', { userId, userEmail, country });
 
-    // 1. Verify user exists
     const { data: existingProfile, error: profileError } = await supabase
       .from('profiles')
       .select('id, email, user_type')
@@ -28,7 +27,6 @@ export default async function handler(req, res) {
 
     console.log('Profile verified:', existingProfile);
 
-    // 2. Create Stripe Connect Express Account
     console.log('Creating Stripe Connect account...');
     const account = await stripe.accounts.create({
       type: 'express',
@@ -43,7 +41,6 @@ export default async function handler(req, res) {
 
     console.log('✅ Stripe account created:', account.id);
 
-    // 3. Update profile with stripe_account_id and user_type
     console.log('Updating profile...');
     const { data: updateData, error: updateError } = await supabase
       .from('profiles')
@@ -64,7 +61,6 @@ export default async function handler(req, res) {
 
     console.log('✅ Profile updated:', updateData);
 
-    // 4. Create onboarding link
     console.log('Generating onboarding link...');
     const accountLink = await stripe.accountLinks.create({
       account: account.id,

@@ -12,7 +12,6 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const getUser = async () => {
-      // Mock user data for demonstration
       const mockUser = {
         id: 'mock-user-id',
         email: 'test@example.com',
@@ -20,13 +19,11 @@ export default function DashboardPage() {
       };
       setUser(mockUser);
       
-      // Mock profile data for demonstration
       const mockProfile = {
         id: mockUser.id,
         user_type: 'buyer', // Can be 'seller' or 'buyer'
       };
       
-      // Redirect based on user type
       if (mockProfile.user_type === 'seller') {
           router.push('/seller-dashboard');
           return;
@@ -35,7 +32,6 @@ export default function DashboardPage() {
           return;
         }
       
-      // Mock user's cars for demonstration
       const mockCars = [
         { id: 'car-1', user_id: mockUser.id, title: 'Mock Car 1', price: 10000, image_url: '/hero.webp' },
         { id: 'car-2', user_id: mockUser.id, title: 'Mock Car 2', price: 20000, image_url: '/hero.webp' },
@@ -46,7 +42,6 @@ export default function DashboardPage() {
   }, [router]);
 
   const handleLogout = async () => {
-    // Mock logout for demonstration
     setUser(null);
     router.push('/');
   };

@@ -1,6 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Create admin client with service role key
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -17,7 +16,6 @@ export default async function handler(req, res) {
     console.log('=== DEBUG CAR IMAGES STARTED ===');
     console.log('Car ID:', carId);
 
-    // Get car details
     const { data: car, error: carError } = await supabaseAdmin
       .from('cars')
       .select('*')
@@ -39,7 +37,6 @@ export default async function handler(req, res) {
       imagesLength: Array.isArray(car.images) ? car.images.length : 'Not array'
     });
 
-    // Check if images is a string that needs parsing
     let parsedImages = null;
     if (typeof car.images === 'string') {
       try {
@@ -50,7 +47,6 @@ export default async function handler(req, res) {
       }
     }
 
-    // Get the best available image URL
     let carImageUrl = null;
     if (car.image_url) {
       carImageUrl = car.image_url;

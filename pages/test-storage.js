@@ -16,7 +16,6 @@ export default function TestStorage() {
     try {
       console.log('🔍 Checking Supabase storage...');
       
-      // List all buckets
       const { data: bucketsData, error: bucketsError } = await supabase.storage.listBuckets();
       
       if (bucketsError) {
@@ -33,13 +32,11 @@ export default function TestStorage() {
         return;
       }
       
-      // Check for user-avatars bucket
       const userAvatarsBucket = bucketsData.find(bucket => bucket.id === 'user-avatars');
       
       if (userAvatarsBucket) {
         setMessage(`✅ Storage bucket 'user-avatars' found! Status: ${userAvatarsBucket.public ? 'Public' : 'Private'}`);
         
-        // Try to list files in the bucket
         const { data: files, error: filesError } = await supabase.storage
           .from('user-avatars')
           .list('', { limit: 10 });
@@ -77,14 +74,12 @@ export default function TestStorage() {
     try {
       console.log('🔄 Testing file upload...');
       
-      // Create test file path
       const fileExt = testFile.name.split('.').pop();
       const fileName = `test-${Date.now()}.${fileExt}`;
       const filePath = `test/${fileName}`;
       
       console.log('📁 Uploading to path:', filePath);
       
-      // Try to upload
       const { data, error } = await supabase.storage
         .from('user-avatars')
         .upload(filePath, testFile, {
@@ -100,7 +95,6 @@ export default function TestStorage() {
       
       console.log('✅ Upload successful:', data);
       
-      // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('user-avatars')
         .getPublicUrl(filePath);

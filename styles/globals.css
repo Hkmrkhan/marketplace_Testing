@@ -32,7 +32,6 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Glassmorphism utility variables & effects */
 :root {
   --glass-bg-dark: rgba(15, 23, 42, 0.78);
   --glass-bg-light: rgba(255, 255, 255, 0.85);
@@ -45,7 +44,6 @@ body {
   --brand-glow: 0 0 30px rgba(99, 102, 241, 0.35);
 }
 
-/* Selection highlight */
 ::selection {
   background: rgba(99, 102, 241, 0.4);
   color: #ffffff;
@@ -61,7 +59,6 @@ a {
   text-decoration: none;
 }
 
-/* Universal input and textarea typography: crisp readable dark text on white/light surfaces */
 textarea,
 input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="file"]) {
   color: #0f172a;
@@ -73,7 +70,6 @@ input::placeholder {
   opacity: 0.8;
 }
 
-/* Maintain light text for dark-themed inputs explicitly styled with Tailwind */
 input.text-white,
 textarea.text-white,
 input[class*="text-white"],
@@ -94,14 +90,12 @@ textarea[class*="bg-slate-9"]::placeholder {
   box-sizing: border-box;
 }
 
-/* Focus ring for accessibility */
 :focus-visible {
   outline: 2px solid #6366f1;
   outline-offset: 2px;
   border-radius: 6px;
 }
 
-/* Global scrollbar styling */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -120,7 +114,6 @@ textarea[class*="bg-slate-9"]::placeholder {
   background: rgba(99, 102, 241, 0.7);
 }
 
-/* Utility Glassmorphism Classes for Tailwind usage */
 @layer utilities {
   .glass-card {
     background: rgba(15, 23, 42, 0.75);

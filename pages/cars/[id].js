@@ -7,8 +7,6 @@ import Reviews from '../../components/Reviews';
 import { supabase } from '../../utils/supabaseClient';
 import { getAllCarImages, onImageErrorFallback } from '../../utils/carImages';
 
-
-
 export default function CarDetails() {
   const router = useRouter();
   const { id } = router.query;
@@ -27,7 +25,6 @@ export default function CarDetails() {
     if (!id) return;
     setLoading(true);
     
-    // Direct query to cars table with seller info to get video_url
     const { data, error } = await supabase
       .from('cars')
       .select(`
@@ -54,7 +51,6 @@ export default function CarDetails() {
       return;
     }
     
-    // Add seller info to match the expected format
     const carData = {
       ...data,
       seller_name: data.profiles?.full_name,
@@ -80,10 +76,8 @@ export default function CarDetails() {
     setPaymentSuccess(true);
     setShowPaymentModal(false);
     
-    // Show success message
     setBuyMessage('✅ Payment successful! Car purchased successfully. Updating car status...');
     
-    // Refresh car data after a delay to show updated status
     setTimeout(() => {
       console.log('Refreshing car data...');
       fetchCar();
@@ -103,7 +97,6 @@ export default function CarDetails() {
       const { data: { user } } = await supabase.auth.getUser();
         if (user) {
           setBuyerId(user.id);
-          // Also fetch user profile to get user_type
           const { data: profile } = await supabase
             .from('profiles')
             .select('user_type')
@@ -125,8 +118,6 @@ export default function CarDetails() {
     fetchBuyer();
   }, []);
 
-
-
   const handleBuy = () => {
     if (!buyerId) {
       setBuyMessage('❌ Please login to purchase this car');
@@ -138,7 +129,6 @@ export default function CarDetails() {
       return;
     }
     
-    // Log car data for debugging
     console.log('=== CAR DATA DEBUG ===');
     console.log('Complete car object:', car);
     console.log('Car ID:', car.id);
@@ -151,12 +141,10 @@ export default function CarDetails() {
     console.log('Car status:', car.status);
     console.log('=== END DEBUG ===');
     
-    // Show payment modal
     setShowPaymentModal(true);
     setBuyMessage('');
   };
 
-  // Handle purchase after successful payment (same as buyer dashboard)
   const handlePurchase = async (car) => {
     try {
       console.log('carToPurchase:', car);
@@ -166,7 +154,6 @@ export default function CarDetails() {
         return;
       }
       
-      // Insert purchase record with all required fields
       const purchaseData = {
         car_id: car.id,
         buyer_id: buyerId,
@@ -186,7 +173,6 @@ export default function CarDetails() {
         return;
       }
       
-      // Update car status to sold
       const { data: updateResult, error: carError } = await supabase
         .from('cars')
         .update({ status: 'sold' })
@@ -201,7 +187,6 @@ export default function CarDetails() {
       alert('✅ Car purchased successfully!');
       setBuyMessage('✅ Car purchased successfully! Car status updated to sold.');
       
-      // Refresh car data to show updated status
       setTimeout(() => {
         fetchCar();
       }, 1000);
@@ -212,7 +197,6 @@ export default function CarDetails() {
     }
   };
 
-  // Combine all images for the car
   const getAllImages = () => {
     return getAllCarImages(car);
   };
@@ -298,7 +282,7 @@ export default function CarDetails() {
           maxWidth: '1200px',
           margin: '0 auto'
         }}>
-          {/* Header Section */}
+          
           <div style={{ 
             textAlign: 'center', 
             marginBottom: '3rem',
@@ -317,8 +301,7 @@ export default function CarDetails() {
           }}>
             {car.title}
           </h1>
-          
-            {/* Price and Status Badge */}
+
           <div style={{
             display: 'flex',
               justifyContent: 'center', 
@@ -356,7 +339,6 @@ export default function CarDetails() {
             </div>
           </div>
 
-          {/* Car Images Gallery */}
           <div style={{ 
             display: 'flex', 
             gap: '2rem', 
@@ -365,7 +347,7 @@ export default function CarDetails() {
             flexWrap: 'wrap',
             alignItems: 'flex-start'
           }}>
-            {/* Main Image */}
+            
             <div style={{
               width: '500px', 
               height: '375px', 
@@ -388,7 +370,7 @@ export default function CarDetails() {
                 onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
                 onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
               />
-              {/* Image Counter */}
+              
               <div style={{
                 position: 'absolute',
                 top: '1rem',
@@ -403,8 +385,7 @@ export default function CarDetails() {
                 {currentImageIndex + 1} / {images.length}
               </div>
             </div>
-            
-            {/* Thumbnails Grid */}
+
             {images.length > 1 && (
               <div style={{
                 display: 'grid', 
@@ -467,7 +448,6 @@ export default function CarDetails() {
             )}
           </div>
 
-          {/* Car Video Section */}
           {car.video_url && (
             <div style={{ 
               background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)', 
@@ -509,7 +489,6 @@ export default function CarDetails() {
             </div>
           )}
 
-          {/* Car Information - EXACT SAME LOGIC AS CARSCARD */}
           <div style={{ 
             background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)', 
             padding: '2rem', 
@@ -533,7 +512,7 @@ export default function CarDetails() {
               gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
               gap: '1.5rem'
             }}>
-              {/* Basic Info */}
+              
               <div style={{ padding: '1.5rem', background: 'white', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
                 <h3 style={{ margin: '0 0 1rem 0', color: '#1e293b', fontSize: '1.3rem', fontWeight: '600' }}>Basic Information</h3>
                 <div style={{ marginBottom: '1rem' }}>
@@ -557,7 +536,6 @@ export default function CarDetails() {
                 </div>
               </div>
 
-              {/* Additional Details */}
               <div style={{ padding: '1.5rem', background: 'white', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
                 <h3 style={{ margin: '0 0 1rem 0', color: '#1e293b', fontSize: '1.3rem', fontWeight: '600' }}>Additional Details</h3>
                 {car.year && (
@@ -580,13 +558,11 @@ export default function CarDetails() {
                 )}
               </div>
 
-              {/* Description */}
               <div style={{ padding: '1.5rem', background: 'white', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
                 <h3 style={{ margin: '0 0 1rem 0', color: '#1e293b', fontSize: '1.3rem', fontWeight: '600' }}>Description</h3>
                 <p style={{ margin: '0', lineHeight: '1.6', color: '#0f172a' }}>{car.description}</p>
               </div>
 
-              {/* Seller Info */}
               <div style={{ padding: '1.5rem', background: 'white', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
                 <h3 style={{ margin: '0 0 1rem 0', color: '#1e293b', fontSize: '1.3rem', fontWeight: '600' }}>Seller Information</h3>
                 <div style={{ marginBottom: '1rem' }}>
@@ -601,11 +577,6 @@ export default function CarDetails() {
             </div>
           </div>
 
-
-
-
-
-          {/* Action Buttons */}
           <div style={{ 
             display: 'flex', 
             justifyContent: 'center', 
@@ -661,7 +632,6 @@ export default function CarDetails() {
         </div>
       </main>
 
-      {/* Reviews Section */}
       {userLoading ? (
         <div style={{ 
           textAlign: 'center', 
@@ -701,7 +671,6 @@ export default function CarDetails() {
         </>
       )}
 
-      {/* Discuss This Car Button */}
       <div style={{ 
         display: 'flex', 
         justifyContent: 'center', 
@@ -752,9 +721,6 @@ export default function CarDetails() {
         </button>
       </div>
 
-
-      
-      {/* Payment Modal */}
       {showPaymentModal && (
         <div style={{
           position: 'fixed',

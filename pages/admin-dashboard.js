@@ -25,7 +25,6 @@ export default function AdminDashboard() {
   const [cleanupLoading, setCleanupLoading] = useState(false);
   const [cleanupMessage, setCleanupMessage] = useState('');
   
-  // Confirmation states for admin actions
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [carToDelete, setCarToDelete] = useState(null);
   const [showEditConfirm, setShowEditConfirm] = useState(false);
@@ -41,7 +40,6 @@ export default function AdminDashboard() {
     }
       setUser(user);
 
-    // Check if user is admin
       const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
       setUserProfile(profile);
       
@@ -64,7 +62,6 @@ export default function AdminDashboard() {
     
   const loadPendingCars = async () => {
     try {
-      // Get cars that need approval (no approval record or pending status)
       const { data, error } = await supabase
         .from('cars')
         .select(`
@@ -87,14 +84,11 @@ export default function AdminDashboard() {
         return;
       }
 
-      // Filter cars that need approval
       const carsNeedingApproval = data.filter(car => {
-        // Check if car has no approval record OR if approval_status is pending/null
         const hasApproval = car.admin_approvals && car.admin_approvals.length > 0;
         const isApproved = hasApproval && car.admin_approvals.some(approval => approval.approval_status === 'approved');
         const isRejected = hasApproval && car.admin_approvals.some(approval => approval.approval_status === 'rejected');
         
-        // Car needs approval if: no approval record OR not approved OR not rejected
         return !hasApproval || (!isApproved && !isRejected);
       });
 
@@ -163,7 +157,6 @@ export default function AdminDashboard() {
     try {
       console.log('🔄 Loading enhanced commission data...');
       
-      // Get enhanced commission data directly from admin_commissions table
       const { data: commissionData, error } = await supabase
         .from('admin_commissions')
         .select('*')
@@ -176,7 +169,6 @@ export default function AdminDashboard() {
 
       console.log('📊 Enhanced commission data from database:', commissionData);
 
-      // Format commission data (all data already available)
       const formattedCommissionData = commissionData.map(commission => ({
         id: commission.id,
         car_title: commission.car_title,
@@ -203,7 +195,6 @@ export default function AdminDashboard() {
 
   const loadAllCars = async () => {
     try {
-      // Get all cars with seller info and approval status
       const { data, error } = await supabase
         .from('cars')
         .select(`
@@ -227,15 +218,12 @@ export default function AdminDashboard() {
 
       setAllCars(data || []);
 
-      // Separate available and approved cars
-      // Available cars: status = 'available' AND approval_status = 'approved'
       const available = data.filter(car => {
         const hasApproval = car.admin_approvals && car.admin_approvals.length > 0;
         const isApproved = hasApproval && car.admin_approvals.some(approval => approval.approval_status === 'approved');
         return car.status === 'available' && isApproved;
       });
 
-      // Approved cars: same as available (for consistency)
       const approved = available;
 
       setAvailableCars(available);
@@ -253,7 +241,6 @@ export default function AdminDashboard() {
     try {
       setLoading(true);
       
-      // Insert approval record
       const { error: approvalError } = await supabase
         .from('admin_approvals')
         .insert([
@@ -273,7 +260,6 @@ export default function AdminDashboard() {
 
       setMessage('✅ Car approved successfully!');
 
-      // Reload all data to reflect changes
       await Promise.all([
         loadPendingCars(),
         loadAllCars(),
@@ -292,7 +278,6 @@ export default function AdminDashboard() {
     try {
       setLoading(true);
       
-      // Insert rejection record
       const { error: approvalError } = await supabase
         .from('admin_approvals')
         .insert([
@@ -312,7 +297,6 @@ export default function AdminDashboard() {
 
       setMessage('✅ Car rejected successfully!');
 
-      // Reload all data to reflect changes
       await Promise.all([
         loadPendingCars(),
         loadAllCars(),
@@ -331,7 +315,6 @@ export default function AdminDashboard() {
     try {
       setLoading(true);
       
-      // Update user account status
       const { error } = await supabase
         .from('profiles')
         .update({ account_status: newStatus })
@@ -345,7 +328,6 @@ export default function AdminDashboard() {
 
       setMessage(`✅ User account ${newStatus === 'active' ? 'activated' : 'revoked'} successfully!`);
 
-      // Reload users to reflect changes
       await loadAllUsers();
 
     } catch (error) {
@@ -360,7 +342,6 @@ export default function AdminDashboard() {
     try {
       setLoading(true);
       
-      // Delete car from database
       const { error } = await supabase
         .from('cars')
         .delete()
@@ -374,7 +355,6 @@ export default function AdminDashboard() {
 
       setMessage('✅ Car deleted successfully!');
 
-      // Reload cars to reflect changes
       await loadAllCars();
 
     } catch (error) {
@@ -391,7 +371,6 @@ export default function AdminDashboard() {
     try {
       console.log('Starting commission backfill...');
       
-      // 1. Get all purchases with car details
       const { data: purchases, error: purchasesError } = await supabase
         .from('purchases')
         .select(`
@@ -426,12 +405,10 @@ export default function AdminDashboard() {
       let errorCount = 0;
       const results = [];
 
-      // 2. Process each purchase
       for (const purchase of purchases) {
         try {
           console.log(`Processing purchase ${purchase.id} for car ${purchase.car_id}`);
 
-          // Check if commission already exists
           const { data: existingCommission } = await supabase
             .from('admin_commissions')
             .select('id')
@@ -443,10 +420,8 @@ export default function AdminDashboard() {
             continue;
           }
 
-          // Calculate commission (10%)
           const commissionAmount = Math.round(purchase.amount * 0.10 * 100) / 100;
 
-          // Create commission record
           const { data: newCommission, error: newCommissionError } = await supabase
             .from('admin_commissions')
             .insert([{
@@ -487,7 +462,6 @@ export default function AdminDashboard() {
             });
           }
 
-          // Small delay to avoid overwhelming the database
           await new Promise(resolve => setTimeout(resolve, 100));
 
         } catch (error) {
@@ -524,7 +498,6 @@ export default function AdminDashboard() {
     try {
       console.log('Starting database cleanup for duplicate purchases...');
       
-      // 1. Identify duplicate purchase records based on sale_id and car_id
       const { data: duplicates, error: duplicatesError } = await supabase
         .from('purchases')
         .select('sale_id, car_id, count')
@@ -545,7 +518,6 @@ export default function AdminDashboard() {
       let errorCount = 0;
       const results = [];
 
-      // 2. Delete the duplicate records
       for (const dup of duplicates) {
         try {
           console.log(`Deleting duplicate purchase record for sale_id: ${dup.sale_id}, car_id: ${dup.car_id}`);
@@ -606,13 +578,11 @@ export default function AdminDashboard() {
   const handleAdminAvatarChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validate file type
       if (!file.type.startsWith('image/')) {
         setMessage('❌ Please select an image file (PNG, JPG, JPEG, GIF)');
         return;
       }
 
-      // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         setMessage('❌ File size must be less than 5MB');
         return;
@@ -621,12 +591,10 @@ export default function AdminDashboard() {
       try {
         setMessage('📸 Uploading profile picture...');
         
-        // Create unique filename
         const fileExt = file.name.split('.').pop();
         const fileName = `${user.id}-${Date.now()}.${fileExt}`;
         const filePath = `${user.id}/${fileName}`;
 
-        // Upload to Supabase storage
         const { data, error } = await supabase.storage
           .from('user-avatars')
           .upload(filePath, file, {
@@ -638,13 +606,10 @@ export default function AdminDashboard() {
           throw error;
         }
 
-        // Get public URL manually (Supabase storage issue fix)
-        // Extract project ref from Supabase URL
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://fdddzfnawuykljrdrlrp.supabase.co';
         const projectRef = supabaseUrl.split('//')[1]?.split('.')[0] || 'fdddzfnawuykljrdrlrp';
         const publicUrl = `https://${projectRef}.supabase.co/storage/v1/object/public/user-avatars/${filePath}`;
 
-        // Update profile with new avatar URL
         const { error: updateError } = await supabase
           .from('profiles')
           .update({ avatar_url: publicUrl })
@@ -654,7 +619,6 @@ export default function AdminDashboard() {
           throw updateError;
         }
 
-        // Update local state
         setUserProfile(prev => ({
           ...prev,
           avatar_url: publicUrl
@@ -662,7 +626,6 @@ export default function AdminDashboard() {
 
         setMessage('✅ Profile picture updated successfully!');
         
-        // Clear the file input
         e.target.value = '';
 
       } catch (error) {
@@ -737,7 +700,7 @@ export default function AdminDashboard() {
             >
               🚗 All Cars ({allCars.length})
             </button>
-            {/* Sold Cars tab removed - integrated with Commission */}
+            
             <button 
               className={`${styles.navItem} ${activeTab === 'commission' ? styles.active : ''}`}
               onClick={() => setActiveTab('commission')}
@@ -768,8 +731,7 @@ export default function AdminDashboard() {
                     {activeTab === 'overview' && (
             <div className={styles.section}>
               <h2>Dashboard Overview</h2>
-              
-              {/* Backfill Commissions Button */}
+
               <div className={styles.backfillSection}>
                 <h3>💰 Commission Management</h3>
                 <p>Backfill admin commissions for all previous purchases (10% rate)</p>
@@ -984,7 +946,6 @@ export default function AdminDashboard() {
                           ✅ Activate
                         </button>
                       ) : (
-                        // Don't show revoke button for admin accounts
                         user.user_type !== 'admin' && (
                           <button 
                             onClick={() => handleAccountStatusChange(user.id, 'revoked')}
@@ -1011,7 +972,7 @@ export default function AdminDashboard() {
                 </div>
               ) : (
                 <div className={styles.carsGrid}>
-                  {/* Show available approved cars */}
+                  
                   {availableCars.map(car => (
                     <div key={car.id} className={styles.carCard}>
                       <div className={styles.carImageContainer}>
@@ -1068,8 +1029,7 @@ export default function AdminDashboard() {
                             )}
                           </div>
                         </div>
-                        
-                        {/* Admin Edit Button for Available Cars */}
+
                         <div className={styles.actionButtonsRow}>
                           <button 
                             onClick={() => {
@@ -1101,8 +1061,7 @@ export default function AdminDashboard() {
                       </div>
                     </div>
                   ))}
-                  
-                  {/* Show sold cars */}
+
                   {commissionData.map(commission => (
                     <div key={commission.id} className={styles.carCard}>
                       <div className={styles.carImageContainer}>
@@ -1156,8 +1115,6 @@ export default function AdminDashboard() {
               )}
             </div>
           )}
-
-          {/* Sold Cars section removed - now integrated with Commission tab */}
 
           {activeTab === 'commission' && (
             <div className={styles.section}>
@@ -1365,7 +1322,7 @@ export default function AdminDashboard() {
                 gap: '2rem',
                 marginTop: '1rem'
               }}>
-                {/* Profile Information */}
+                
                 <div style={{ 
                   background: 'white', 
                   padding: '1.5rem', 
@@ -1392,7 +1349,6 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                {/* Avatar Management */}
                 <div style={{ 
                   background: 'white', 
                   padding: '1.5rem', 
@@ -1491,8 +1447,7 @@ export default function AdminDashboard() {
           )}
               </div>
             </div>
-      
-      {/* Confirmation Notifications */}
+
       {showDeleteConfirm && carToDelete && (
         <div className={styles.confirmationOverlay}>
           <div className={styles.confirmationModal}>

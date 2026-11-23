@@ -170,8 +170,7 @@ export default function CarsPage() {
       <Navbar />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        
-        {/* Header Hero Banner */}
+
         <div className="relative rounded-3xl overflow-hidden backdrop-blur-2xl bg-slate-900/80 border border-white/10 p-8 sm:p-12 mb-10 shadow-2xl">
           <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-600/15 rounded-full blur-3xl pointer-events-none"></div>
           <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 justify-between">
@@ -211,7 +210,6 @@ export default function CarsPage() {
           </div>
         </div>
 
-        {/* Search & Stats Bar */}
         <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mb-8">
           <div className="relative flex-1 w-full flex items-center gap-3">
             <div className="relative flex-1">
@@ -232,10 +230,8 @@ export default function CarsPage() {
           </div>
         </div>
 
-        {/* Filter Accordion */}
         <CarFilter onFilterChange={handleFilterChange} filters={filters} />
 
-        {/* Car Grid State */}
         {loading ? (
           <div className="py-24 text-center">
             <div className="w-10 h-10 border-3 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>

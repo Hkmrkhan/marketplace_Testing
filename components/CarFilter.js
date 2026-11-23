@@ -121,7 +121,7 @@ export default function CarFilter({ onFilterChange, filters }) {
 
       {isExpanded && (
         <div className="mt-6 pt-6 border-t border-white/10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {/* Car Title Filter */}
+          
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">Car Title</label>
             <input
@@ -133,7 +133,6 @@ export default function CarFilter({ onFilterChange, filters }) {
             />
           </div>
 
-          {/* Price Range Filter */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">Price Range ($)</label>
             <div className="flex items-center gap-2">
@@ -157,7 +156,6 @@ export default function CarFilter({ onFilterChange, filters }) {
             </div>
           </div>
 
-          {/* Miles Range Filter */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">Miles Range</label>
             <div className="flex items-center gap-2">
@@ -181,7 +179,6 @@ export default function CarFilter({ onFilterChange, filters }) {
             </div>
           </div>
 
-          {/* Registration City */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">Registration City</label>
             <select
@@ -196,7 +193,6 @@ export default function CarFilter({ onFilterChange, filters }) {
             </select>
           </div>
 
-          {/* Save Filter Actions */}
           <div className="sm:col-span-2 lg:col-span-4 flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-white/10">
             <button
               onClick={() => setShowSaveDialog(true)}
@@ -233,7 +229,6 @@ export default function CarFilter({ onFilterChange, filters }) {
         </div>
       )}
 
-      {/* Save Filter Dialog */}
       {showSaveDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
           <div className="w-full max-w-sm rounded-3xl bg-slate-900 border border-white/20 p-6 shadow-2xl">

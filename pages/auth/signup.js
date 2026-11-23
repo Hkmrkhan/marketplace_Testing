@@ -237,13 +237,12 @@ export default function SignupPage() {
 
   return (
     <main className="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-[#070b14] relative overflow-hidden">
-      {/* Aurora Ambient Background */}
+      
       <div className="absolute top-1/4 -left-20 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl pointer-events-none"></div>
 
       <div className="relative z-10 w-full max-w-4xl grid grid-cols-1 lg:grid-cols-12 rounded-3xl backdrop-blur-2xl bg-slate-900/80 border border-white/10 shadow-2xl overflow-hidden">
-        
-        {/* Left Form Column */}
+
         <div className="lg:col-span-7 p-8 sm:p-12 flex flex-col justify-between">
           <div>
             <div className="mb-6">
@@ -254,8 +253,7 @@ export default function SignupPage() {
                 Create your account to start buying or selling cars
               </p>
             </div>
-            
-            {/* Profile Picture Uploader */}
+
             <div className="mb-6">
               <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
                 Profile Picture (Optional)
@@ -390,7 +388,6 @@ export default function SignupPage() {
                 </div>
               </div>
 
-              {/* User Type Selection: Buyer vs Seller */}
               <div className="pt-2">
                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">
                   Account Type
@@ -455,7 +452,6 @@ export default function SignupPage() {
           </div>
         </div>
 
-        {/* Right Graphic Column */}
         <div className="lg:col-span-5 relative bg-gradient-to-br from-indigo-900/60 via-purple-900/40 to-slate-950 p-8 sm:p-12 flex flex-col justify-between border-t lg:border-t-0 lg:border-l border-white/10">
           <div>
             <div className="relative rounded-2xl overflow-hidden mb-8 border border-white/10 shadow-xl">

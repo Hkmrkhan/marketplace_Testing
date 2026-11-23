@@ -14,7 +14,6 @@ export default async function handler(req, res) {
   try {
     const lowerMessage = message.toLowerCase();
     
-    // Basic fallback responses
     let response = '';
     
     if (lowerMessage.includes('buying') || lowerMessage.includes('buyer')) {

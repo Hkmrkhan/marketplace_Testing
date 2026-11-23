@@ -1,5 +1,3 @@
-// Environment checker for the marketplace app
-// Now works without Supabase environment variables
 
 export const checkEnvironment = () => {
   const envVars = [

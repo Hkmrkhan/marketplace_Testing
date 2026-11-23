@@ -66,7 +66,7 @@ export default function ReviewList({ reviews, stats, currentUserId, currentUserT
 
   return (
     <div className={styles.reviewListContainer}>
-      {/* Review Statistics */}
+      
       <div className={styles.reviewStats}>
         <div className={styles.overallRating}>
           <div className={styles.averageRating}>
@@ -91,7 +91,6 @@ export default function ReviewList({ reviews, stats, currentUserId, currentUserT
         </div>
       </div>
 
-      {/* Reviews List */}
       <div className={styles.reviewsList}>
         <h3>Customer Reviews</h3>
         {reviews.map((review) => (
@@ -150,7 +149,6 @@ export default function ReviewList({ reviews, stats, currentUserId, currentUserT
               </div>
             </div>
 
-            {/* Review Actions for Review Owner or Admin */}
             {(currentUserId === review.reviewer_id || currentUserType === 'admin') && (
               <div className={styles.reviewActions}>
                 {currentUserId === review.reviewer_id && (

@@ -38,7 +38,6 @@ export function getAllCarImages(car) {
   const mainUrl = car.image_url || car.cars?.image_url;
   const additional = car.additional_images || car.cars?.additional_images;
 
-  // Filter out empty or whitespace-only strings
   if (mainUrl && typeof mainUrl === 'string' && mainUrl.trim() !== '') {
     images.push(mainUrl.trim());
   }

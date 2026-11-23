@@ -44,7 +44,7 @@ export default function ContactPage() {
       <Navbar />
 
       <main className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Contact Info Header */}
+        
         <div className="text-center mb-12">
           <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight mb-4">
             Contact <span className="bg-gradient-to-r from-indigo-400 to-cyan-300 bg-clip-text text-transparent">Us</span>
@@ -65,7 +65,6 @@ export default function ContactPage() {
           </div>
         </div>
 
-        {/* Message Form Card */}
         <div className="rounded-3xl backdrop-blur-2xl bg-slate-900/80 border border-white/10 p-8 sm:p-10 shadow-2xl">
           <h2 className="text-xl font-bold text-white mb-6">Send us a Message</h2>
 
@@ -151,7 +150,6 @@ export default function ContactPage() {
 
       </main>
 
-      {/* Cancel Confirmation Dialog */}
       {showCancelConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
           <div className="w-full max-w-sm rounded-3xl bg-slate-900 border border-white/20 p-6 shadow-2xl text-center">

@@ -1,6 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Create admin client with service role key
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -14,7 +13,6 @@ export default async function handler(req, res) {
   try {
     console.log('=== FIX COMMISSION IMAGES STARTED ===');
 
-    // 1. Get all commission records with missing car_image_url
     console.log('Fetching commissions with missing images...');
     const { data: commissions, error: commissionsError } = await supabaseAdmin
       .from('admin_commissions')
@@ -36,7 +34,6 @@ export default async function handler(req, res) {
 
     console.log(`Found ${commissions.length} commissions with missing images`);
 
-    // 2. Process each commission and update image URL
     let successCount = 0;
     let errorCount = 0;
     const results = [];
@@ -53,15 +50,12 @@ export default async function handler(req, res) {
           imagesLength: commission.cars?.images?.length || 0
         });
 
-        // Get the best available image URL
         let carImageUrl = null;
         
-        // First try image_url
         if (commission.cars?.image_url) {
           carImageUrl = commission.cars.image_url;
           console.log('Using image_url:', carImageUrl);
         } 
-        // Then try images field
         else if (commission.cars?.images) {
           console.log('Images field type:', typeof commission.cars.images);
           console.log('Images field value:', commission.cars.images);
@@ -70,7 +64,6 @@ export default async function handler(req, res) {
             carImageUrl = commission.cars.images[0];
             console.log('Using first image from array:', carImageUrl);
           } else if (typeof commission.cars.images === 'string') {
-            // Try to parse JSON string
             try {
               const parsedImages = JSON.parse(commission.cars.images);
               console.log('Parsed images:', parsedImages);
@@ -80,7 +73,6 @@ export default async function handler(req, res) {
               }
             } catch (e) {
               console.log('Failed to parse images string, using as is');
-              // If parsing fails, check if it's a valid URL
               if (commission.cars.images.startsWith('http')) {
                 carImageUrl = commission.cars.images;
                 console.log('Using images string as URL:', carImageUrl);
@@ -89,7 +81,6 @@ export default async function handler(req, res) {
           }
         }
         
-        // If still no image, try to get from cars table directly
         if (!carImageUrl) {
           console.log('No image found in commission data, fetching from cars table...');
           try {
@@ -133,7 +124,6 @@ export default async function handler(req, res) {
         console.log('Final image URL:', carImageUrl);
 
         if (carImageUrl) {
-          // Update commission record with image URL
           const { error: updateError } = await supabaseAdmin
             .from('admin_commissions')
             .update({ car_image_url: carImageUrl })
@@ -165,7 +155,6 @@ export default async function handler(req, res) {
           });
         }
 
-        // Small delay to avoid overwhelming the database
         await new Promise(resolve => setTimeout(resolve, 100));
 
       } catch (error) {

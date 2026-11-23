@@ -7,7 +7,7 @@ export default function AboutPage() {
       <Navbar />
 
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Hero Section */}
+        
         <div className="text-center mb-16 relative">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-xs font-semibold text-indigo-300 mb-4">
             <span>About Us</span>
@@ -20,7 +20,6 @@ export default function AboutPage() {
           </p>
         </div>
 
-        {/* Mission Section */}
         <div className="rounded-3xl backdrop-blur-xl bg-slate-900/80 border border-white/10 p-8 sm:p-12 mb-12 shadow-xl">
           <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2.5">
             <span className="w-2 h-6 bg-indigo-500 rounded-full"></span>
@@ -34,7 +33,6 @@ export default function AboutPage() {
           </p>
         </div>
 
-        {/* Platform Features */}
         <div className="mb-16">
           <h2 className="text-2xl sm:text-3xl font-bold text-white text-center mb-10">
             Platform Features
@@ -60,7 +58,6 @@ export default function AboutPage() {
           </div>
         </div>
 
-        {/* Stats Section */}
         <div className="rounded-3xl backdrop-blur-xl bg-slate-900/80 border border-white/10 p-8 sm:p-12 mb-12 shadow-xl text-center">
           <h2 className="text-2xl font-bold text-white mb-8">Platform Statistics</h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
@@ -80,7 +77,6 @@ export default function AboutPage() {
           </div>
         </div>
 
-        {/* Team Section */}
         <div className="rounded-3xl backdrop-blur-xl bg-slate-900/80 border border-white/10 p-8 sm:p-12 mb-12 shadow-xl">
           <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2.5">
             <span className="w-2 h-6 bg-cyan-500 rounded-full"></span>
@@ -94,7 +90,6 @@ export default function AboutPage() {
           </p>
         </div>
 
-        {/* Contact Section */}
         <div className="rounded-3xl backdrop-blur-xl bg-gradient-to-br from-indigo-950/60 to-slate-950 border border-indigo-500/30 p-8 sm:p-12 shadow-xl text-center">
           <h2 className="text-2xl font-bold text-white mb-2">Get in Touch</h2>
           <p className="text-sm text-slate-300 max-w-md mx-auto mb-6">

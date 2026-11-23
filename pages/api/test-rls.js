@@ -6,10 +6,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Simple user ID for testing (UUID format)
     const testUserId = '123e4567-e89b-12d3-a456-426614174000';
 
-    // Test 1: Try to insert a test record
     const testData = {
       user_id: testUserId,
       filter_name: 'Test Filter',
@@ -31,7 +29,6 @@ export default async function handler(req, res) {
       });
     }
 
-    // Test 2: Try to select the test record
     const { data: selectData, error: selectError } = await supabase
       .from('user_filters')
       .select('*')
@@ -45,7 +42,6 @@ export default async function handler(req, res) {
       });
     }
 
-    // Clean up test data
     if (insertData && insertData[0]) {
       await supabase
         .from('user_filters')

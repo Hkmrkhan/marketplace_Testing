@@ -8,7 +8,6 @@ export default function CarCard({ car, userProfile }) {
   const router = useRouter();
   const { addToComparison, isInComparison, comparisonCars } = useComparison();
   
-  // Combine primary image with additional images
   const allImages = getAllCarImages(car);
   const imageSrc = allImages[currentImageIndex] || allImages[0] || '/carp2.webp';
 
@@ -24,10 +23,9 @@ export default function CarCard({ car, userProfile }) {
 
   return (
     <div className="group rounded-3xl backdrop-blur-2xl bg-slate-900/80 border border-white/10 hover:border-indigo-500/50 p-4 shadow-xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-indigo-500/20 flex flex-col justify-between">
-      
-      {/* Clickable Area */}
+
       <div onClick={handleCarClick} className="cursor-pointer">
-        {/* Main Image Container */}
+        
         <div className="relative h-52 w-full rounded-2xl overflow-hidden mb-3 bg-slate-950">
           <img 
             src={imageSrc} 
@@ -45,7 +43,6 @@ export default function CarCard({ car, userProfile }) {
           </div>
         </div>
 
-        {/* Thumbnails Row */}
         {allImages.length > 1 && (
           <div className="flex gap-1.5 mb-3 overflow-x-auto pb-1" onClick={(e) => e.stopPropagation()}>
             {allImages.map((img, idx) => (
@@ -65,7 +62,6 @@ export default function CarCard({ car, userProfile }) {
           </div>
         )}
 
-        {/* Car Info */}
         <div className="space-y-2">
           <h3 className="text-lg font-bold text-white group-hover:text-indigo-300 transition-colors line-clamp-1">
             {car.title}
@@ -94,7 +90,6 @@ export default function CarCard({ car, userProfile }) {
         </div>
       </div>
 
-      {/* Action Buttons */}
       <div className="mt-4 pt-3 border-t border-white/10 flex items-center gap-2">
         {userProfile?.user_type !== 'admin' && (
           <button 

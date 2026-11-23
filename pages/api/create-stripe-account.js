@@ -1,19 +1,16 @@
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 
-// Check if Stripe secret key is available
 if (!process.env.STRIPE_SECRET_KEY) {
   console.error('STRIPE_SECRET_KEY is not set');
 }
 
-// Check if service role key is available
 if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
   console.error('SUPABASE_SERVICE_ROLE_KEY is not set');
 }
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// Create admin client with service role key
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -30,7 +27,6 @@ export default async function handler(req, res) {
   console.log('SUPABASE_SERVICE_ROLE_KEY available:', !!process.env.SUPABASE_SERVICE_ROLE_KEY);
 
   try {
-    // First, verify user exists in profiles table using admin client
     console.log('Verifying user exists in profiles table...');
     const { data: existingProfile, error: profileError } = await supabaseAdmin
       .from('profiles')
@@ -45,7 +41,6 @@ export default async function handler(req, res) {
 
     console.log('Profile verified:', existingProfile);
 
-    // Create Stripe Connect Express Account
     console.log('Creating Stripe Connect account...');
     const account = await stripe.accounts.create({
       type: 'express',
@@ -65,7 +60,6 @@ export default async function handler(req, res) {
       email: account.email
     });
 
-    // Generate onboarding link
     console.log('Generating onboarding link...');
     const accountLink = await stripe.accountLinks.create({
       account: account.id,
@@ -76,7 +70,6 @@ export default async function handler(req, res) {
 
     console.log('✅ Onboarding link generated:', accountLink.url);
 
-    // Update profile with Stripe account ID using admin client
     console.log('Updating profile with Stripe account ID...');
     console.log('Update data:', { 
       stripe_account_id: account.id,
@@ -107,7 +100,6 @@ export default async function handler(req, res) {
 
     console.log('✅ Profile updated successfully:', updateData);
 
-    // Verify the update was successful
     console.log('Verifying profile update...');
     const { data: verifyData, error: verifyError } = await supabaseAdmin
       .from('profiles')

@@ -21,9 +21,7 @@ export default function DebugPage() {
         errors: []
       };
 
-      // Get user profile if user exists
       if (info.currentUser) {
-        // Mock user profile
         info.userProfile = {
           id: info.currentUser.id,
           full_name: 'Test User',
@@ -32,7 +30,6 @@ export default function DebugPage() {
         };
       }
 
-      // Check mock data availability
       try {
         const cars = JSON.parse(localStorage.getItem('marketplace_cars') || '[]');
         const profiles = JSON.parse(localStorage.getItem('marketplace_profiles') || '[]');

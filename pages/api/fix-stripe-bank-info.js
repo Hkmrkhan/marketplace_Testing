@@ -3,7 +3,6 @@ import { createClient } from '@supabase/supabase-js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// Create admin client with service role key
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -20,7 +19,6 @@ export default async function handler(req, res) {
     console.log('=== FIX STRIPE BANK INFO STARTED ===');
     console.log('User ID:', userId);
 
-    // Get user profile with stripe_account_id
     const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('stripe_account_id, email, full_name')
@@ -43,7 +41,6 @@ export default async function handler(req, res) {
       stripeAccountId: profile.stripe_account_id
     });
 
-    // Check current Stripe account status
     const account = await stripe.accounts.retrieve(profile.stripe_account_id);
     
     console.log('Current Stripe account status:', {
@@ -56,7 +53,6 @@ export default async function handler(req, res) {
       country: account.country
     });
 
-    // Check what's missing
     const missingRequirements = [];
     
     if (account.requirements?.currently_due?.length > 0) {
@@ -69,7 +65,6 @@ export default async function handler(req, res) {
 
     console.log('Missing requirements:', missingRequirements);
 
-    // Generate new onboarding link for bank info
     console.log('Generating new onboarding link for bank info...');
     
     const accountLink = await stripe.accountLinks.create({

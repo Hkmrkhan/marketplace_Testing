@@ -10,7 +10,6 @@ export default async function handler(req, res) {
   }
 
       try {
-      // Hugging Face Inference API call with better prompt
       const response = await fetch('https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium', {
         method: 'POST',
         headers: {
@@ -31,17 +30,14 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       console.error('Hugging Face API Error:', response.status);
-      // Use smart fallback instead of generic response
       throw new Error('API failed - using smart fallback');
     }
 
     const data = await response.json();
     let aiMessage = data[0]?.generated_text || data.generated_text || 'Sorry, samajh nahi aaya. Dobara try kariye.';
     
-    // Clean up the response
     aiMessage = aiMessage.replace(/^(Car marketplace assistant|User:|Assistant:)/gi, '').trim();
     
-    // Add context-specific response if too generic
     if (aiMessage.length < 20) {
       aiMessage = `${aiMessage} Main aap ki car marketplace assistant hun! ${context === 'buyer-dashboard' ? 'Car buying guidance' : context === 'seller-dashboard' ? 'Car selling tips' : 'Car marketplace help'} ke liye yahan hun.`;
     }
@@ -55,7 +51,6 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error('Hugging Face API error:', error);
     
-    // Smart fallback responses based on keywords and context
     let fallbackMessage = '';
     
     const lowerMessage = message.toLowerCase();
