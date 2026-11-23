@@ -4,6 +4,35 @@ import { useRouter } from 'next/router';
 import { supabase } from '../utils/supabaseClient';
 import { useComparison } from '../utils/ComparisonContext';
 
+function NavItem({ href, label, active, onClick, extraClass = '' }) {
+  return (
+    <Link
+      href={href}
+      onClick={onClick}
+      className={`
+        relative group px-3.5 py-2 rounded-xl text-sm font-medium transition-all duration-200 ease-out flex items-center justify-center
+        hover:-translate-y-0.5 hover:scale-[1.03] active:translate-y-0 active:scale-95
+        ${active 
+          ? 'text-white bg-indigo-600/30 border border-indigo-400/50 shadow-md shadow-indigo-500/25 font-semibold' 
+          : 'text-slate-300 hover:text-white hover:bg-white/10 border border-transparent hover:border-white/15 hover:shadow-md hover:shadow-indigo-500/10'}
+        ${extraClass}
+      `}
+    >
+      <span className="relative z-10 transition-colors duration-200 group-hover:text-white">
+        {label}
+      </span>
+      {/* Animated glowing bottom bar */}
+      <span 
+        className={`absolute bottom-1 left-3 right-3 h-[2px] rounded-full transition-all duration-300 ease-out origin-center pointer-events-none ${
+          active 
+            ? 'opacity-100 scale-x-100 bg-gradient-to-r from-indigo-400 via-violet-400 to-cyan-400 shadow-sm shadow-indigo-400/50' 
+            : 'opacity-0 scale-x-0 group-hover:opacity-100 group-hover:scale-x-100 bg-gradient-to-r from-indigo-400 via-violet-400 to-cyan-400'
+        }`}
+      />
+    </Link>
+  );
+}
+
 export default function Navbar({ logoText }) {
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -49,17 +78,6 @@ export default function Navbar({ logoText }) {
 
   const isActive = (path) => router.pathname === path;
 
-  const linkClass = (path) => `
-    px-3.5 py-2 rounded-xl text-sm font-medium transition-all duration-200
-    ${isActive(path) 
-      ? 'text-white bg-indigo-600/30 border border-indigo-500/40 shadow-sm shadow-indigo-500/20' 
-      : 'text-slate-300 hover:text-white hover:bg-white/5 border border-transparent'}
-  `;
-
-  const disabledLinkClass = `
-    px-3.5 py-2 rounded-xl text-sm font-medium text-slate-500 border border-transparent cursor-not-allowed opacity-60
-  `;
-
   return (
     <>
       <nav className="sticky top-0 z-50 backdrop-blur-xl bg-slate-950/80 border-b border-white/10 shadow-2xl transition-all duration-300">
@@ -67,9 +85,9 @@ export default function Navbar({ logoText }) {
           
           {/* Brand Logo */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative w-10 h-10 rounded-xl overflow-hidden bg-gradient-to-tr from-indigo-600 to-violet-500 p-[1px] shadow-lg shadow-indigo-500/25 transition-transform duration-300 group-hover:scale-105">
+            <div className="relative w-10 h-10 rounded-xl overflow-hidden bg-gradient-to-tr from-indigo-600 to-violet-500 p-[1px] shadow-lg shadow-indigo-500/25 transition-transform duration-300 group-hover:scale-105 group-hover:rotate-1">
               <div className="w-full h-full bg-slate-950 rounded-[11px] flex items-center justify-center p-1">
-                <img src="/logo.webp" alt="Car Marketplace Logo" className="w-full h-full object-contain" />
+                <img src="/logo.webp" alt="Car Marketplace Logo" className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-110" />
               </div>
             </div>
             <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-100 to-indigo-300 bg-clip-text text-transparent group-hover:to-cyan-300 transition-colors">
@@ -82,42 +100,29 @@ export default function Navbar({ logoText }) {
             <div className="hidden md:flex items-center gap-2">
               <ul className="flex items-center gap-1.5 list-none m-0 p-0">
                 <li>
-                  <Link href="/" className={linkClass('/')} onClick={closeMobileMenu}>
-                    Home
-                  </Link>
+                  <NavItem href="/" label="Home" active={isActive('/')} onClick={closeMobileMenu} />
                 </li>
 
                 {userProfile && (
                   <li>
-                    <Link href="/forum" className={linkClass('/forum')} onClick={closeMobileMenu}>
-                      Forum
-                    </Link>
+                    <NavItem href="/forum" label="Forum" active={isActive('/forum')} onClick={closeMobileMenu} />
                   </li>
                 )}
 
                 {!userProfile && (
                   <>
                     <li>
-                      {isActive('/auth/login') ? (
-                        <span className={disabledLinkClass}>Login</span>
-                      ) : (
-                        <Link href="/auth/login" className={linkClass('/auth/login')} onClick={closeMobileMenu}>
-                          Login
-                        </Link>
-                      )}
+                      <NavItem href="/auth/login" label="Login" active={isActive('/auth/login')} onClick={closeMobileMenu} />
                     </li>
                     <li>
-                      {isActive('/auth/signup') ? (
-                        <span className={disabledLinkClass}>Sign Up</span>
-                      ) : (
-                        <Link 
-                          href="/auth/signup" 
-                          className="ml-2 px-4 py-2 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500 shadow-md shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all" 
-                          onClick={closeMobileMenu}
-                        >
-                          Sign Up
-                        </Link>
-                      )}
+                      <Link 
+                        href="/auth/signup" 
+                        className="relative group ml-2 px-4 py-2 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500 shadow-md shadow-indigo-500/25 hover:shadow-xl hover:shadow-indigo-500/40 hover:-translate-y-0.5 hover:scale-105 active:scale-95 transition-all duration-200 overflow-hidden" 
+                        onClick={closeMobileMenu}
+                      >
+                        <span className="relative z-10">Sign Up</span>
+                        <span className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out pointer-events-none" />
+                      </Link>
                     </li>
                   </>
                 )}
@@ -125,22 +130,10 @@ export default function Navbar({ logoText }) {
                 {userProfile?.user_type === 'buyer' && (
                   <>
                     <li>
-                      {isActive('/cars') ? (
-                        <span className={disabledLinkClass}>Cars</span>
-                      ) : (
-                        <Link href="/cars" className={linkClass('/cars')} onClick={closeMobileMenu}>
-                          Cars
-                        </Link>
-                      )}
+                      <NavItem href="/cars" label="Cars" active={isActive('/cars')} onClick={closeMobileMenu} />
                     </li>
                     <li>
-                      {isActive('/buyer-dashboard') ? (
-                        <span className={disabledLinkClass}>Dashboard</span>
-                      ) : (
-                        <Link href="/buyer-dashboard" className={linkClass('/buyer-dashboard')} onClick={closeMobileMenu}>
-                          Dashboard
-                        </Link>
-                      )}
+                      <NavItem href="/buyer-dashboard" label="Dashboard" active={isActive('/buyer-dashboard')} onClick={closeMobileMenu} />
                     </li>
                   </>
                 )}
@@ -148,35 +141,17 @@ export default function Navbar({ logoText }) {
                 {userProfile?.user_type === 'seller' && (
                   <>
                     <li>
-                      {isActive('/cars') ? (
-                        <span className={disabledLinkClass}>Cars</span>
-                      ) : (
-                        <Link href="/cars" className={linkClass('/cars')} onClick={closeMobileMenu}>
-                          Cars
-                        </Link>
-                      )}
+                      <NavItem href="/cars" label="Cars" active={isActive('/cars')} onClick={closeMobileMenu} />
                     </li>
                     <li>
-                      {isActive('/add-car') ? (
-                        <span className={disabledLinkClass}>Add Car</span>
-                      ) : (
-                        <Link href="/add-car" className={linkClass('/add-car')} onClick={closeMobileMenu}>
-                          Add Car
-                        </Link>
-                      )}
+                      <NavItem href="/add-car" label="Add Car" active={isActive('/add-car')} onClick={closeMobileMenu} />
                     </li>
                     <li>
-                      {isActive('/seller-dashboard') ? (
-                        <span className={disabledLinkClass}>Dashboard</span>
-                      ) : (
-                        <Link href="/seller-dashboard" className={linkClass('/seller-dashboard')} onClick={closeMobileMenu}>
-                          Dashboard
-                        </Link>
-                      )}
+                      <NavItem href="/seller-dashboard" label="Dashboard" active={isActive('/seller-dashboard')} onClick={closeMobileMenu} />
                     </li>
                     <li>
                       <button 
-                        className="px-3.5 py-2 rounded-xl text-sm font-medium text-cyan-300 hover:text-cyan-200 bg-cyan-950/40 hover:bg-cyan-900/50 border border-cyan-500/30 transition-all flex items-center gap-1.5"
+                        className="relative group px-3.5 py-2 rounded-xl text-sm font-semibold text-cyan-300 hover:text-white bg-cyan-950/30 hover:bg-gradient-to-r hover:from-cyan-600 hover:to-blue-600 border border-cyan-500/30 hover:border-cyan-400/60 shadow-sm hover:shadow-lg hover:shadow-cyan-500/25 hover:-translate-y-0.5 hover:scale-105 active:scale-95 transition-all duration-200 flex items-center gap-1.5 cursor-pointer"
                         onClick={() => {
                           if (typeof window !== 'undefined' && window.openChatModal) {
                             window.openChatModal();
@@ -184,7 +159,8 @@ export default function Navbar({ logoText }) {
                         }}
                         title="Open Chats"
                       >
-                        💬 Chats
+                        <span className="transition-transform duration-200 group-hover:scale-110">💬</span>
+                        <span>Chats</span>
                       </button>
                     </li>
                   </>
@@ -193,22 +169,10 @@ export default function Navbar({ logoText }) {
                 {userProfile?.user_type === 'admin' && (
                   <>
                     <li>
-                      {isActive('/cars') ? (
-                        <span className={disabledLinkClass}>All Cars</span>
-                      ) : (
-                        <Link href="/cars" className={linkClass('/cars')} onClick={closeMobileMenu}>
-                          All Cars
-                        </Link>
-                      )}
+                      <NavItem href="/cars" label="All Cars" active={isActive('/cars')} onClick={closeMobileMenu} />
                     </li>
                     <li>
-                      {isActive('/admin-dashboard') ? (
-                        <span className={disabledLinkClass}>Admin Dashboard</span>
-                      ) : (
-                        <Link href="/admin-dashboard" className={linkClass('/admin-dashboard')} onClick={closeMobileMenu}>
-                          Admin Dashboard
-                        </Link>
-                      )}
+                      <NavItem href="/admin-dashboard" label="Admin Dashboard" active={isActive('/admin-dashboard')} onClick={closeMobileMenu} />
                     </li>
                   </>
                 )}
@@ -217,7 +181,7 @@ export default function Navbar({ logoText }) {
                   <li className="ml-2">
                     <button 
                       onClick={handleLogout} 
-                      className="px-3.5 py-1.5 rounded-xl text-sm font-medium text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 border border-rose-500/20 hover:border-rose-500/40 transition-all"
+                      className="relative group px-3.5 py-1.5 rounded-xl text-sm font-semibold text-rose-400 hover:text-white bg-rose-500/10 hover:bg-gradient-to-r hover:from-rose-600 hover:to-pink-600 border border-rose-500/30 hover:border-rose-400/60 shadow-sm hover:shadow-lg hover:shadow-rose-600/30 hover:-translate-y-0.5 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer"
                     >
                       Logout
                     </button>
@@ -237,7 +201,7 @@ export default function Navbar({ logoText }) {
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center">
             <button 
-              className="p-2.5 rounded-xl bg-slate-900/80 border border-white/10 text-slate-200 hover:text-white hover:bg-white/10 transition-colors"
+              className="p-2.5 rounded-xl bg-slate-900/80 border border-white/10 text-slate-200 hover:text-white hover:bg-white/10 hover:scale-105 active:scale-95 transition-all duration-200"
               onClick={toggleMobileMenu}
               aria-label="Toggle navigation menu"
             >
@@ -249,10 +213,14 @@ export default function Navbar({ logoText }) {
         {/* Mobile Menu Overlay */}
         {mobileMenuOpen && (
           <div className="md:hidden fixed inset-0 top-20 z-50 bg-slate-950/95 backdrop-blur-2xl border-t border-white/10 p-6 overflow-y-auto animate-in fade-in duration-200">
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2">
               <Link 
                 href="/" 
-                className={`px-4 py-3 rounded-xl text-base font-medium ${isActive('/') ? 'text-white bg-indigo-600/30 border border-indigo-500/40' : 'text-slate-300 hover:bg-white/5'}`}
+                className={`px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 hover:translate-x-1 ${
+                  isActive('/') 
+                    ? 'text-white bg-indigo-600/30 border border-indigo-500/40 shadow-sm shadow-indigo-500/20' 
+                    : 'text-slate-300 hover:text-white hover:bg-white/10'
+                }`}
                 onClick={closeMobileMenu}
               >
                 Home
@@ -261,7 +229,11 @@ export default function Navbar({ logoText }) {
               {userProfile && (
                 <Link 
                   href="/forum" 
-                  className={`px-4 py-3 rounded-xl text-base font-medium ${isActive('/forum') ? 'text-white bg-indigo-600/30 border border-indigo-500/40' : 'text-slate-300 hover:bg-white/5'}`}
+                  className={`px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 hover:translate-x-1 ${
+                    isActive('/forum') 
+                      ? 'text-white bg-indigo-600/30 border border-indigo-500/40 shadow-sm shadow-indigo-500/20' 
+                      : 'text-slate-300 hover:text-white hover:bg-white/10'
+                  }`}
                   onClick={closeMobileMenu}
                 >
                   Forum
@@ -272,14 +244,18 @@ export default function Navbar({ logoText }) {
                 <>
                   <Link 
                     href="/auth/login" 
-                    className={`px-4 py-3 rounded-xl text-base font-medium ${isActive('/auth/login') ? 'text-white bg-indigo-600/30 border border-indigo-500/40' : 'text-slate-300 hover:bg-white/5'}`}
+                    className={`px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 hover:translate-x-1 ${
+                      isActive('/auth/login') 
+                        ? 'text-white bg-indigo-600/30 border border-indigo-500/40 shadow-sm shadow-indigo-500/20' 
+                        : 'text-slate-300 hover:text-white hover:bg-white/10'
+                    }`}
                     onClick={closeMobileMenu}
                   >
                     Login
                   </Link>
                   <Link 
                     href="/auth/signup" 
-                    className="px-4 py-3 rounded-xl text-base font-semibold text-center text-white bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500 shadow-lg shadow-indigo-500/25"
+                    className="px-4 py-3 rounded-xl text-base font-semibold text-center text-white bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-500 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all"
                     onClick={closeMobileMenu}
                   >
                     Sign Up
@@ -291,14 +267,22 @@ export default function Navbar({ logoText }) {
                 <>
                   <Link 
                     href="/cars" 
-                    className={`px-4 py-3 rounded-xl text-base font-medium ${isActive('/cars') ? 'text-white bg-indigo-600/30 border border-indigo-500/40' : 'text-slate-300 hover:bg-white/5'}`}
+                    className={`px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 hover:translate-x-1 ${
+                      isActive('/cars') 
+                        ? 'text-white bg-indigo-600/30 border border-indigo-500/40 shadow-sm shadow-indigo-500/20' 
+                        : 'text-slate-300 hover:text-white hover:bg-white/10'
+                    }`}
                     onClick={closeMobileMenu}
                   >
                     Cars
                   </Link>
                   <Link 
                     href="/buyer-dashboard" 
-                    className={`px-4 py-3 rounded-xl text-base font-medium ${isActive('/buyer-dashboard') ? 'text-white bg-indigo-600/30 border border-indigo-500/40' : 'text-slate-300 hover:bg-white/5'}`}
+                    className={`px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 hover:translate-x-1 ${
+                      isActive('/buyer-dashboard') 
+                        ? 'text-white bg-indigo-600/30 border border-indigo-500/40 shadow-sm shadow-indigo-500/20' 
+                        : 'text-slate-300 hover:text-white hover:bg-white/10'
+                    }`}
                     onClick={closeMobileMenu}
                   >
                     Dashboard
@@ -310,27 +294,39 @@ export default function Navbar({ logoText }) {
                 <>
                   <Link 
                     href="/cars" 
-                    className={`px-4 py-3 rounded-xl text-base font-medium ${isActive('/cars') ? 'text-white bg-indigo-600/30 border border-indigo-500/40' : 'text-slate-300 hover:bg-white/5'}`}
+                    className={`px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 hover:translate-x-1 ${
+                      isActive('/cars') 
+                        ? 'text-white bg-indigo-600/30 border border-indigo-500/40 shadow-sm shadow-indigo-500/20' 
+                        : 'text-slate-300 hover:text-white hover:bg-white/10'
+                    }`}
                     onClick={closeMobileMenu}
                   >
                     Cars
                   </Link>
                   <Link 
                     href="/add-car" 
-                    className={`px-4 py-3 rounded-xl text-base font-medium ${isActive('/add-car') ? 'text-white bg-indigo-600/30 border border-indigo-500/40' : 'text-slate-300 hover:bg-white/5'}`}
+                    className={`px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 hover:translate-x-1 ${
+                      isActive('/add-car') 
+                        ? 'text-white bg-indigo-600/30 border border-indigo-500/40 shadow-sm shadow-indigo-500/20' 
+                        : 'text-slate-300 hover:text-white hover:bg-white/10'
+                    }`}
                     onClick={closeMobileMenu}
                   >
                     Add Car
                   </Link>
                   <Link 
                     href="/seller-dashboard" 
-                    className={`px-4 py-3 rounded-xl text-base font-medium ${isActive('/seller-dashboard') ? 'text-white bg-indigo-600/30 border border-indigo-500/40' : 'text-slate-300 hover:bg-white/5'}`}
+                    className={`px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 hover:translate-x-1 ${
+                      isActive('/seller-dashboard') 
+                        ? 'text-white bg-indigo-600/30 border border-indigo-500/40 shadow-sm shadow-indigo-500/20' 
+                        : 'text-slate-300 hover:text-white hover:bg-white/10'
+                    }`}
                     onClick={closeMobileMenu}
                   >
                     Dashboard
                   </Link>
                   <button 
-                    className="px-4 py-3 rounded-xl text-base font-medium text-cyan-300 bg-cyan-950/40 border border-cyan-500/30 flex items-center gap-2"
+                    className="px-4 py-3 rounded-xl text-base font-medium text-cyan-300 bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-500/30 flex items-center gap-2 hover:translate-x-1 transition-all"
                     onClick={() => {
                       closeMobileMenu();
                       if (typeof window !== 'undefined' && window.openChatModal) {
@@ -347,14 +343,22 @@ export default function Navbar({ logoText }) {
                 <>
                   <Link 
                     href="/cars" 
-                    className={`px-4 py-3 rounded-xl text-base font-medium ${isActive('/cars') ? 'text-white bg-indigo-600/30 border border-indigo-500/40' : 'text-slate-300 hover:bg-white/5'}`}
+                    className={`px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 hover:translate-x-1 ${
+                      isActive('/cars') 
+                        ? 'text-white bg-indigo-600/30 border border-indigo-500/40 shadow-sm shadow-indigo-500/20' 
+                        : 'text-slate-300 hover:text-white hover:bg-white/10'
+                    }`}
                     onClick={closeMobileMenu}
                   >
                     All Cars
                   </Link>
                   <Link 
                     href="/admin-dashboard" 
-                    className={`px-4 py-3 rounded-xl text-base font-medium ${isActive('/admin-dashboard') ? 'text-white bg-indigo-600/30 border border-indigo-500/40' : 'text-slate-300 hover:bg-white/5'}`}
+                    className={`px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 hover:translate-x-1 ${
+                      isActive('/admin-dashboard') 
+                        ? 'text-white bg-indigo-600/30 border border-indigo-500/40 shadow-sm shadow-indigo-500/20' 
+                        : 'text-slate-300 hover:text-white hover:bg-white/10'
+                    }`}
                     onClick={closeMobileMenu}
                   >
                     Admin Dashboard
@@ -365,7 +369,7 @@ export default function Navbar({ logoText }) {
               {userProfile && (
                 <button 
                   onClick={handleLogout} 
-                  className="mt-4 px-4 py-3 rounded-xl text-base font-medium text-rose-400 bg-rose-500/10 border border-rose-500/20 text-center"
+                  className="mt-4 px-4 py-3 rounded-xl text-base font-medium text-rose-400 bg-rose-500/10 hover:bg-rose-600 hover:text-white border border-rose-500/20 text-center transition-all duration-200 hover:scale-[1.02]"
                 >
                   Logout
                 </button>
