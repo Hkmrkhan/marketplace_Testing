@@ -1214,7 +1214,15 @@ export default function BuyerDashboard() {
                               {car.title || `${car.make || 'Car'} ${car.model || ''} ${car.year || ''}`}
                             </h3>
                             <div className={styles.priceContainer}>
-                              <span className={styles.price}>${car.price?.toLocaleString() || '0'}</span>
+                              <span className={styles.price} style={{ color: '#4338ca', WebkitTextFillColor: '#4338ca' }}>
+                                ${(() => {
+                                  const p = car.price;
+                                  if (p === null || p === undefined || p === '') return '0';
+                                  const clean = String(p).replace(/^\$/, '').trim();
+                                  const n = Number(clean.replace(/,/g, ''));
+                                  return isNaN(n) ? clean : n.toLocaleString();
+                                })()}
+                              </span>
                             </div>
                           </div>
                           
@@ -1382,7 +1390,15 @@ export default function BuyerDashboard() {
                           <div className={styles.carCardHeader}>
                             <h3 className={styles.carTitle}>{purchase.title || purchase.cars?.title || "Car"}</h3>
                             <div className={styles.priceContainer}>
-                              <span className={styles.price}>${purchase.price || purchase.cars?.price || 'N/A'}</span>
+                              <span className={styles.price} style={{ color: '#4338ca', WebkitTextFillColor: '#4338ca' }}>
+                                ${(() => {
+                                  const p = purchase.price || purchase.cars?.price;
+                                  if (p === null || p === undefined || p === '') return 'N/A';
+                                  const clean = String(p).replace(/^\$/, '').trim();
+                                  const n = Number(clean.replace(/,/g, ''));
+                                  return isNaN(n) ? clean : n.toLocaleString();
+                                })()}
+                              </span>
                             </div>
                           </div>
                           

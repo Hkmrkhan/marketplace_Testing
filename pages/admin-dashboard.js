@@ -883,7 +883,15 @@ export default function AdminDashboard() {
                         <div className={styles.carCardHeader}>
                           <h3 className={styles.carTitle}>{car.title}</h3>
                           <div className={styles.priceContainer}>
-                            <span className={styles.price}>${car.price?.toLocaleString()}</span>
+                            <span className={styles.price} style={{ color: '#4338ca', WebkitTextFillColor: '#4338ca' }}>
+                              ${(() => {
+                                const p = car.price;
+                                if (p === null || p === undefined || p === '') return '0';
+                                const clean = String(p).replace(/^\$/, '').trim();
+                                const n = Number(clean.replace(/,/g, ''));
+                                return isNaN(n) ? clean : n.toLocaleString();
+                              })()}
+                            </span>
                           </div>
                         </div>
                         
@@ -1017,7 +1025,15 @@ export default function AdminDashboard() {
                         <div className={styles.carCardHeader}>
                           <h3 className={styles.carTitle}>{car.title}</h3>
                           <div className={styles.priceContainer}>
-                            <span className={styles.price}>${car.price?.toLocaleString()}</span>
+                            <span className={styles.price} style={{ color: '#4338ca', WebkitTextFillColor: '#4338ca' }}>
+                              ${(() => {
+                                const p = car.price;
+                                if (p === null || p === undefined || p === '') return '0';
+                                const clean = String(p).replace(/^\$/, '').trim();
+                                const n = Number(clean.replace(/,/g, ''));
+                                return isNaN(n) ? clean : n.toLocaleString();
+                              })()}
+                            </span>
                           </div>
                         </div>
                         <p className={styles.carDescription}>{car.description}</p>
@@ -1089,7 +1105,15 @@ export default function AdminDashboard() {
                         <div className={styles.carCardHeader}>
                           <h3 className={styles.carTitle}>{commission.car_title}</h3>
                           <div className={styles.priceContainer}>
-                            <span className={styles.price}>${commission.sale_amount?.toLocaleString()}</span>
+                            <span className={styles.price} style={{ color: '#4338ca', WebkitTextFillColor: '#4338ca' }}>
+                              ${(() => {
+                                const p = commission.sale_amount;
+                                if (p === null || p === undefined || p === '') return '0';
+                                const clean = String(p).replace(/^\$/, '').trim();
+                                const n = Number(clean.replace(/,/g, ''));
+                                return isNaN(n) ? clean : n.toLocaleString();
+                              })()}
+                            </span>
                           </div>
                         </div>
                         <p className={styles.carDescription}>Sold car - {commission.car_description || 'No description available'}</p>

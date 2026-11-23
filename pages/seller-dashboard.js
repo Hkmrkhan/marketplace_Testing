@@ -2277,7 +2277,13 @@ export default function SellerDashboard() {
                                 {car.status === 'sold' ? 'Sold' : 'Available'}
                               </span>
                               {car.admin_approvals && car.admin_approvals.length > 0 && (
-                                <span className={`${styles.approvalBadgeFloating} ${styles[car.admin_approvals[car.admin_approvals.length - 1].approval_status]}`}>
+                                <span className={
+                                  car.admin_approvals[car.admin_approvals.length - 1].approval_status === 'approved'
+                                    ? styles.approvedBadgeFloating
+                                    : car.admin_approvals[car.admin_approvals.length - 1].approval_status === 'pending'
+                                      ? styles.pendingBadgeFloating
+                                      : styles.rejectedBadgeFloating
+                                }>
                                   {car.admin_approvals[car.admin_approvals.length - 1].approval_status === 'approved' ? '✓ Approved' : 
                                    car.admin_approvals[car.admin_approvals.length - 1].approval_status === 'pending' ? '⏳ Pending' : '✕ Rejected'}
                                 </span>
@@ -2308,7 +2314,15 @@ export default function SellerDashboard() {
                             <div className={styles.carCardHeader}>
                               <h3 className={styles.carTitle}>{car.title}</h3>
                               <div className={styles.priceContainer}>
-                                <span className={styles.price}>${car.price?.toLocaleString() || '0'}</span>
+                                <span className={styles.price} style={{ color: '#4338ca', WebkitTextFillColor: '#4338ca' }}>
+                                  ${(() => {
+                                    const p = car.price;
+                                    if (p === null || p === undefined || p === '') return '0';
+                                    const clean = String(p).replace(/^\$/, '').trim();
+                                    const n = Number(clean.replace(/,/g, ''));
+                                    return isNaN(n) ? clean : n.toLocaleString();
+                                  })()}
+                                </span>
                               </div>
                             </div>
                             
@@ -2372,7 +2386,13 @@ export default function SellerDashboard() {
                             <span className={car.status === 'sold' ? styles.soldBadgeFloating : styles.availableBadgeFloating}>
                               {car.status === 'sold' ? 'Sold' : 'Available'}
                             </span>
-                            <span className={`${styles.approvalBadgeFloating} ${styles[approvalStatusClass]}`}>
+                            <span className={
+                              (car.status === 'sold' || approvalStatus === 'approved')
+                                ? styles.approvedBadgeFloating
+                                : approvalStatus === 'pending'
+                                  ? styles.pendingBadgeFloating
+                                  : styles.rejectedBadgeFloating
+                            }>
                               {car.status === 'sold' ? '✓ Auto-Approved' : 
                                approvalStatus === 'approved' ? '✓ Approved' : 
                                approvalStatus === 'pending' ? '⏳ Pending' : '✕ Rejected'}
@@ -2402,7 +2422,15 @@ export default function SellerDashboard() {
                           <div className={styles.carCardHeader}>
                             <h3 className={styles.carTitle}>{car.title}</h3>
                             <div className={styles.priceContainer}>
-                              <span className={styles.price}>${car.price?.toLocaleString() || '0'}</span>
+                              <span className={styles.price} style={{ color: '#4338ca', WebkitTextFillColor: '#4338ca' }}>
+                                ${(() => {
+                                  const p = car.price;
+                                  if (p === null || p === undefined || p === '') return '0';
+                                  const clean = String(p).replace(/^\$/, '').trim();
+                                  const n = Number(clean.replace(/,/g, ''));
+                                  return isNaN(n) ? clean : n.toLocaleString();
+                                })()}
+                              </span>
                             </div>
                           </div>
                           

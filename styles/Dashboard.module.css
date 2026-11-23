@@ -982,14 +982,17 @@
   }
   
   .price {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin: 16px 0;
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #4338ca;
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+    padding: 4px 12px;
+    border-radius: 10px;
+    white-space: nowrap;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    display: inline-block;
   }
   
   .status {
@@ -8205,15 +8208,32 @@
   .approvedBadgeFloating {
     backdrop-filter: blur(8px) !important;
     -webkit-backdrop-filter: blur(8px) !important;
-    background: rgba(99, 102, 241, 0.9) !important;
+    background: rgba(16, 185, 129, 0.95) !important;
     color: #ffffff !important;
     font-size: 0.725rem !important;
     font-weight: 700 !important;
     letter-spacing: 0.04em !important;
     padding: 5px 12px !important;
     border-radius: 9999px !important;
-    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3) !important;
-    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+  }
+
+  .rejectedBadgeFloating {
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    background: rgba(239, 68, 68, 0.95) !important;
+    color: #ffffff !important;
+    font-size: 0.725rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.04em !important;
+    padding: 5px 12px !important;
+    border-radius: 9999px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
     display: inline-flex !important;
     align-items: center !important;
     gap: 4px !important;
@@ -8344,16 +8364,22 @@
   }
 
   .price {
-    font-size: 1.2rem !important;
+    font-size: 1.25rem !important;
     font-weight: 800 !important;
-    color: #4f46e5 !important;
+    color: #4338ca !important;
+    -webkit-text-fill-color: #4338ca !important;
+    -webkit-background-clip: border-box !important;
+    background-clip: border-box !important;
     background: #eef2ff !important;
-    border: 1px solid #e0e7ff !important;
-    padding: 4px 10px !important;
+    border: 1.5px solid #c7d2fe !important;
+    padding: 4px 12px !important;
     border-radius: 10px !important;
     white-space: nowrap !important;
-    line-height: 1.2 !important;
+    line-height: 1.25 !important;
     letter-spacing: -0.02em !important;
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 
   .carDescription {
