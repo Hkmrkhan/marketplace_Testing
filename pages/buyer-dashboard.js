@@ -1156,7 +1156,12 @@ export default function BuyerDashboard() {
                     return (
                       <div key={car.id} className={styles.carCard}>
                         {/* Gallery block - at top */}
-                        <div className={styles.carImageContainer}>
+                        <div 
+                          className={styles.carImageContainer}
+                          onClick={() => handleOpenDetails(car)}
+                          style={{ cursor: 'pointer' }}
+                          title="Click to view full details and gallery"
+                        >
                           {/* Main image */}
                           <img
                             src={carImages[currentImageIndex] || '/carp2.webp'}
@@ -1175,33 +1180,16 @@ export default function BuyerDashboard() {
                             )}
                           </div>
                         </div>
-
-                        {/* Thumbnails row - only show if more than 1 image */}
-                        {carImages.length > 1 && (
-                          <div className={styles.thumbnailsRow}>
-                            {carImages.map((img, idx) => (
-                              <img
-                                key={idx}
-                                src={img}
-                                alt={`Thumbnail ${idx + 1}`}
-                                className={
-                                  styles.thumbnail +
-                                  (currentImageIndex === idx ? ' ' + styles.activeThumbnail : '')
-                                }
-                                onClick={() => {
-                                  console.log('Clicking thumbnail:', idx, 'for car:', car.id);
-                                  setImageIndexes(prev => ({ ...prev, [car.id]: idx }));
-                                }}
-                                onError={(e) => onImageErrorFallback(e, car.title)}
-                              />
-                            ))}
-                          </div>
-                        )}
-
+                        
                         <div className={styles.carDetails}>
                           {/* Car Title & Price Header */}
                           <div className={styles.carCardHeader}>
-                            <h3 className={styles.carTitle}>
+                            <h3 
+                              className={styles.carTitle}
+                              onClick={() => handleOpenDetails(car)}
+                              style={{ cursor: 'pointer' }}
+                              title="Click to view details"
+                            >
                               {car.title || `${car.make || 'Car'} ${car.model || ''} ${car.year || ''}`}
                             </h3>
                             <div className={styles.priceContainer}>
@@ -1217,39 +1205,36 @@ export default function BuyerDashboard() {
                             </div>
                           </div>
 
-                          {/* Car Description */}
-                          <p className={styles.carDescription}>{car.description}</p>
-
-                          {/* Seller Info - Enhanced with Avatar */}
-                          <div className={styles.sellerInfo}>
-                            <div className={styles.sellerAvatar}>
-                              {car.seller?.avatar_url ? (
-                                <img
-                                  src={car.seller.avatar_url}
-                                  alt="Seller Avatar"
-                                  className={styles.avatarImage}
-                                />
-                              ) : (
-                                <div className={styles.avatarPlaceholder}>
-                                  {car.seller?.full_name?.charAt(0)?.toUpperCase() || 'S'}
-                                </div>
-                              )}
-                            </div>
-                            <div className={styles.sellerDetails}>
-                              <span className={styles.sellerRole}>SELLER</span>
-                              <span className={styles.sellerName}>
-                                {car.seller?.full_name || 'N/A'}
+                          {/* Minimalist Subtitle: Model/Make & Subtle Seller hint */}
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '4px', marginBottom: '14px', fontSize: '0.825rem', color: '#64748b' }}>
+                            <span style={{ fontWeight: 600, color: '#475569' }}>
+                              {[car.make, car.model, car.year].filter(Boolean).join(' • ') || 'Verified Vehicle'}
+                            </span>
+                            {car.seller?.full_name && (
+                              <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#64748b', fontSize: '0.78rem' }}>
+                                by <strong style={{ color: '#334155', fontWeight: 600 }}>{car.seller.full_name}</strong>
                               </span>
-                              {car.seller?.email && (
-                                <span className={styles.sellerEmail}>{car.seller.email}</span>
-                              )}
-                            </div>
+                            )}
                           </div>
 
+                          {/* View Details Button */}
+                          <button 
+                            type="button" 
+                            className={styles.viewDetailsBtn}
+                            onClick={() => handleOpenDetails(car)}
+                            style={{ marginBottom: '8px' }}
+                          >
+                            <svg className="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            View Details
+                          </button>
+                          
                           {/* Action Buttons - Professional Layout */}
                           <div className={styles.actionButtons}>
                             {car.status === 'available' ? (
-                              <button
+                              <button 
                                 className={styles.buyBtn}
                                 onClick={() => setCheckoutCar({ ...car, seller_id: car.seller_id })}
                               >
@@ -1263,32 +1248,16 @@ export default function BuyerDashboard() {
                                 Sold
                               </div>
                             )}
-
+                            
                             {/* Message Button - Integrated */}
-                            <button
+                            <button 
                               className={styles.messageBtn}
                               onClick={() => {
-                                console.log('🎯 Message button clicked!');
-                                console.log('📊 Full Car Object:', car);
-                                console.log('📊 Car data breakdown:', {
-                                  carId: car.id,
-                                  sellerId: car.seller_id,
-                                  seller: car.seller,
-                                  seller_id: car.seller_id,
-                                  'car.seller?.id': car.seller?.id,
-                                  'car.seller_id': car.seller_id
-                                });
-
-                                // Try to get seller ID from multiple possible sources
                                 const sellerId = car.seller_id || car.seller?.id || car.seller_id;
-                                console.log('🎯 Final sellerId to use:', sellerId);
-
                                 if (!sellerId) {
-                                  console.error('❌ No seller ID found! Cannot open chat.');
                                   alert('Error: Seller information not available for this car.');
                                   return;
                                 }
-
                                 onOpenChat(car.id, sellerId, [], null, '', null, false, null);
                               }}
                               style={{ position: 'relative' }}
@@ -1297,7 +1266,6 @@ export default function BuyerDashboard() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                               </svg>
                               Message Seller
-                              {/* Unread Count Badge */}
                               {unreadCounts[car.id] > 0 && (
                                 <span className={styles.unreadBadge}>
                                   {unreadCounts[car.id]}
@@ -1329,7 +1297,12 @@ export default function BuyerDashboard() {
                     return (
                       <div key={purchase.id} className={styles.carCard}>
                         {/* Gallery block for purchased cars */}
-                        <div className={styles.carImageContainer}>
+                        <div 
+                          className={styles.carImageContainer}
+                          onClick={() => handleOpenDetails(purchase)}
+                          style={{ cursor: 'pointer' }}
+                          title="Click to view purchase details"
+                        >
                           {/* Main image */}
                           <img
                             src={purchaseImages[currentImageIndex] || '/carp2.webp'}
@@ -1348,32 +1321,17 @@ export default function BuyerDashboard() {
                             )}
                           </div>
                         </div>
-
-                        {/* Thumbnails row - only show if more than 1 image */}
-                        {purchaseImages.length > 1 && (
-                          <div className={styles.thumbnailsRow}>
-                            {purchaseImages.map((img, idx) => (
-                              <img
-                                key={idx}
-                                src={img}
-                                alt={`Thumbnail ${idx + 1}`}
-                                className={
-                                  styles.thumbnail +
-                                  (currentImageIndex === idx ? ' ' + styles.activeThumbnail : '')
-                                }
-                                onClick={() => {
-                                  console.log('Clicking purchase thumbnail:', idx, 'for purchase:', purchase.id);
-                                  setImageIndexes(prev => ({ ...prev, [purchase.id]: idx }));
-                                }}
-                                onError={(e) => onImageErrorFallback(e, purchase.title || purchase.cars?.title)}
-                              />
-                            ))}
-                          </div>
-                        )}
-
+                        
                         <div className={styles.carDetails}>
                           <div className={styles.carCardHeader}>
-                            <h3 className={styles.carTitle}>{purchase.title || purchase.cars?.title || "Car"}</h3>
+                            <h3 
+                              className={styles.carTitle}
+                              onClick={() => handleOpenDetails(purchase)}
+                              style={{ cursor: 'pointer' }}
+                              title="Click to view details"
+                            >
+                              {purchase.title || purchase.cars?.title || "Car"}
+                            </h3>
                             <div className={styles.priceContainer}>
                               <span className={styles.price} style={{ color: '#4338ca', WebkitTextFillColor: '#4338ca' }}>
                                 ${(() => {
@@ -1386,26 +1344,30 @@ export default function BuyerDashboard() {
                               </span>
                             </div>
                           </div>
-
-                          <p className={styles.carDescription}>{purchase.description || purchase.cars?.description}</p>
-
-                          <div className={styles.sellerInfo}>
-                            <div className={styles.sellerAvatar}>
-                              <div className={styles.avatarPlaceholder}>
-                                {(purchase.seller_name || purchase.seller?.full_name || 'S').charAt(0).toUpperCase()}
-                              </div>
-                            </div>
-                            <div className={styles.sellerDetails}>
-                              <span className={styles.sellerRole}>SELLER</span>
-                              <span className={styles.sellerName}>
-                                {purchase.seller_name || purchase.seller?.full_name || 'Unknown'}
+                          
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '4px', marginBottom: '14px', fontSize: '0.825rem', color: '#64748b' }}>
+                            <span style={{ fontWeight: 600, color: '#475569' }}>
+                              {[purchase.make || purchase.cars?.make, purchase.model || purchase.cars?.model, purchase.year || purchase.cars?.year].filter(Boolean).join(' • ') || 'Order Completed'}
+                            </span>
+                            {(purchase.seller_name || purchase.seller?.full_name) && (
+                              <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#64748b', fontSize: '0.78rem' }}>
+                                seller: <strong style={{ color: '#334155', fontWeight: 600 }}>{purchase.seller_name || purchase.seller?.full_name}</strong>
                               </span>
-                              {(purchase.seller_email || purchase.seller?.email) && (
-                                <span className={styles.sellerEmail}>
-                                  {purchase.seller_email || purchase.seller?.email}
-                                </span>
-                              )}
-                            </div>
+                            )}
+                          </div>
+
+                          <div className={styles.actionButtons}>
+                            <button 
+                              type="button" 
+                              className={styles.viewDetailsBtn}
+                              onClick={() => handleOpenDetails(purchase)}
+                            >
+                              <svg className="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              </svg>
+                              View Details & Receipt
+                            </button>
                           </div>
                         </div>
                       </div>
