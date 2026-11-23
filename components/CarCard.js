@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useComparison } from '../utils/ComparisonContext';
+import { getAllCarImages, onImageErrorFallback } from '../utils/carImages';
 
 export default function CarCard({ car, userProfile }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -8,16 +9,8 @@ export default function CarCard({ car, userProfile }) {
   const { addToComparison, isInComparison, comparisonCars } = useComparison();
   
   // Combine primary image with additional images
-  const allImages = [];
-  if (car.image_url && car.image_url.trim() !== '') {
-    allImages.push(car.image_url);
-  }
-  if (car.additional_images && Array.isArray(car.additional_images)) {
-    allImages.push(...car.additional_images.filter(img => img && img.trim() !== ''));
-  }
-  const imageSrc = allImages.length > 0 
-    ? allImages[currentImageIndex] 
-    : (car.image && car.image.trim() !== '' ? car.image : '/carp2.png');
+  const allImages = getAllCarImages(car);
+  const imageSrc = allImages[currentImageIndex] || allImages[0] || '/carp2.png';
 
   const handleCarClick = () => {
     router.push(`/cars/${car.car_id || car.id}`);
@@ -40,6 +33,7 @@ export default function CarCard({ car, userProfile }) {
             src={imageSrc} 
             alt={car.title} 
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+            onError={(e) => onImageErrorFallback(e, car.title)}
           />
           <div className="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-extrabold text-white bg-indigo-600/90 backdrop-blur-md shadow-md">
             ${car.price}
@@ -65,6 +59,7 @@ export default function CarCard({ car, userProfile }) {
                     : 'border-transparent opacity-60 hover:opacity-100'
                 }`}
                 onClick={() => setCurrentImageIndex(idx)}
+                onError={(e) => onImageErrorFallback(e, car.title)}
               />
             ))}
           </div>

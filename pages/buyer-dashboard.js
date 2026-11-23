@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import AIChat from '../components/AIChat';
 import { supabase } from '../utils/supabaseClient';
+import { getAllCarImages, onImageErrorFallback } from '../utils/carImages';
 import styles from '../styles/Dashboard.module.css';
 import authStyles from '../styles/Auth.module.css';
 import dynamic from 'next/dynamic';
@@ -362,18 +363,7 @@ export default function BuyerDashboard() {
 
   // Helper to get all images for a car
   const getAllImages = (car) => {
-    const images = [];
-    
-    // Handle both view data and fallback data structures
-    const imageUrl = car.image_url || car.cars?.image_url;
-    const additionalImages = car.additional_images || car.cars?.additional_images;
-    
-    if (imageUrl && imageUrl.trim() !== '') images.push(imageUrl);
-    if (additionalImages && Array.isArray(additionalImages)) {
-      images.push(...additionalImages.filter(img => img && img.trim() !== ''));
-    }
-    
-    return images.length > 0 ? images : ['/carp2.png'];
+    return getAllCarImages(car);
   };
 
   useEffect(() => {
@@ -1165,10 +1155,7 @@ export default function BuyerDashboard() {
                             src={carImages[currentImageIndex] || '/carp2.png'}
                             alt={car.title}
                             className={styles.mainImage}
-                            onError={(e) => {
-                              e.target.src = '/carp2.png';
-                              console.log('Image failed to load, using fallback');
-                            }}
+                            onError={(e) => onImageErrorFallback(e, car.title)}
                           />
                           <div className={styles.imageOverlayTop}>
                             <span className={car.status === 'sold' ? styles.soldBadgeFloating : styles.availableBadgeFloating}>
@@ -1198,10 +1185,7 @@ export default function BuyerDashboard() {
                                   console.log('Clicking thumbnail:', idx, 'for car:', car.id);
                                   setImageIndexes(prev => ({ ...prev, [car.id]: idx }));
                                 }}
-                                onError={(e) => {
-                                  e.target.src = '/carp2.png';
-                                  console.log('Thumbnail failed to load, using fallback');
-                                }}
+                                onError={(e) => onImageErrorFallback(e, car.title)}
                               />
                             ))}
                           </div>
@@ -1344,10 +1328,7 @@ export default function BuyerDashboard() {
                             src={purchaseImages[currentImageIndex] || '/carp2.png'}
                             alt={purchase.title || purchase.cars?.title || "Car"}
                             className={styles.mainImage}
-                            onError={(e) => {
-                              e.target.src = '/carp2.png';
-                              console.log('Purchase image failed to load, using fallback');
-                            }}
+                            onError={(e) => onImageErrorFallback(e, purchase.title || purchase.cars?.title)}
                           />
                           <div className={styles.imageOverlayTop}>
                             <span className={styles.purchasedBadgeFloating}>
@@ -1377,10 +1358,7 @@ export default function BuyerDashboard() {
                                   console.log('Clicking purchase thumbnail:', idx, 'for purchase:', purchase.id);
                                   setImageIndexes(prev => ({ ...prev, [purchase.id]: idx }));
                                 }}
-                                onError={(e) => {
-                                  e.target.src = '/carp2.png';
-                                  console.log('Purchase thumbnail failed to load, using fallback');
-                                }}
+                                onError={(e) => onImageErrorFallback(e, purchase.title || purchase.cars?.title)}
                               />
                             ))}
                           </div>

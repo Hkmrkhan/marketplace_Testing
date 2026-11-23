@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import AIChat from '../components/AIChat';
 import { supabase } from '../utils/supabaseClient';
+import { getAllCarImages, onImageErrorFallback } from '../utils/carImages';
 import styles from '../styles/Dashboard.module.css';
 import authStyles from '../styles/Auth.module.css';
 
@@ -1164,10 +1165,7 @@ export default function SellerDashboard() {
 
   // Helper to get all images for a car
   const getAllImages = (car) => {
-    const images = [];
-    if (car.image_url && car.image_url.trim() !== '') images.push(car.image_url);
-    if (car.additional_images && Array.isArray(car.additional_images)) images.push(...car.additional_images.filter(img => img && img.trim() !== ''));
-    return images.length > 0 ? images : ['/carp2.png'];
+    return getAllCarImages(car);
   };
 
   useEffect(() => {
@@ -2271,6 +2269,7 @@ export default function SellerDashboard() {
                               src={getAllImages(car)[imageIndexes[car.id] || 0]}
                               alt={car.title}
                               className={styles.mainImage}
+                              onError={(e) => onImageErrorFallback(e, car.title)}
                             />
                             <div className={styles.imageOverlayTop}>
                               <span className={car.status === 'sold' ? styles.soldBadgeFloating : styles.availableBadgeFloating}>
@@ -2303,6 +2302,7 @@ export default function SellerDashboard() {
                                     ((imageIndexes[car.id] || 0) === idx ? ' ' + styles.activeThumbnail : '')
                                   }
                                   onClick={() => setImageIndexes(prev => ({ ...prev, [car.id]: idx }))}
+                                  onError={(e) => onImageErrorFallback(e, car.title)}
                                 />
                               ))}
                             </div>
@@ -2381,6 +2381,7 @@ export default function SellerDashboard() {
                             src={getAllImages(car)[imageIndexes[car.id] || 0]}
                             alt={car.title}
                             className={styles.mainImage}
+                            onError={(e) => onImageErrorFallback(e, car.title)}
                           />
                           <div className={styles.imageOverlayTop}>
                             <span className={car.status === 'sold' ? styles.soldBadgeFloating : styles.availableBadgeFloating}>
@@ -2412,6 +2413,7 @@ export default function SellerDashboard() {
                                   ((imageIndexes[car.id] || 0) === idx ? ' ' + styles.activeThumbnail : '')
                                 }
                                 onClick={() => setImageIndexes(prev => ({ ...prev, [car.id]: idx }))}
+                                onError={(e) => onImageErrorFallback(e, car.title)}
                               />
                             ))}
                           </div>

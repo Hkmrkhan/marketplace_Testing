@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { supabase } from '../utils/supabaseClient';
+import { onImageErrorFallback } from '../utils/carImages';
 import styles from '../styles/AdminDashboard.module.css';
 
 export default function AdminDashboard() {
@@ -871,7 +872,12 @@ export default function AdminDashboard() {
                   {pendingCars.map(car => (
                     <div key={car.id} className={styles.carCard}>
                       <div className={styles.carImageContainer}>
-                        <img src={car.image_url || '/carp2.png'} alt={car.title} className={styles.mainImage} />
+                        <img
+                          src={car.image_url || '/carp2.png'}
+                          alt={car.title}
+                          className={styles.mainImage}
+                          onError={(e) => onImageErrorFallback(e, car.title)}
+                        />
                         <div className={styles.imageOverlayTop}>
                           <span className={styles.pendingBadgeFloating}>
                             ⏳ Pending Approval
@@ -1009,7 +1015,12 @@ export default function AdminDashboard() {
                   {availableCars.map(car => (
                     <div key={car.id} className={styles.carCard}>
                       <div className={styles.carImageContainer}>
-                        <img src={car.image_url || '/carp2.png'} alt={car.title} className={styles.mainImage} />
+                        <img
+                          src={car.image_url || '/carp2.png'}
+                          alt={car.title}
+                          className={styles.mainImage}
+                          onError={(e) => onImageErrorFallback(e, car.title)}
+                        />
                         <div className={styles.imageOverlayTop}>
                           <span className={car.status === 'sold' ? styles.soldBadgeFloating : styles.availableBadgeFloating}>
                             {car.status === 'sold' ? 'Sold' : 'Available'}
@@ -1095,7 +1106,12 @@ export default function AdminDashboard() {
                   {commissionData.map(commission => (
                     <div key={commission.id} className={styles.carCard}>
                       <div className={styles.carImageContainer}>
-                        <img src={commission.car_image_url || '/carp2.png'} alt={commission.car_title} className={styles.mainImage} />
+                        <img
+                          src={commission.car_image_url || '/carp2.png'}
+                          alt={commission.car_title}
+                          className={styles.mainImage}
+                          onError={(e) => onImageErrorFallback(e, commission.car_title)}
+                        />
                         <div className={styles.imageOverlayTop}>
                           <span className={styles.soldBadgeFloating}>Sold</span>
                           <span className={styles.approvedBadgeFloating}>✓ Approved</span>

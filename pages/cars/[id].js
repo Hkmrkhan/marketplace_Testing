@@ -5,6 +5,7 @@ import Footer from '../../components/Footer';
 import StripeCheckout from '../../components/StripeCheckout';
 import Reviews from '../../components/Reviews';
 import { supabase } from '../../utils/supabaseClient';
+import { getAllCarImages, onImageErrorFallback } from '../../utils/carImages';
 
 
 
@@ -213,14 +214,7 @@ export default function CarDetails() {
 
   // Combine all images for the car
   const getAllImages = () => {
-    const images = [];
-    if (car?.image_url && car.image_url.trim() !== '') {
-      images.push(car.image_url);
-    }
-    if (car?.additional_images && Array.isArray(car.additional_images)) {
-      images.push(...car.additional_images.filter(img => img && img.trim() !== ''));
-    }
-    return images.length > 0 ? images : ['/carp2.png'];
+    return getAllCarImages(car);
   };
 
   const images = getAllImages();
@@ -384,6 +378,7 @@ export default function CarDetails() {
             <img 
                 src={currentImage} 
               alt={car.title} 
+              onError={(e) => onImageErrorFallback(e, car?.title)}
               style={{ 
                 width: '100%', 
                   height: '100%', 
@@ -425,6 +420,7 @@ export default function CarDetails() {
                     src={img}
                       alt={`${car.title} ${idx + 1}`}
                       onClick={() => setCurrentImageIndex(idx)}
+                      onError={(e) => onImageErrorFallback(e, car?.title)}
                     style={{
                         width: '120px', 
                         height: '90px', 
