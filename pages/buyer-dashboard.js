@@ -1160,7 +1160,7 @@ export default function BuyerDashboard() {
                           className={styles.carImageContainer}
                           onClick={() => handleOpenDetails(car)}
                           style={{ cursor: 'pointer' }}
-                          title="Click to view full details and gallery"
+                          title="Click to see details"
                         >
                           {/* Main image */}
                           <img
@@ -1179,17 +1179,28 @@ export default function BuyerDashboard() {
                               </span>
                             )}
                           </div>
+
+                          {/* Hover Overlay: Click to see details */}
+                          <div className={styles.hoverDetailsOverlay}>
+                            <span className={styles.hoverDetailsPill}>
+                              <svg className="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              </svg>
+                              Click to see details
+                            </span>
+                          </div>
                         </div>
                         
                         <div className={styles.carDetails}>
                           {/* Car Title & Price Header */}
-                          <div className={styles.carCardHeader}>
-                            <h3 
-                              className={styles.carTitle}
-                              onClick={() => handleOpenDetails(car)}
-                              style={{ cursor: 'pointer' }}
-                              title="Click to view details"
-                            >
+                          <div 
+                            className={styles.carCardHeader}
+                            onClick={() => handleOpenDetails(car)}
+                            style={{ cursor: 'pointer' }}
+                            title="Click to see details"
+                          >
+                            <h3 className={styles.carTitle}>
                               {car.title || `${car.make || 'Car'} ${car.model || ''} ${car.year || ''}`}
                             </h3>
                             <div className={styles.priceContainer}>
@@ -1205,32 +1216,6 @@ export default function BuyerDashboard() {
                             </div>
                           </div>
 
-                          {/* Minimalist Subtitle: Model/Make & Subtle Seller hint */}
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '4px', marginBottom: '14px', fontSize: '0.825rem', color: '#64748b' }}>
-                            <span style={{ fontWeight: 600, color: '#475569' }}>
-                              {[car.make, car.model, car.year].filter(Boolean).join(' • ') || 'Verified Vehicle'}
-                            </span>
-                            {car.seller?.full_name && (
-                              <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#64748b', fontSize: '0.78rem' }}>
-                                by <strong style={{ color: '#334155', fontWeight: 600 }}>{car.seller.full_name}</strong>
-                              </span>
-                            )}
-                          </div>
-
-                          {/* View Details Button */}
-                          <button 
-                            type="button" 
-                            className={styles.viewDetailsBtn}
-                            onClick={() => handleOpenDetails(car)}
-                            style={{ marginBottom: '8px' }}
-                          >
-                            <svg className="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                            </svg>
-                            View Details
-                          </button>
-                          
                           {/* Action Buttons - Professional Layout */}
                           <div className={styles.actionButtons}>
                             {car.status === 'available' ? (
@@ -1301,7 +1286,7 @@ export default function BuyerDashboard() {
                           className={styles.carImageContainer}
                           onClick={() => handleOpenDetails(purchase)}
                           style={{ cursor: 'pointer' }}
-                          title="Click to view purchase details"
+                          title="Click to see details"
                         >
                           {/* Main image */}
                           <img
@@ -1320,16 +1305,27 @@ export default function BuyerDashboard() {
                               </span>
                             )}
                           </div>
+
+                          {/* Hover Overlay: Click to see details */}
+                          <div className={styles.hoverDetailsOverlay}>
+                            <span className={styles.hoverDetailsPill}>
+                              <svg className="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                              </svg>
+                              Click to see details
+                            </span>
+                          </div>
                         </div>
                         
                         <div className={styles.carDetails}>
-                          <div className={styles.carCardHeader}>
-                            <h3 
-                              className={styles.carTitle}
-                              onClick={() => handleOpenDetails(purchase)}
-                              style={{ cursor: 'pointer' }}
-                              title="Click to view details"
-                            >
+                          <div 
+                            className={styles.carCardHeader}
+                            onClick={() => handleOpenDetails(purchase)}
+                            style={{ cursor: 'pointer' }}
+                            title="Click to see details"
+                          >
+                            <h3 className={styles.carTitle}>
                               {purchase.title || purchase.cars?.title || "Car"}
                             </h3>
                             <div className={styles.priceContainer}>
@@ -1344,30 +1340,15 @@ export default function BuyerDashboard() {
                               </span>
                             </div>
                           </div>
-                          
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '4px', marginBottom: '14px', fontSize: '0.825rem', color: '#64748b' }}>
-                            <span style={{ fontWeight: 600, color: '#475569' }}>
-                              {[purchase.make || purchase.cars?.make, purchase.model || purchase.cars?.model, purchase.year || purchase.cars?.year].filter(Boolean).join(' • ') || 'Order Completed'}
-                            </span>
-                            {(purchase.seller_name || purchase.seller?.full_name) && (
-                              <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#64748b', fontSize: '0.78rem' }}>
-                                seller: <strong style={{ color: '#334155', fontWeight: 600 }}>{purchase.seller_name || purchase.seller?.full_name}</strong>
-                              </span>
-                            )}
-                          </div>
 
-                          <div className={styles.actionButtons}>
-                            <button 
-                              type="button" 
-                              className={styles.viewDetailsBtn}
+                          <div className={styles.actionButtons} style={{ marginTop: 'auto' }}>
+                            <div 
+                              className={styles.soldBadgeButton}
                               onClick={() => handleOpenDetails(purchase)}
+                              style={{ cursor: 'pointer', background: '#f8fafc', color: '#475569', border: '1px solid #e2e8f0', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                             >
-                              <svg className="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                              </svg>
-                              View Details & Receipt
-                            </button>
+                              <span>Receipt & Full Details</span>
+                            </div>
                           </div>
                         </div>
                       </div>
